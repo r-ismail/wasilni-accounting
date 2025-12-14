@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "Wasilni Accounting",
+    "description": "Property Management Accounting System"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "loginButton": "Sign In",
+    "loginError": "Invalid username or password",
+    "welcome": "Welcome back!"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation completed successfully",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "units": "Units",
+    "contracts": "Contracts",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "customers": "Customers",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalUnits": "Total Units",
+    "occupiedUnits": "Occupied Units",
+    "availableUnits": "Available Units",
+    "monthlyRevenue": "Monthly Revenue"
+  }
+}

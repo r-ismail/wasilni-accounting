@@ -1,0 +1,26 @@
+{
+  "name": "wasilni-accounting",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant property management accounting system",
+  "scripts": {
+    "dev:api": "pnpm --filter @wasilni/api dev",
+    "dev:web": "pnpm --filter @wasilni/web dev",
+    "dev": "pnpm --parallel --filter @wasilni/api --filter @wasilni/web dev",
+    "build:api": "pnpm --filter @wasilni/api build",
+    "build:web": "pnpm --filter @wasilni/web build",
+    "build": "pnpm --filter @wasilni/shared build && pnpm --filter @wasilni/api build && pnpm --filter @wasilni/web build",
+    "start:api": "pnpm --filter @wasilni/api start:prod",
+    "lint": "pnpm --recursive lint",
+    "test": "pnpm --recursive test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

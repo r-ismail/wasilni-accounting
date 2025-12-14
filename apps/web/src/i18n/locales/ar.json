@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "واصلني للمحاسبة",
+    "description": "نظام محاسبة إدارة العقارات"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "loginButton": "دخول",
+    "loginError": "اسم المستخدم أو كلمة المرور غير صحيحة",
+    "welcome": "مرحباً بعودتك!"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "تمت العملية بنجاح",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "finish": "إنهاء"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "units": "الوحدات",
+    "contracts": "العقود",
+    "invoices": "الفواتير",
+    "payments": "المدفوعات",
+    "customers": "العملاء",
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "totalUnits": "إجمالي الوحدات",
+    "occupiedUnits": "الوحدات المشغولة",
+    "availableUnits": "الوحدات المتاحة",
+    "monthlyRevenue": "الإيرادات الشهرية"
+  }
+}

@@ -1,0 +1,43 @@
+import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { LoginDto, RefreshTokenDto } from '@wasilni/shared';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+@ApiTags('auth')
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto) {
+    const result = await this.authService.login(loginDto);
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    const result = await this.authService.refreshToken(refreshTokenDto.refreshToken);
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async logout(@Request() req: any) {
+    await this.authService.logout(req.user.userId);
+    return {
+      success: true,
+      message: 'Logged out successfully',
+    };
+  }
+}
