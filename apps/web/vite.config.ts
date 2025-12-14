@@ -11,11 +11,16 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',
     port: 5173,
+    cors: true,
+    strictPort: false,
+    allowedHosts: ['5173-i38ky9reaf15140rnrl0z-807a6cb4.manusvm.computer'],
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://3001-i38ky9reaf15140rnrl0z-807a6cb4.manusvm.computer',
         changeOrigin: true,
+        secure: false,
       },
     },
   },

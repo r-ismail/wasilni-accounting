@@ -159,7 +159,7 @@ importers:
         specifier: ^3.3.4
         version: 3.10.0(react-hook-form@7.68.0)
       '@mui/icons-material':
-        specifier: ^5.15.3
+        specifier: ^5.18.0
         version: 5.18.0(@mui/material@5.18.0)(@types/react@18.3.27)(react@18.3.1)
       '@mui/material':
         specifier: ^5.15.3

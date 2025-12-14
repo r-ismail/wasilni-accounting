@@ -10,6 +10,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Units from './pages/Units';
+import Contracts from './pages/Contracts';
+import Invoices from './pages/Invoices';
+import Payments from './pages/Payments';
+import Customers from './pages/Customers';
+import Settings from './pages/Settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,12 +49,12 @@ const App: React.FC = () => {
                     <Layout>
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
-                        <Route path="/units" element={<Dashboard />} />
-                        <Route path="/contracts" element={<Dashboard />} />
-                        <Route path="/invoices" element={<Dashboard />} />
-                        <Route path="/payments" element={<Dashboard />} />
-                        <Route path="/customers" element={<Dashboard />} />
-                        <Route path="/settings" element={<Dashboard />} />
+                        <Route path="/units" element={<Units />} />
+                        <Route path="/contracts" element={<Contracts />} />
+                        <Route path="/invoices" element={<Invoices />} />
+                        <Route path="/payments" element={<Payments />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/settings" element={<Settings />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </Layout>

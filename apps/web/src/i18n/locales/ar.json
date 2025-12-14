@@ -26,7 +26,13 @@
     "back": "رجوع",
     "next": "التالي",
     "previous": "السابق",
-    "finish": "إنهاء"
+    "finish": "إنهاء",
+    "comingSoon": "قريباً",
+    "availableInPhase": "هذه الميزة ستكون متاحة في المرحلة {{phase}}",
+    "currentPhase": "المرحلة الحالية",
+    "phase1Complete": "المرحلة 1 - المصادقة والترجمة ✅",
+    "nextPhase": "المرحلة القادمة",
+    "setupWizard": "المرحلة 2 - معالج الإعداد"
   },
   "nav": {
     "dashboard": "لوحة التحكم",

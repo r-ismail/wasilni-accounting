@@ -26,7 +26,13 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "finish": "Finish"
+    "finish": "Finish",
+    "comingSoon": "Coming Soon",
+    "availableInPhase": "This feature will be available in Phase {{phase}}",
+    "currentPhase": "Current Phase",
+    "phase1Complete": "Phase 1 - Authentication & i18n ✅",
+    "nextPhase": "Next Phase",
+    "setupWizard": "Phase 2 - Setup Wizard"
   },
   "nav": {
     "dashboard": "Dashboard",
