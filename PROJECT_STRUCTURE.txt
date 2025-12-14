@@ -1,0 +1,46 @@
+.
+├── PHASE1_COMPLETE.md
+├── PROJECT_STRUCTURE.txt
+├── README.md
+├── apps
+│   ├── api
+│   │   ├── nest-cli.json
+│   │   ├── package.json
+│   │   ├── src
+│   │   │   ├── app.module.ts
+│   │   │   ├── main.ts
+│   │   │   ├── modules
+│   │   │   └── seed.ts
+│   │   ├── tsconfig.json
+│   │   └── tsconfig.tsbuildinfo
+│   └── web
+│       ├── README.md
+│       ├── index.html
+│       ├── package.json
+│       ├── public
+│       ├── src
+│       │   ├── App.tsx
+│       │   ├── components
+│       │   ├── contexts
+│       │   ├── i18n
+│       │   ├── lib
+│       │   ├── main.tsx
+│       │   ├── pages
+│       │   └── theme
+│       ├── tsconfig.json
+│       ├── tsconfig.node.json
+│       └── vite.config.ts
+├── package.json
+├── packages
+│   └── shared
+│       ├── package.json
+│       ├── src
+│       │   ├── index.d.ts
+│       │   ├── index.js
+│       │   ├── index.js.map
+│       │   └── index.ts
+│       └── tsconfig.json
+├── pnpm-lock.yaml
+└── pnpm-workspace.yaml
+
+16 directories, 27 files
