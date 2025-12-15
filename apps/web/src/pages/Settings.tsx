@@ -371,6 +371,18 @@ const Settings: React.FC = () => {
             label={t('settings.customization.title')}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           />
+          <Tab
+            icon={<ReceiptIcon />}
+            iconPosition="start"
+            label={t('settings.invoice.title')}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+          <Tab
+            icon={<SettingsIcon />}
+            iconPosition="start"
+            label={t('settings.services.title')}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
         </Tabs>
 
         {/* Company Settings Tab */}
@@ -1582,6 +1594,322 @@ const Settings: React.FC = () => {
                 disabled={updateCompanyMutation.isPending}
                 size="large"
               >
+                {t('common.save')}
+              </Button>
+            </Box>
+          </Box>
+        </TabPanel>
+
+        {/* Invoice Customization Tab */}
+        <TabPanel value={tabValue} index={5}>
+          <Box sx={{ px: 3 }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              {t('settings.invoice.title')}
+            </Typography>
+            
+            <Alert severity="info" sx={{ mb: 3 }}>
+              {t('settings.invoice.description')}
+            </Alert>
+
+            {/* Invoice Display Options */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ReceiptIcon color="primary" />
+                  {t('settings.invoice.displayOptions')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showHeader')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showFooter')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showCustomerDetails')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showUnitDetails')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showContractDetails')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showPaymentTerms')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Tax & Discount Settings */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DescriptionIcon color="primary" />
+                  {t('settings.invoice.taxAndDiscount')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.defaultTaxRate')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: '%' }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch />}
+                      label={t('settings.invoice.enableDiscount')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.defaultDiscountPercent')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: '%' }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={true} />}
+                      label={t('settings.invoice.showTaxBreakdown')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Custom Text Fields */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DescriptionIcon color="primary" />
+                  {t('settings.invoice.customText')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.headerText')}
+                      multiline
+                      rows={2}
+                      placeholder={t('settings.invoice.headerTextPlaceholder')}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.footerText')}
+                      multiline
+                      rows={2}
+                      defaultValue={company?.invoiceFooterText || ''}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.notes')}
+                      multiline
+                      rows={3}
+                      placeholder={t('settings.invoice.notesPlaceholder')}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.invoice.paymentInstructions')}
+                      multiline
+                      rows={3}
+                      placeholder={t('settings.invoice.paymentInstructionsPlaceholder')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Page Settings */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DescriptionIcon color="primary" />
+                  {t('settings.invoice.pageSettings')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.invoice.pageSize')}
+                      defaultValue="A4"
+                    >
+                      <MenuItem value="A4">A4</MenuItem>
+                      <MenuItem value="Letter">Letter</MenuItem>
+                      <MenuItem value="A5">A5</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.invoice.orientation')}
+                      defaultValue="portrait"
+                    >
+                      <MenuItem value="portrait">{t('settings.invoice.portrait')}</MenuItem>
+                      <MenuItem value="landscape">{t('settings.invoice.landscape')}</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button variant="outlined" size="large">
+                {t('common.reset')}
+              </Button>
+              <Button variant="contained" startIcon={<SaveIcon />} size="large">
+                {t('common.save')}
+              </Button>
+            </Box>
+          </Box>
+        </TabPanel>
+
+        {/* Services Management Tab */}
+        <TabPanel value={tabValue} index={6}>
+          <Box sx={{ px: 3 }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              {t('settings.services.title')}
+            </Typography>
+            
+            <Alert severity="info" sx={{ mb: 3 }}>
+              {t('settings.services.description')}
+            </Alert>
+
+            {/* Meter Pricing */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SettingsIcon color="primary" />
+                  {t('settings.services.meterPricing')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                      ⚡ {t('settings.services.electricity')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.services.pricePerKwh')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: t('settings.services.perKwh') }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.services.fixedCharge')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: t('common.currency') }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                      💧 {t('settings.services.water')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.services.pricePerCubicMeter')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: t('settings.services.perM3') }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.services.fixedCharge')}
+                      type="number"
+                      defaultValue={0}
+                      InputProps={{ endAdornment: t('common.currency') }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={<Switch />}
+                      label={t('settings.services.enableTieredPricing')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Service Categories */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SettingsIcon color="primary" />
+                    {t('settings.services.customServices')}
+                  </Typography>
+                  <Button variant="contained" size="small">
+                    {t('settings.services.addService')}
+                  </Button>
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('settings.services.customServicesDescription')}
+                </Typography>
+                
+                {/* Service List Placeholder */}
+                <Alert severity="info">
+                  {t('settings.services.noCustomServices')}
+                </Alert>
+              </CardContent>
+            </Card>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button variant="outlined" size="large">
+                {t('common.reset')}
+              </Button>
+              <Button variant="contained" startIcon={<SaveIcon />} size="large">
                 {t('common.save')}
               </Button>
             </Box>

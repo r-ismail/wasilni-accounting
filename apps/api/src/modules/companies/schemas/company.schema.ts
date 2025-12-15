@@ -168,6 +168,82 @@ export class Company {
 
   @Prop({ default: 'log' })
   failureAction?: string; // 'log' | 'email_admin' | 'disable'
+
+  // Advanced Invoice Customization
+  @Prop({ default: true })
+  showInvoiceHeader?: boolean;
+
+  @Prop({ default: true })
+  showInvoiceFooter?: boolean;
+
+  @Prop({ default: true })
+  showCustomerDetails?: boolean;
+
+  @Prop({ default: true })
+  showUnitDetails?: boolean;
+
+  @Prop({ default: true })
+  showContractDetails?: boolean;
+
+  @Prop({ default: true })
+  showPaymentTerms?: boolean;
+
+  @Prop({ default: true })
+  showTaxBreakdown?: boolean;
+
+  @Prop({ default: 0 })
+  defaultTaxRate?: number; // Default tax rate percentage
+
+  @Prop({ default: false })
+  enableDiscount?: boolean;
+
+  @Prop({ default: 0 })
+  defaultDiscountPercent?: number;
+
+  @Prop()
+  invoiceHeaderText?: string; // Custom header text
+
+  @Prop()
+  invoiceNotes?: string; // Default notes for invoices
+
+  @Prop()
+  paymentInstructions?: string; // Payment instructions text
+
+  @Prop({ default: 'A4' })
+  invoicePageSize?: string; // 'A4' | 'Letter' | 'A5'
+
+  @Prop({ default: 'portrait' })
+  invoiceOrientation?: string; // 'portrait' | 'landscape'
+
+  // Meter Pricing Configuration
+  @Prop({ default: 0 })
+  electricityPricePerKwh?: number; // Price per kWh
+
+  @Prop({ default: 0 })
+  waterPricePerCubicMeter?: number; // Price per m³
+
+  @Prop({ default: false })
+  enableTieredPricing?: boolean; // Enable tiered/progressive pricing
+
+  @Prop({ type: Object })
+  electricityTiers?: {
+    tier1?: { max: number; price: number };
+    tier2?: { max: number; price: number };
+    tier3?: { max: number; price: number };
+  };
+
+  @Prop({ type: Object })
+  waterTiers?: {
+    tier1?: { max: number; price: number };
+    tier2?: { max: number; price: number };
+    tier3?: { max: number; price: number };
+  };
+
+  @Prop({ default: 0 })
+  electricityFixedCharge?: number; // Fixed monthly charge
+
+  @Prop({ default: 0 })
+  waterFixedCharge?: number; // Fixed monthly charge
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
