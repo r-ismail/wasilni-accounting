@@ -41,6 +41,17 @@ import {
   Email as EmailIcon,
   Sms as SmsIcon,
   WhatsApp as WhatsAppIcon,
+  Palette as PaletteIcon,
+  ColorLens as ColorLensIcon,
+  Receipt as ReceiptIcon,
+  Settings as SettingsIcon,
+  FormatListNumbered as FormatListNumberedIcon,
+  CalendarToday as CalendarTodayIcon,
+  NotificationsActive as NotificationsActiveIcon,
+  Description as DescriptionIcon,
+  Timer as TimerIcon,
+  Dashboard as DashboardIcon,
+  TableChart as TableChartIcon,
 } from '@mui/icons-material';
 import api from '../lib/api';
 import { toast } from 'react-hot-toast';
@@ -106,6 +117,45 @@ const Settings: React.FC = () => {
     confirmPassword: '',
   });
 
+  // Customization form state
+  const [customizationForm, setCustomizationForm] = useState({
+    primaryColor: '#1976d2',
+    secondaryColor: '#dc004e',
+    accentColor: '#2e7d32',
+    invoiceTemplate: 'modern',
+    showInvoiceLogo: true,
+    showInvoiceColors: true,
+    invoiceLogoPosition: 'right',
+    invoiceFooterText: '',
+  });
+
+  // Advanced Settings form state
+  const [advancedForm, setAdvancedForm] = useState({
+    // Invoice Customization
+    mergedServices: [] as string[],
+    showServiceDetails: true,
+    invoiceItemOrder: 'service-rent-meter',
+    customInvoiceDescription: '',
+    // Number & Date Formatting
+    dateFormat: 'DD/MM/YYYY',
+    thousandsSeparator: ',',
+    decimalPlaces: 2,
+    currencyPosition: 'before',
+    // Automatic Notifications
+    autoSendInvoice: true,
+    reminderDaysBefore: 3,
+    overdueNotificationDays: 1,
+    sendPaymentConfirmation: true,
+    // Contract Settings
+    autoRenewContracts: false,
+    contractExpiryNoticeDays: 30,
+    defaultRenewalIncreasePercent: 0,
+    // System Preferences
+    defaultPageSize: 25,
+    defaultLandingPage: '/dashboard',
+    sessionTimeoutMinutes: 480,
+  });
+
   // Update form when company data loads
   React.useEffect(() => {
     if (company) {
@@ -115,6 +165,41 @@ const Settings: React.FC = () => {
         defaultLanguage: company.defaultLanguage || 'ar',
         mergeServicesWithRent: company.mergeServicesWithRent ?? true,
         logo: company.logo,
+      });
+      setCustomizationForm({
+        primaryColor: company.primaryColor || '#1976d2',
+        secondaryColor: company.secondaryColor || '#dc004e',
+        accentColor: company.accentColor || '#2e7d32',
+        invoiceTemplate: company.invoiceTemplate || 'modern',
+        showInvoiceLogo: company.showInvoiceLogo ?? true,
+        showInvoiceColors: company.showInvoiceColors ?? true,
+        invoiceLogoPosition: company.invoiceLogoPosition || 'right',
+        invoiceFooterText: company.invoiceFooterText || '',
+      });
+      setAdvancedForm({
+        // Invoice Customization
+        mergedServices: company.mergedServices || [],
+        showServiceDetails: company.showServiceDetails ?? true,
+        invoiceItemOrder: company.invoiceItemOrder || 'service-rent-meter',
+        customInvoiceDescription: company.customInvoiceDescription || '',
+        // Number & Date Formatting
+        dateFormat: company.dateFormat || 'DD/MM/YYYY',
+        thousandsSeparator: company.thousandsSeparator || ',',
+        decimalPlaces: company.decimalPlaces ?? 2,
+        currencyPosition: company.currencyPosition || 'before',
+        // Automatic Notifications
+        autoSendInvoice: company.autoSendInvoice ?? true,
+        reminderDaysBefore: company.reminderDaysBefore ?? 3,
+        overdueNotificationDays: company.overdueNotificationDays ?? 1,
+        sendPaymentConfirmation: company.sendPaymentConfirmation ?? true,
+        // Contract Settings
+        autoRenewContracts: company.autoRenewContracts ?? false,
+        contractExpiryNoticeDays: company.contractExpiryNoticeDays ?? 30,
+        defaultRenewalIncreasePercent: company.defaultRenewalIncreasePercent ?? 0,
+        // System Preferences
+        defaultPageSize: company.defaultPageSize ?? 25,
+        defaultLandingPage: company.defaultLandingPage || '/dashboard',
+        sessionTimeoutMinutes: company.sessionTimeoutMinutes ?? 480,
       });
     }
   }, [company]);
@@ -257,6 +342,12 @@ const Settings: React.FC = () => {
             icon={<SecurityIcon />}
             iconPosition="start"
             label={t('settings.security.title')}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+          <Tab
+            icon={<PaletteIcon />}
+            iconPosition="start"
+            label={t('settings.customization.title')}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           />
         </Tabs>
@@ -782,6 +873,376 @@ const Settings: React.FC = () => {
                 </Grid>
               </Grid>
             </form>
+          </Box>
+        </TabPanel>
+
+        {/* Advanced Customization Tab */}
+        <TabPanel value={tabValue} index={4}>
+          <Box sx={{ px: 3 }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              {t('settings.advanced.title')}
+            </Typography>
+
+            {/* 1. Invoice Customization Section */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                    <ReceiptIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('settings.advanced.invoiceCustomization')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('settings.advanced.invoiceCustomizationDesc')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.invoiceItemOrder')}
+                      value={advancedForm.invoiceItemOrder}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, invoiceItemOrder: e.target.value })}
+                    >
+                      <MenuItem value="service-rent-meter">{t('settings.advanced.orderServiceRentMeter')}</MenuItem>
+                      <MenuItem value="rent-service-meter">{t('settings.advanced.orderRentServiceMeter')}</MenuItem>
+                      <MenuItem value="meter-service-rent">{t('settings.advanced.orderMeterServiceRent')}</MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={advancedForm.showServiceDetails}
+                          onChange={(e) => setAdvancedForm({ ...advancedForm, showServiceDetails: e.target.checked })}
+                        />
+                      }
+                      label={t('settings.advanced.showServiceDetails')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label={t('settings.advanced.customInvoiceDescription')}
+                      value={advancedForm.customInvoiceDescription}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, customInvoiceDescription: e.target.value })}
+                      placeholder={t('settings.advanced.customInvoiceDescPlaceholder')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* 2. Number & Date Formatting Section */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Avatar sx={{ bgcolor: 'info.main', mr: 2 }}>
+                    <FormatListNumberedIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('settings.advanced.numberDateFormat')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('settings.advanced.numberDateFormatDesc')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.dateFormat')}
+                      value={advancedForm.dateFormat}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, dateFormat: e.target.value })}
+                    >
+                      <MenuItem value="DD/MM/YYYY">DD/MM/YYYY (31/12/2025)</MenuItem>
+                      <MenuItem value="MM/DD/YYYY">MM/DD/YYYY (12/31/2025)</MenuItem>
+                      <MenuItem value="YYYY-MM-DD">YYYY-MM-DD (2025-12-31)</MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.thousandsSeparator')}
+                      value={advancedForm.thousandsSeparator}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, thousandsSeparator: e.target.value })}
+                    >
+                      <MenuItem value=",">Comma (1,000,000)</MenuItem>
+                      <MenuItem value=".">Period (1.000.000)</MenuItem>
+                      <MenuItem value=" ">Space (1 000 000)</MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.decimalPlaces')}
+                      value={advancedForm.decimalPlaces}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, decimalPlaces: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 0, max: 4 }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.currencyPosition')}
+                      value={advancedForm.currencyPosition}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, currencyPosition: e.target.value })}
+                    >
+                      <MenuItem value="before">{t('settings.advanced.currencyBefore')} (YER 1,000)</MenuItem>
+                      <MenuItem value="after">{t('settings.advanced.currencyAfter')} (1,000 YER)</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* 3. Automatic Notifications Section */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Avatar sx={{ bgcolor: 'warning.main', mr: 2 }}>
+                    <NotificationsActiveIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('settings.advanced.autoNotifications')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('settings.advanced.autoNotificationsDesc')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={advancedForm.autoSendInvoice}
+                          onChange={(e) => setAdvancedForm({ ...advancedForm, autoSendInvoice: e.target.checked })}
+                        />
+                      }
+                      label={t('settings.advanced.autoSendInvoice')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={advancedForm.sendPaymentConfirmation}
+                          onChange={(e) => setAdvancedForm({ ...advancedForm, sendPaymentConfirmation: e.target.checked })}
+                        />
+                      }
+                      label={t('settings.advanced.sendPaymentConfirmation')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.reminderDaysBefore')}
+                      value={advancedForm.reminderDaysBefore}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, reminderDaysBefore: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 0, max: 30 }}
+                      helperText={t('settings.advanced.reminderDaysBeforeHelp')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.overdueNotificationDays')}
+                      value={advancedForm.overdueNotificationDays}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, overdueNotificationDays: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 0, max: 30 }}
+                      helperText={t('settings.advanced.overdueNotificationDaysHelp')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* 4. Contract Settings Section */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
+                    <DescriptionIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('settings.advanced.contractSettings')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('settings.advanced.contractSettingsDesc')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={advancedForm.autoRenewContracts}
+                          onChange={(e) => setAdvancedForm({ ...advancedForm, autoRenewContracts: e.target.checked })}
+                        />
+                      }
+                      label={t('settings.advanced.autoRenewContracts')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.contractExpiryNoticeDays')}
+                      value={advancedForm.contractExpiryNoticeDays}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, contractExpiryNoticeDays: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 0, max: 90 }}
+                      helperText={t('settings.advanced.contractExpiryNoticeDaysHelp')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.defaultRenewalIncreasePercent')}
+                      value={advancedForm.defaultRenewalIncreasePercent}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, defaultRenewalIncreasePercent: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 0, max: 100 }}
+                      helperText={t('settings.advanced.defaultRenewalIncreasePercentHelp')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* 5. System Preferences Section */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Avatar sx={{ bgcolor: 'secondary.main', mr: 2 }}>
+                    <SettingsIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('settings.advanced.systemPreferences')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('settings.advanced.systemPreferencesDesc')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.defaultPageSize')}
+                      value={advancedForm.defaultPageSize}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, defaultPageSize: parseInt(e.target.value) })}
+                    >
+                      <MenuItem value={10}>10 {t('settings.advanced.rowsPerPage')}</MenuItem>
+                      <MenuItem value={25}>25 {t('settings.advanced.rowsPerPage')}</MenuItem>
+                      <MenuItem value={50}>50 {t('settings.advanced.rowsPerPage')}</MenuItem>
+                      <MenuItem value={100}>100 {t('settings.advanced.rowsPerPage')}</MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      select
+                      label={t('settings.advanced.defaultLandingPage')}
+                      value={advancedForm.defaultLandingPage}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, defaultLandingPage: e.target.value })}
+                    >
+                      <MenuItem value="/dashboard">{t('nav.dashboard')}</MenuItem>
+                      <MenuItem value="/units">{t('nav.units')}</MenuItem>
+                      <MenuItem value="/contracts">{t('nav.contracts')}</MenuItem>
+                      <MenuItem value="/invoices">{t('nav.invoices')}</MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={t('settings.advanced.sessionTimeoutMinutes')}
+                      value={advancedForm.sessionTimeoutMinutes}
+                      onChange={(e) => setAdvancedForm({ ...advancedForm, sessionTimeoutMinutes: parseInt(e.target.value) || 0 })}
+                      inputProps={{ min: 30, max: 1440 }}
+                      helperText={t('settings.advanced.sessionTimeoutMinutesHelp')}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Save Button */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  if (company) {
+                    setAdvancedForm({
+                      mergedServices: company.mergedServices || [],
+                      showServiceDetails: company.showServiceDetails ?? true,
+                      invoiceItemOrder: company.invoiceItemOrder || 'service-rent-meter',
+                      customInvoiceDescription: company.customInvoiceDescription || '',
+                      dateFormat: company.dateFormat || 'DD/MM/YYYY',
+                      thousandsSeparator: company.thousandsSeparator || ',',
+                      decimalPlaces: company.decimalPlaces ?? 2,
+                      currencyPosition: company.currencyPosition || 'before',
+                      autoSendInvoice: company.autoSendInvoice ?? true,
+                      reminderDaysBefore: company.reminderDaysBefore ?? 3,
+                      overdueNotificationDays: company.overdueNotificationDays ?? 1,
+                      sendPaymentConfirmation: company.sendPaymentConfirmation ?? true,
+                      autoRenewContracts: company.autoRenewContracts ?? false,
+                      contractExpiryNoticeDays: company.contractExpiryNoticeDays ?? 30,
+                      defaultRenewalIncreasePercent: company.defaultRenewalIncreasePercent ?? 0,
+                      defaultPageSize: company.defaultPageSize ?? 25,
+                      defaultLandingPage: company.defaultLandingPage || '/dashboard',
+                      sessionTimeoutMinutes: company.sessionTimeoutMinutes ?? 480,
+                    });
+                  }
+                }}
+              >
+                {t('common.reset')}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<SaveIcon />}
+                onClick={() => updateCompanyMutation.mutate(advancedForm)}
+                disabled={updateCompanyMutation.isPending}
+                size="large"
+              >
+                {t('common.save')}
+              </Button>
+            </Box>
           </Box>
         </TabPanel>
       </Paper>
