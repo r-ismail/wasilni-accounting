@@ -40,8 +40,11 @@ RUN pnpm install --prod --frozen-lockfile
 # Copy built application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
+# Set working directory to api app
+WORKDIR /app/apps/api
+
 # Expose port
 EXPOSE 3001
 
 # Start the application
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "dist/apps/api/src/main.js"]
