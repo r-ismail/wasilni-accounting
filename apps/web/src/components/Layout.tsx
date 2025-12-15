@@ -57,8 +57,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       try {
         const response = await api.get('/companies/my-company');
         if (response.data.success && response.data.data) {
-          setCompanyName(response.data.data.name);
+          const name = response.data.data.name;
+          setCompanyName(name);
           setCompanyLogo(response.data.data.logo || null);
+          // Update page title
+          document.title = `${name} - ${t('app.title')}`;
         }
       } catch (error) {
         console.error('Failed to fetch company info:', error);
@@ -66,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     };
 
     fetchCompanyInfo();
-  }, []);
+  }, [t]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

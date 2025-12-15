@@ -12,6 +12,11 @@ export class CompaniesController {
     return this.companiesService.findById(req.user.companyId);
   }
 
+  @Patch('my-company')
+  async updateMyCompany(@Request() req: any, @Body() updateData: any) {
+    return this.companiesService.update(req.user.companyId, updateData);
+  }
+
   @Patch('my-company/logo')
   async updateLogo(@Request() req: any, @Body('logo') logo: string) {
     return this.companiesService.updateLogo(req.user.companyId, logo);

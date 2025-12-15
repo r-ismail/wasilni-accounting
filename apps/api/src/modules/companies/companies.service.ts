@@ -23,6 +23,14 @@ export class CompaniesService {
     await this.companyModel.findByIdAndUpdate(id, { setupCompleted: true });
   }
 
+  async update(id: string, updateData: Partial<Company>): Promise<CompanyDocument | null> {
+    return this.companyModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+  }
+
   async updateLogo(id: string, logo: string): Promise<CompanyDocument | null> {
     return this.companyModel.findByIdAndUpdate(
       id,

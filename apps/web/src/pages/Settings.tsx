@@ -122,7 +122,7 @@ const Settings: React.FC = () => {
   // Update company mutation
   const updateCompanyMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await api.patch(`/companies/${company._id}`, data);
+      const res = await api.patch('/companies/my-company', data);
       return res.data;
     },
     onSuccess: () => {
