@@ -26,7 +26,7 @@ export default function MeterReadings() {
     queryKey: ['meter-readings'],
     queryFn: async () => {
       const res = await api.get('/meters/readings/list');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 
@@ -34,7 +34,7 @@ export default function MeterReadings() {
     queryKey: ['meters'],
     queryFn: async () => {
       const res = await api.get('/meters');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 

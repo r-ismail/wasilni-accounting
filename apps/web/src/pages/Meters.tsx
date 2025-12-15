@@ -29,7 +29,7 @@ export default function Meters() {
     queryKey: ['meters'],
     queryFn: async () => {
       const res = await api.get('/meters');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 
@@ -37,7 +37,7 @@ export default function Meters() {
     queryKey: ['services'],
     queryFn: async () => {
       const res = await api.get('/services');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 
@@ -45,7 +45,7 @@ export default function Meters() {
     queryKey: ['buildings'],
     queryFn: async () => {
       const res = await api.get('/buildings');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 
@@ -53,7 +53,7 @@ export default function Meters() {
     queryKey: ['units'],
     queryFn: async () => {
       const res = await api.get('/units');
-      return res.data;
+      return res.data.data || res.data || [];
     },
   });
 
