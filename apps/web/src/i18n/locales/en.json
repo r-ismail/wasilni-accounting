@@ -12,6 +12,35 @@
     "loginError": "Invalid username or password",
     "welcome": "Welcome back!"
   },
+  "invoices": {
+    "title": "Invoices",
+    "generate": "Generate Invoice",
+    "generateInvoice": "Generate Invoice",
+    "invoiceNumber": "Invoice Number",
+    "customer": "Customer",
+    "unit": "Unit",
+    "contract": "Contract",
+    "issueDate": "Issue Date",
+    "dueDate": "Due Date",
+    "periodStart": "Period Start",
+    "periodEnd": "Period End",
+    "totalAmount": "Total Amount",
+    "paidAmount": "Paid Amount",
+    "balance": "Balance",
+    "status": {
+      "draft": "Draft",
+      "posted": "Posted",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "filterByStatus": "Filter by Status",
+    "invoiceDetails": "Invoice Details",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "amount": "Amount",
+    "total": "Total"
+  },
   "common": {
     "all": "All",
     "active": "Active",

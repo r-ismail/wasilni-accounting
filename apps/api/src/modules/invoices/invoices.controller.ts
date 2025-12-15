@@ -108,4 +108,11 @@ export class InvoicesController {
       message: 'Invoice deleted successfully',
     };
   }
+
+  @Get(':id/pdf')
+  @ApiOperation({ summary: 'Generate invoice PDF' })
+  async generatePdf(@Param('id') id: string, @Request() res: any) {
+    const pdfBuffer = await this.invoicesService.generatePdf(id);
+    return pdfBuffer;
+  }
 }

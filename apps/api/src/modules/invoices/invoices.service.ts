@@ -12,6 +12,7 @@ import { Contract, ContractDocument } from '../contracts/schemas/contract.schema
 import { Company, CompanyDocument } from '../companies/schemas/company.schema';
 import { Service, ServiceDocument } from '../services/schemas/service.schema';
 import { GenerateInvoiceDto, UpdateInvoiceDto, UpdateInvoiceStatusDto } from './dto/generate-invoice.dto';
+import { generateInvoicePdf, InvoicePdfData } from './pdf.helper';
 
 @Injectable()
 export class InvoicesService {
@@ -306,5 +307,74 @@ export class InvoicesService {
     }
 
     return `${prefix}-${String(sequence).padStart(4, '0')}`;
+  }
+
+  async generatePdf(id: string): Promise<Buffer> {
+    const invoice = await this.invoiceModel
+      .findById(id)
+      .populate({
+        path: 'contractId',
+        populate: [
+          { path: 'unitId', populate: 'buildingId' },
+          { path: 'customerId' },
+        ],
+      })
+      .exec();
+
+    if (!invoice) {
+      throw new NotFoundException('Invoice not found');
+    }
+
+    const lines = await this.invoiceLineModel
+      .find({ invoiceId: invoice._id })
+      .exec();
+
+    const company = await this.companyModel
+      .findById(invoice.companyId)
+      .exec();
+
+    if (!company) {
+      throw new NotFoundException('Company not found');
+    }
+
+    const contract: any = invoice.contractId;
+    const customer: any = contract.customerId;
+    const unit: any = contract.unitId;
+    const building: any = unit?.buildingId;
+
+    const pdfData: InvoicePdfData = {
+      invoice: {
+        invoiceNumber: invoice.invoiceNumber,
+        issueDate: invoice.issueDate,
+        dueDate: invoice.dueDate,
+        status: invoice.status,
+        totalAmount: invoice.totalAmount,
+        paidAmount: invoice.paidAmount,
+        periodStart: invoice.periodStart,
+        periodEnd: invoice.periodEnd,
+      },
+      company: {
+        name: company.name,
+        currency: company.currency,
+        defaultLanguage: company.defaultLanguage,
+      },
+      customer: {
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
+      },
+      unit: {
+        unitNumber: unit.unitNumber,
+        buildingName: building?.name,
+      },
+      lines: lines.map((line) => ({
+        description: line.description,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        amount: line.amount,
+      })),
+    };
+
+    return generateInvoicePdf(pdfData);
   }
 }

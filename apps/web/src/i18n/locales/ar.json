@@ -12,6 +12,36 @@
     "loginError": "اسم المستخدم أو كلمة المرور غير صحيحة",
     "welcome": "مرحباً بعودتك!"
   },
+  "invoices": {
+    "title": "الفواتير",
+    "generate": "إنشاء فاتورة",
+    "generateInvoice": "إنشاء فاتورة",
+    "invoiceNumber": "رقم الفاتورة",
+    "customer": "العميل",
+    "unit": "الوحدة",
+    "contract": "العقد",
+    "issueDate": "تاريخ الإصدار",
+    "dueDate": "تاريخ الاستحقاق",
+    "periodStart": "بداية الفترة",
+    "periodEnd": "نهاية الفترة",
+    "totalAmount": "المبلغ الإجمالي",
+    "paidAmount": "المبلغ المدفوع",
+    "balance": "المتبقي",
+    "status": {
+      "draft": "مسودة",
+      "posted": "منشورة",
+      "paid": "مدفوعة",
+      "cancelled": "ملغاة"
+    },
+    "filterByStatus": "تصفية حسب الحالة",
+    "invoiceDetails": "تفاصيل الفاتورة",
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "amount": "المبلغ",
+    "total": "الإجمالي",
+    "close": "إغلاق"
+  },
   "common": {
     "all": "الكل",
     "active": "نشط",
