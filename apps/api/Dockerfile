@@ -17,6 +17,10 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY apps/api/ ./apps/api/
 
+# Build shared package first
+WORKDIR /app/packages/shared
+RUN pnpm build
+
 # Build the application
 WORKDIR /app/apps/api
 RUN pnpm build
@@ -36,6 +40,9 @@ COPY packages/ ./packages/
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
+
+# Copy built shared package
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
 # Copy built application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
