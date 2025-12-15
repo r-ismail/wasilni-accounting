@@ -325,7 +325,14 @@
       "current": "Current Language",
       "switch": "Switch Language",
       "changed": "Language changed successfully",
-      "supported": "Supported Languages"
+      "supported": "Supported Languages",
+      "currentStatus": "التطبيق يعمل حالياً باللغة العربية مع دعم RTL",
+      "currentStatusEn": "Application is currently running in English with LTR support",
+      "arabicName": "العربية (Arabic)",
+      "arabicSupport": "Right-to-Left (RTL) Support",
+      "englishName": "English",
+      "englishSupport": "Left-to-Right (LTR) Support",
+      "companyLogo": "Company Logo"
     },
     "notifications": {
       "title": "Notifications",
@@ -335,7 +342,42 @@
       "smsDescription": "Send SMS text messages to customers",
       "whatsappDescription": "Send WhatsApp messages to customers",
       "emailDescription": "Send email messages to customers",
-      "updated": "Notification settings updated successfully"
+      "updated": "Notification settings updated successfully",
+      "advanced": {
+        "title": "Advanced Settings",
+        "channelConfig": "Channel Configuration",
+        "channelConfigDesc": "API connection details for each notification channel",
+        "smsConfig": "SMS Configuration",
+        "smsApiKey": "SMS Service API Key",
+        "smsSenderId": "Sender ID",
+        "whatsappConfig": "WhatsApp Configuration",
+        "whatsappApiKey": "WhatsApp Service API Key",
+        "whatsappPhone": "Sender Phone Number",
+        "emailConfig": "Email Configuration",
+        "emailSmtpHost": "SMTP Host",
+        "emailSmtpPort": "SMTP Port",
+        "emailSmtpUser": "SMTP Username",
+        "emailSmtpPassword": "SMTP Password",
+        "emailFromAddress": "From Address",
+        "emailFromName": "From Name",
+        "sendingSchedule": "Sending Schedule",
+        "sendingScheduleDesc": "Define notification sending times and quiet hours",
+        "sendingStartTime": "Sending Start Time",
+        "sendingEndTime": "Sending End Time",
+        "enableQuietHours": "Enable Quiet Hours",
+        "quietHoursStart": "Quiet Hours Start",
+        "quietHoursEnd": "Quiet Hours End",
+        "retrySettings": "Retry Settings",
+        "retrySettingsDesc": "Manage retry attempts for failed notifications",
+        "maxRetries": "Maximum Retries",
+        "maxRetriesHelp": "Number of attempts before giving up",
+        "retryInterval": "Retry Interval (minutes)",
+        "retryIntervalHelp": "Time in minutes between each attempt",
+        "failureAction": "Action on Failure",
+        "failureActionLog": "Log Only",
+        "failureActionEmail": "Email Admin",
+        "failureActionDisable": "Disable Notifications"
+      }
     },
     "security": {
       "title": "Security",
@@ -423,7 +465,13 @@
       "rowsPerPage": "rows per page",
       "defaultLandingPage": "Default landing page after login",
       "sessionTimeoutMinutes": "Session timeout (minutes)",
-      "sessionTimeoutMinutesHelp": "Duration user stays logged in before automatic logout"
+      "sessionTimeoutMinutesHelp": "Duration user stays logged in before automatic logout",
+      "dateFormatDMY": "DD/MM/YYYY (Day/Month/Year)",
+      "dateFormatMDY": "MM/DD/YYYY (Month/Day/Year)",
+      "dateFormatYMD": "YYYY-MM-DD (Year-Month-Day)",
+      "separatorComma": "Comma (1,000,000)",
+      "separatorPeriod": "Period (1.000.000)",
+      "separatorSpace": "Space (1 000 000)"
     }
   }
 }

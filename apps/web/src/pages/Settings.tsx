@@ -108,6 +108,27 @@ const Settings: React.FC = () => {
     smsEnabled: true,
     whatsappEnabled: true,
     emailEnabled: true,
+    // Advanced Notification Settings
+    smsApiKey: '',
+    smsSenderId: '',
+    whatsappApiKey: '',
+    whatsappPhoneNumber: '',
+    emailSmtpHost: '',
+    emailSmtpPort: 587,
+    emailSmtpUser: '',
+    emailSmtpPassword: '',
+    emailFromAddress: '',
+    emailFromName: '',
+    // Sending Schedule
+    sendingStartTime: '08:00',
+    sendingEndTime: '20:00',
+    enableQuietHours: true,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '08:00',
+    // Retry Settings
+    maxRetries: 3,
+    retryIntervalMinutes: 30,
+    failureAction: 'log', // 'log' | 'email_admin' | 'disable'
   });
 
   // Password form state
@@ -419,7 +440,7 @@ const Settings: React.FC = () => {
                         </Box>
                         {companyForm.logo && (
                           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                            <img src={companyForm.logo} alt="Company Logo" style={{ maxHeight: 100, maxWidth: 300, objectFit: 'contain' }} />
+                            <img src={companyForm.logo} alt={t('settings.language.companyLogo')} style={{ maxHeight: 100, maxWidth: 300, objectFit: 'contain' }} />
                           </Box>
                         )}
                         <Button
@@ -532,8 +553,8 @@ const Settings: React.FC = () => {
                       
                       <Typography variant="body2" color="text.secondary">
                         {i18n.language === 'ar' 
-                          ? 'التطبيق يعمل حالياً باللغة العربية مع دعم RTL'
-                          : 'Application is currently running in English with LTR support'
+                          ? t('settings.language.currentStatus')
+                          : t('settings.language.currentStatusEn')
                         }
                       </Typography>
 
@@ -566,8 +587,8 @@ const Settings: React.FC = () => {
                           <CheckIcon color="success" />
                         </ListItemIcon>
                         <ListItemText 
-                          primary="العربية (Arabic)"
-                          secondary="Right-to-Left (RTL) Support"
+                          primary={t('settings.language.arabicName')}
+                          secondary={t('settings.language.arabicSupport')}
                         />
                       </ListItem>
                       <ListItem>
@@ -575,8 +596,8 @@ const Settings: React.FC = () => {
                           <CheckIcon color="success" />
                         </ListItemIcon>
                         <ListItemText 
-                          primary="English"
-                          secondary="Left-to-Right (LTR) Support"
+                          primary={t('settings.language.englishName')}
+                          secondary={t('settings.language.englishSupport')}
                         />
                       </ListItem>
                     </List>
@@ -715,17 +736,338 @@ const Settings: React.FC = () => {
                   </Card>
                 </Grid>
 
+                {/* Advanced Notification Settings */}
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 3 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+                    {t('settings.notifications.advanced.title')}
+                  </Typography>
+                </Grid>
+
+                {/* 1. Channel Configuration */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                          <SettingsIcon />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.channelConfig')}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('settings.notifications.advanced.channelConfigDesc')}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        {/* SMS Configuration */}
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.smsConfig')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.smsApiKey')}
+                            value={notificationsForm.smsApiKey}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, smsApiKey: e.target.value })}
+                            type="password"
+                            disabled={!notificationsForm.smsEnabled}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.smsSenderId')}
+                            value={notificationsForm.smsSenderId}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, smsSenderId: e.target.value })}
+                            disabled={!notificationsForm.smsEnabled}
+                          />
+                        </Grid>
+
+                        {/* WhatsApp Configuration */}
+                        <Grid item xs={12}>
+                          <Divider sx={{ my: 1 }} />
+                          <Typography variant="subtitle2" sx={{ mb: 2, mt: 2, fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.whatsappConfig')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.whatsappApiKey')}
+                            value={notificationsForm.whatsappApiKey}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, whatsappApiKey: e.target.value })}
+                            type="password"
+                            disabled={!notificationsForm.whatsappEnabled}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.whatsappPhone')}
+                            value={notificationsForm.whatsappPhoneNumber}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, whatsappPhoneNumber: e.target.value })}
+                            disabled={!notificationsForm.whatsappEnabled}
+                            placeholder="+967xxxxxxxxx"
+                          />
+                        </Grid>
+
+                        {/* Email Configuration */}
+                        <Grid item xs={12}>
+                          <Divider sx={{ my: 1 }} />
+                          <Typography variant="subtitle2" sx={{ mb: 2, mt: 2, fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.emailConfig')}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.emailSmtpHost')}
+                            value={notificationsForm.emailSmtpHost}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailSmtpHost: e.target.value })}
+                            disabled={!notificationsForm.emailEnabled}
+                            placeholder="smtp.gmail.com"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            label={t('settings.notifications.advanced.emailSmtpPort')}
+                            value={notificationsForm.emailSmtpPort}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailSmtpPort: parseInt(e.target.value) || 587 })}
+                            disabled={!notificationsForm.emailEnabled}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.emailSmtpUser')}
+                            value={notificationsForm.emailSmtpUser}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailSmtpUser: e.target.value })}
+                            disabled={!notificationsForm.emailEnabled}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            type="password"
+                            label={t('settings.notifications.advanced.emailSmtpPassword')}
+                            value={notificationsForm.emailSmtpPassword}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailSmtpPassword: e.target.value })}
+                            disabled={!notificationsForm.emailEnabled}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.emailFromAddress')}
+                            value={notificationsForm.emailFromAddress}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailFromAddress: e.target.value })}
+                            disabled={!notificationsForm.emailEnabled}
+                            placeholder="noreply@example.com"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label={t('settings.notifications.advanced.emailFromName')}
+                            value={notificationsForm.emailFromName}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, emailFromName: e.target.value })}
+                            disabled={!notificationsForm.emailEnabled}
+                          />
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* 2. Sending Schedule */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <Avatar sx={{ bgcolor: 'info.main', mr: 2 }}>
+                          <TimerIcon />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.sendingSchedule')}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('settings.notifications.advanced.sendingScheduleDesc')}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            type="time"
+                            label={t('settings.notifications.advanced.sendingStartTime')}
+                            value={notificationsForm.sendingStartTime}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, sendingStartTime: e.target.value })}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            type="time"
+                            label={t('settings.notifications.advanced.sendingEndTime')}
+                            value={notificationsForm.sendingEndTime}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, sendingEndTime: e.target.value })}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={notificationsForm.enableQuietHours}
+                                onChange={(e) => setNotificationsForm({ ...notificationsForm, enableQuietHours: e.target.checked })}
+                              />
+                            }
+                            label={t('settings.notifications.advanced.enableQuietHours')}
+                          />
+                        </Grid>
+                        {notificationsForm.enableQuietHours && (
+                          <>
+                            <Grid item xs={12} md={6}>
+                              <TextField
+                                fullWidth
+                                type="time"
+                                label={t('settings.notifications.advanced.quietHoursStart')}
+                                value={notificationsForm.quietHoursStart}
+                                onChange={(e) => setNotificationsForm({ ...notificationsForm, quietHoursStart: e.target.value })}
+                                InputLabelProps={{ shrink: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <TextField
+                                fullWidth
+                                type="time"
+                                label={t('settings.notifications.advanced.quietHoursEnd')}
+                                value={notificationsForm.quietHoursEnd}
+                                onChange={(e) => setNotificationsForm({ ...notificationsForm, quietHoursEnd: e.target.value })}
+                                InputLabelProps={{ shrink: true }}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* 3. Retry Settings */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <Avatar sx={{ bgcolor: 'warning.main', mr: 2 }}>
+                          <NotificationsActiveIcon />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {t('settings.notifications.advanced.retrySettings')}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('settings.notifications.advanced.retrySettingsDesc')}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            label={t('settings.notifications.advanced.maxRetries')}
+                            value={notificationsForm.maxRetries}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, maxRetries: parseInt(e.target.value) || 0 })}
+                            inputProps={{ min: 0, max: 10 }}
+                            helperText={t('settings.notifications.advanced.maxRetriesHelp')}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            label={t('settings.notifications.advanced.retryInterval')}
+                            value={notificationsForm.retryIntervalMinutes}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, retryIntervalMinutes: parseInt(e.target.value) || 0 })}
+                            inputProps={{ min: 1, max: 1440 }}
+                            helperText={t('settings.notifications.advanced.retryIntervalHelp')}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <TextField
+                            fullWidth
+                            select
+                            label={t('settings.notifications.advanced.failureAction')}
+                            value={notificationsForm.failureAction}
+                            onChange={(e) => setNotificationsForm({ ...notificationsForm, failureAction: e.target.value })}
+                          >
+                            <MenuItem value="log">{t('settings.notifications.advanced.failureActionLog')}</MenuItem>
+                            <MenuItem value="email_admin">{t('settings.notifications.advanced.failureActionEmail')}</MenuItem>
+                            <MenuItem value="disable">{t('settings.notifications.advanced.failureActionDisable')}</MenuItem>
+                          </TextField>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
                 <Grid item xs={12}>
                   <Divider sx={{ my: 2 }} />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    startIcon={<SaveIcon />}
-                    disabled={updateNotificationsMutation.isPending}
-                  >
-                    {t('common.save')}
-                  </Button>
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        setNotificationsForm({
+                          smsEnabled: true,
+                          whatsappEnabled: true,
+                          emailEnabled: true,
+                          smsApiKey: '',
+                          smsSenderId: '',
+                          whatsappApiKey: '',
+                          whatsappPhoneNumber: '',
+                          emailSmtpHost: '',
+                          emailSmtpPort: 587,
+                          emailSmtpUser: '',
+                          emailSmtpPassword: '',
+                          emailFromAddress: '',
+                          emailFromName: '',
+                          sendingStartTime: '08:00',
+                          sendingEndTime: '20:00',
+                          enableQuietHours: true,
+                          quietHoursStart: '22:00',
+                          quietHoursEnd: '08:00',
+                          maxRetries: 3,
+                          retryIntervalMinutes: 30,
+                          failureAction: 'log',
+                        });
+                      }}
+                    >
+                      {t('common.reset')}
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      startIcon={<SaveIcon />}
+                      disabled={updateNotificationsMutation.isPending}
+                    >
+                      {t('common.save')}
+                    </Button>
+                  </Box>
                 </Grid>
               </Grid>
             </form>
@@ -966,9 +1308,9 @@ const Settings: React.FC = () => {
                       value={advancedForm.dateFormat}
                       onChange={(e) => setAdvancedForm({ ...advancedForm, dateFormat: e.target.value })}
                     >
-                      <MenuItem value="DD/MM/YYYY">DD/MM/YYYY (31/12/2025)</MenuItem>
-                      <MenuItem value="MM/DD/YYYY">MM/DD/YYYY (12/31/2025)</MenuItem>
-                      <MenuItem value="YYYY-MM-DD">YYYY-MM-DD (2025-12-31)</MenuItem>
+                      <MenuItem value="DD/MM/YYYY">{t('settings.advanced.dateFormatDMY')}</MenuItem>
+                      <MenuItem value="MM/DD/YYYY">{t('settings.advanced.dateFormatMDY')}</MenuItem>
+                      <MenuItem value="YYYY-MM-DD">{t('settings.advanced.dateFormatYMD')}</MenuItem>
                     </TextField>
                   </Grid>
 
@@ -980,9 +1322,9 @@ const Settings: React.FC = () => {
                       value={advancedForm.thousandsSeparator}
                       onChange={(e) => setAdvancedForm({ ...advancedForm, thousandsSeparator: e.target.value })}
                     >
-                      <MenuItem value=",">Comma (1,000,000)</MenuItem>
-                      <MenuItem value=".">Period (1.000.000)</MenuItem>
-                      <MenuItem value=" ">Space (1 000 000)</MenuItem>
+                      <MenuItem value=",">{t('settings.advanced.separatorComma')}</MenuItem>
+                      <MenuItem value=".">{t('settings.advanced.separatorPeriod')}</MenuItem>
+                      <MenuItem value=" ">{t('settings.advanced.separatorSpace')}</MenuItem>
                     </TextField>
                   </Grid>
 

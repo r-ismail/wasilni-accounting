@@ -111,6 +111,63 @@ export class Company {
 
   @Prop({ default: 480 })
   sessionTimeoutMinutes?: number; // Session timeout in minutes
+
+  // Advanced Notification Settings - Channel Configuration
+  @Prop()
+  smsApiKey?: string;
+
+  @Prop()
+  smsSenderId?: string;
+
+  @Prop()
+  whatsappApiKey?: string;
+
+  @Prop()
+  whatsappPhoneNumber?: string;
+
+  @Prop()
+  emailSmtpHost?: string;
+
+  @Prop({ default: 587 })
+  emailSmtpPort?: number;
+
+  @Prop()
+  emailSmtpUser?: string;
+
+  @Prop()
+  emailSmtpPassword?: string;
+
+  @Prop()
+  emailFromAddress?: string;
+
+  @Prop()
+  emailFromName?: string;
+
+  // Advanced Notification Settings - Sending Schedule
+  @Prop({ default: '08:00' })
+  sendingStartTime?: string;
+
+  @Prop({ default: '20:00' })
+  sendingEndTime?: string;
+
+  @Prop({ default: true })
+  enableQuietHours?: boolean;
+
+  @Prop({ default: '22:00' })
+  quietHoursStart?: string;
+
+  @Prop({ default: '08:00' })
+  quietHoursEnd?: string;
+
+  // Advanced Notification Settings - Retry Settings
+  @Prop({ default: 3 })
+  maxRetries?: number;
+
+  @Prop({ default: 30 })
+  retryIntervalMinutes?: number;
+
+  @Prop({ default: 'log' })
+  failureAction?: string; // 'log' | 'email_admin' | 'disable'
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);

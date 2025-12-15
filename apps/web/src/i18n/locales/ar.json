@@ -326,7 +326,14 @@
       "current": "اللغة الحالية",
       "switch": "تبديل اللغة",
       "changed": "تم تغيير اللغة بنجاح",
-      "supported": "اللغات المدعومة"
+      "supported": "اللغات المدعومة",
+      "currentStatus": "التطبيق يعمل حالياً باللغة العربية مع دعم RTL",
+      "currentStatusEn": "Application is currently running in English with LTR support",
+      "arabicName": "العربية (Arabic)",
+      "arabicSupport": "Right-to-Left (RTL) Support",
+      "englishName": "English",
+      "englishSupport": "Left-to-Right (LTR) Support",
+      "companyLogo": "شعار الشركة"
     },
     "notifications": {
       "title": "الإشعارات",
@@ -336,7 +343,42 @@
       "smsDescription": "إرسال إشعارات نصية قصيرة للعملاء",
       "whatsappDescription": "إرسال رسائل واتساب للعملاء",
       "emailDescription": "إرسال رسائل بريد إلكتروني للعملاء",
-      "updated": "تم تحديث إعدادات الإشعارات بنجاح"
+      "updated": "تم تحديث إعدادات الإشعارات بنجاح",
+      "advanced": {
+        "title": "الإعدادات المتقدمة",
+        "channelConfig": "إعدادات القنوات",
+        "channelConfigDesc": "بيانات الاتصال بخدمات API لكل قناة",
+        "smsConfig": "إعدادات SMS",
+        "smsApiKey": "API Key لخدمة SMS",
+        "smsSenderId": "معرف المرسل (Sender ID)",
+        "whatsappConfig": "إعدادات WhatsApp",
+        "whatsappApiKey": "API Key لخدمة WhatsApp",
+        "whatsappPhone": "رقم الهاتف المرسل",
+        "emailConfig": "إعدادات البريد الإلكتروني",
+        "emailSmtpHost": "SMTP Host",
+        "emailSmtpPort": "SMTP Port",
+        "emailSmtpUser": "SMTP Username",
+        "emailSmtpPassword": "SMTP Password",
+        "emailFromAddress": "عنوان المرسل",
+        "emailFromName": "اسم المرسل",
+        "sendingSchedule": "جدولة الإرسال",
+        "sendingScheduleDesc": "تحديد أوقات إرسال الإشعارات وفترات الهدوء",
+        "sendingStartTime": "وقت بدء الإرسال",
+        "sendingEndTime": "وقت انتهاء الإرسال",
+        "enableQuietHours": "تفعيل فترة الهدوء",
+        "quietHoursStart": "بداية فترة الهدوء",
+        "quietHoursEnd": "نهاية فترة الهدوء",
+        "retrySettings": "إعدادات إعادة المحاولة",
+        "retrySettingsDesc": "إدارة إعادة محاولة إرسال الإشعارات الفاشلة",
+        "maxRetries": "عدد مرات إعادة المحاولة",
+        "maxRetriesHelp": "عدد المحاولات قبل الاستسلام",
+        "retryInterval": "الفترة بين المحاولات (دقائق)",
+        "retryIntervalHelp": "الوقت بالدقائق بين كل محاولة",
+        "failureAction": "الإجراء عند الفشل",
+        "failureActionLog": "تسجيل فقط",
+        "failureActionEmail": "إرسال بريد للمسؤول",
+        "failureActionDisable": "تعطيل الإشعارات"
+      }
     },
     "security": {
       "title": "الأمان",
@@ -424,7 +466,13 @@
       "rowsPerPage": "صف لكل صفحة",
       "defaultLandingPage": "الصفحة الافتراضية بعد تسجيل الدخول",
       "sessionTimeoutMinutes": "مدة الجلسة (بالدقائق)",
-      "sessionTimeoutMinutesHelp": "المدة التي يبقى فيها المستخدم مسجلاً قبل تسجيل الخروج التلقائي"
+      "sessionTimeoutMinutesHelp": "المدة التي يبقى فيها المستخدم مسجلاً قبل تسجيل الخروج التلقائي",
+      "dateFormatDMY": "DD/MM/YYYY (يوم/شهر/سنة)",
+      "dateFormatMDY": "MM/DD/YYYY (شهر/يوم/سنة)",
+      "dateFormatYMD": "YYYY-MM-DD (سنة-شهر-يوم)",
+      "separatorComma": "فاصلة (1,000,000)",
+      "separatorPeriod": "نقطة (1.000.000)",
+      "separatorSpace": "مسافة (1 000 000)"
     }
   }
 }
