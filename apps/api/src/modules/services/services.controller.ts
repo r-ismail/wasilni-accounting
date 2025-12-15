@@ -13,6 +13,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
+import { UpdateServiceDto } from './dto/update-service.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('services')
@@ -58,7 +59,7 @@ export class ServicesController {
   async update(
     @Request() req: any,
     @Param('id') id: string,
-    @Body() updateServiceDto: Partial<CreateServiceDto>,
+    @Body() updateServiceDto: UpdateServiceDto,
   ) {
     const service = await this.servicesService.update(
       req.user.companyId,

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Service } from './schemas/service.schema';
 import { CreateServiceDto } from './dto/create-service.dto';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServicesService {
@@ -26,7 +27,7 @@ export class ServicesService {
     if (activeOnly) {
       query.isActive = true;
     }
-    return this.serviceModel.find(query).sort({ name: 1 }).exec();
+    return this.serviceModel.find(query).sort({ nameAr: 1, nameEn: 1 }).exec();
   }
 
   async findOne(companyId: string, id: string): Promise<Service> {
@@ -47,7 +48,7 @@ export class ServicesService {
   async update(
     companyId: string,
     id: string,
-    updateServiceDto: Partial<CreateServiceDto>,
+    updateServiceDto: UpdateServiceDto,
   ): Promise<Service> {
     const service = await this.serviceModel
       .findOneAndUpdate(

@@ -26,6 +26,18 @@ import {
   ListItemText,
   IconButton,
   Tooltip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material';
 import {
   Business as BusinessIcon,
@@ -52,9 +64,12 @@ import {
   Timer as TimerIcon,
   Dashboard as DashboardIcon,
   TableChart as TableChartIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import api from '../lib/api';
 import { toast } from 'react-hot-toast';
+import ServiceFormDialog from '../components/ServiceFormDialog';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -91,6 +106,15 @@ const Settings: React.FC = () => {
     queryFn: async () => {
       const res = await api.get('/companies/my-company');
       return res.data.data || res.data;
+    },
+  });
+
+  // Fetch services
+  const servicesQuery = useQuery({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const res = await api.get('/services');
+      return res.data;
     },
   });
 
@@ -191,6 +215,11 @@ const Settings: React.FC = () => {
   });
 
   // Advanced Settings form state
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState<any>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingServiceId, setDeletingServiceId] = useState<string | null>(null);
+
   const [advancedForm, setAdvancedForm] = useState({
     // Invoice Customization
     mergedServices: [] as string[],
@@ -349,6 +378,53 @@ const Settings: React.FC = () => {
     },
   });
 
+  // Service CRUD mutations
+  const createServiceMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await api.post('/services', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success(t('services.created'));
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      setServiceDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || t('common.error'));
+    },
+  });
+
+  const updateServiceMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await api.put(`/services/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success(t('services.updated'));
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      setServiceDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || t('common.error'));
+    },
+  });
+
+  const deleteServiceMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.delete(`/services/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success(t('services.deleted'));
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      setDeleteConfirmOpen(false);
+      setDeletingServiceId(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || t('common.error'));
+    },
+  });
+
   const handleCompanySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateCompanyMutation.mutate(companyForm);
@@ -376,6 +452,25 @@ const Settings: React.FC = () => {
       currentPassword: passwordForm.currentPassword,
       newPassword: passwordForm.newPassword,
     });
+  };
+
+  const handleServiceSubmit = (data: any) => {
+    if (editingService) {
+      updateServiceMutation.mutate({ id: editingService._id, data });
+    } else {
+      createServiceMutation.mutate(data);
+    }
+  };
+
+  const handleDeleteService = (id: string) => {
+    setDeletingServiceId(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteService = () => {
+    if (deletingServiceId) {
+      deleteServiceMutation.mutate(deletingServiceId);
+    }
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -2048,7 +2143,7 @@ const Settings: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Service Categories */}
+            {/* Custom Services CRUD */}
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -2056,7 +2151,14 @@ const Settings: React.FC = () => {
                     <SettingsIcon color="primary" />
                     {t('settings.services.customServices')}
                   </Typography>
-                  <Button variant="contained" size="small">
+                  <Button 
+                    variant="contained" 
+                    size="small"
+                    onClick={() => {
+                      setServiceDialogOpen(true);
+                      setEditingService(null);
+                    }}
+                  >
                     {t('settings.services.addService')}
                   </Button>
                 </Box>
@@ -2065,10 +2167,73 @@ const Settings: React.FC = () => {
                   {t('settings.services.customServicesDescription')}
                 </Typography>
                 
-                {/* Service List Placeholder */}
-                <Alert severity="info">
-                  {t('settings.services.noCustomServices')}
-                </Alert>
+                {/* Service List */}
+                {servicesQuery.isLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : servicesQuery.data?.data?.length === 0 ? (
+                  <Alert severity="info">
+                    {t('settings.services.noCustomServices')}
+                  </Alert>
+                ) : (
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t('services.nameAr')}</TableCell>
+                          <TableCell>{t('services.nameEn')}</TableCell>
+                          <TableCell>{t('services.type')}</TableCell>
+                          <TableCell>{t('services.defaultPrice')}</TableCell>
+                          <TableCell>{t('services.status')}</TableCell>
+                          <TableCell align="right">{t('common.actions')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {servicesQuery.data?.data?.map((service: any) => (
+                          <TableRow key={service._id}>
+                            <TableCell>{service.nameAr}</TableCell>
+                            <TableCell>{service.nameEn}</TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={t(`services.types.${service.type}`)} 
+                                size="small" 
+                                color="primary" 
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>{service.defaultPrice}</TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={service.isActive ? t('common.active') : t('common.inactive')} 
+                                size="small" 
+                                color={service.isActive ? 'success' : 'default'}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <IconButton 
+                                size="small" 
+                                onClick={() => {
+                                  setEditingService(service);
+                                  setServiceDialogOpen(true);
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton 
+                                size="small" 
+                                color="error"
+                                onClick={() => handleDeleteService(service._id)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
               </CardContent>
             </Card>
 
@@ -2129,9 +2294,55 @@ const Settings: React.FC = () => {
             </Typography>
           </Grid>
         </Grid>
-      </Paper>
+       </Paper>
+
+      {/* Service Form Dialog */}
+      <ServiceFormDialog
+        open={serviceDialogOpen}
+        onClose={() => {
+          setServiceDialogOpen(false);
+          setEditingService(null);
+        }}
+        onSubmit={handleServiceSubmit}
+        initialData={editingService}
+        isLoading={createServiceMutation.isPending || updateServiceMutation.isPending}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setDeletingServiceId(null);
+        }}
+      >
+        <DialogTitle>{t('services.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('services.deleteConfirmMessage')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDeleteConfirmOpen(false);
+              setDeletingServiceId(null);
+            }}
+            disabled={deleteServiceMutation.isPending}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmDeleteService}
+            color="error"
+            variant="contained"
+            disabled={deleteServiceMutation.isPending}
+          >
+            {deleteServiceMutation.isPending ? t('common.deleting') : t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
-
 export default Settings;

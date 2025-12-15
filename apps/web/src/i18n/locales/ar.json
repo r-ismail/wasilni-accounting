@@ -163,6 +163,8 @@
     "reset": "إعادة تعيين",
     "create": "إنشاء",
     "update": "تحديث",
+    "deleting": "جاري الحذف...",
+    "saving": "جاري الحفظ...",
     "currentPhase": "المرحلة الحالية",
     "phase1Complete": "المرحلة 1 - المصادقة والترجمة ✅",
     "nextPhase": "المرحلة القادمة",
@@ -526,6 +528,40 @@
       "addService": "إضافة خدمة",
       "customServicesDescription": "أضف خدمات مخصصة مثل الصيانة، النظافة، الأمن، إلخ",
       "noCustomServices": "لا توجد خدمات مخصصة. اضغط 'إضافة خدمة' لإنشاء خدمة جديدة"
+    }
+  },
+  "services": {
+    "title": "الخدمات",
+    "nameAr": "الاسم بالعربية",
+    "nameEn": "الاسم بالإنجليزية",
+    "description": "الوصف",
+    "type": "النوع",
+    "defaultPrice": "السعر الافتراضي",
+    "unit": "وحدة القياس",
+    "category": "التصنيف",
+    "taxRate": "نسبة الضريبة",
+    "isActive": "مفعّل",
+    "requiresApproval": "يتطلب موافقة",
+    "status": "الحالة",
+    "addService": "إضافة خدمة",
+    "editService": "تعديل خدمة",
+    "deleteService": "حذف خدمة",
+    "created": "تم إنشاء الخدمة بنجاح",
+    "updated": "تم تحديث الخدمة بنجاح",
+    "deleted": "تم حذف الخدمة بنجاح",
+    "deleteConfirmTitle": "تأكيد الحذف",
+    "deleteConfirmMessage": "هل أنت متأكد من حذف هذه الخدمة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "requiredFields": "يرجى ملء جميع الحقول المطلوبة (الاسم بالعربية والإنجليزية)",
+    "types": {
+      "fixed_fee": "رسوم ثابتة",
+      "metered": "عداد",
+      "variable": "متغير"
+    },
+    "categories": {
+      "utilities": "مرافق",
+      "maintenance": "صيانة",
+      "amenities": "خدمات إضافية",
+      "other": "أخرى"
     }
   }
 }
