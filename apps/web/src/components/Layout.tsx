@@ -308,7 +308,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3 },
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
           minHeight: '100vh',
           ml: i18n.language === 'ar' ? 0 : { sm: `${drawerWidth}px` },
           mr: i18n.language === 'ar' ? { sm: `${drawerWidth}px` } : 0,
