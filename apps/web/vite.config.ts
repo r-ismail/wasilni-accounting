@@ -15,7 +15,7 @@ export default defineConfig({
     port: 5173,
     cors: true,
     strictPort: false,
-    allowedHosts: ['5173-i38ky9reaf15140rnrl0z-807a6cb4.manusvm.computer'],
+    allowedHosts: 'all',
     proxy: {
       '/api': {
         target: 'https://3001-i38ky9reaf15140rnrl0z-807a6cb4.manusvm.computer',
