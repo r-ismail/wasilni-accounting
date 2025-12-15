@@ -9,15 +9,18 @@ import {
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
-import { toast } from 'react-hot-toast';
 import { usePagination } from '../hooks/usePagination';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 export default function Meters() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
   const [editingMeter, setEditingMeter] = useState<any>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const [formData, setFormData] = useState({
     meterNumber: '',
     type: 'unit',
@@ -130,9 +133,14 @@ export default function Meters() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t('meters.confirmDelete'))) {
-      deleteMutation.mutate(id);
+    setConfirmDelete({ open: true, id });
+  };
+
+  const confirmDeleteMeter = () => {
+    if (confirmDelete.id) {
+      deleteMutation.mutate(confirmDelete.id);
     }
+    setConfirmDelete({ open: false, id: null });
   };
 
   return (
@@ -282,6 +290,18 @@ export default function Meters() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('common.confirmDelete')}
+        message={t('meters.confirmDeleteMessage')}
+        onConfirm={confirmDeleteMeter}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        confirmText={t('common.delete')}
+        confirmColor="error"
+      />
+
+      {SnackbarComponent}
     </Box>
   );
 }

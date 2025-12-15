@@ -31,15 +31,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function Invoices() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [generateOpen, setGenerateOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
 
   // Fetch invoices
   const { data: invoices = [], isLoading } = useQuery({
@@ -69,6 +73,10 @@ export default function Invoices() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       setGenerateOpen(false);
+      showSnackbar(t('invoices.invoiceGenerated'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -79,6 +87,11 @@ export default function Invoices() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      setConfirmDelete({ open: false, id: null });
+      showSnackbar(t('invoices.invoiceDeleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -196,7 +209,7 @@ export default function Invoices() {
                     </IconButton>
                     {invoice.status === 'draft' && (
                       <IconButton
-                        onClick={() => deleteMutation.mutate(invoice._id)}
+                        onClick={() => setConfirmDelete({ open: true, id: invoice._id })}
                         size="small"
                         color="error"
                       >
@@ -238,6 +251,17 @@ export default function Invoices() {
           invoice={selectedInvoice}
         />
       )}
+
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('invoices.deleteConfirm')}
+        message={t('invoices.deleteWarning')}
+        onConfirm={() => confirmDelete.id && deleteMutation.mutate(confirmDelete.id)}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        loading={deleteMutation.isPending}
+      />
+
+      {SnackbarComponent}
     </Box>
   );
 }

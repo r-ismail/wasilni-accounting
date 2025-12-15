@@ -33,10 +33,13 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { api } from '../lib/api';
 import toast from 'react-hot-toast';
 import { usePagination } from '../hooks/usePagination';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 export default function Payments() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState('');
@@ -44,6 +47,7 @@ export default function Payments() {
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   const [filterInvoiceId, setFilterInvoiceId] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
 
   // Fetch unpaid invoices
   const { data: invoices = [] } = useQuery({
@@ -74,11 +78,11 @@ export default function Payments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success(t('payments.paymentRecorded'));
+      showSnackbar(t('payments.paymentRecorded'), 'success');
       handleCloseDialog();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -90,7 +94,10 @@ export default function Payments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success(t('payments.paymentDeleted'));
+      showSnackbar(t('payments.paymentDeleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -121,9 +128,14 @@ export default function Payments() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t('payments.confirmDelete'))) {
-      deletePayment.mutate(id);
+    setConfirmDelete({ open: true, id });
+  };
+
+  const confirmDeletePayment = () => {
+    if (confirmDelete.id) {
+      deletePayment.mutate(confirmDelete.id);
     }
+    setConfirmDelete({ open: false, id: null });
   };
 
   const getInvoiceInfo = (invoiceId: string) => {
@@ -290,12 +302,28 @@ export default function Payments() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {t('payments.record')}
+          <Button onClick={handleCloseDialog} disabled={createPayment.isPending}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained"
+            disabled={createPayment.isPending}
+          >
+            {createPayment.isPending ? t('common.saving') : t('payments.record')}
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('common.confirmDelete')}
+        message={t('payments.confirmDeleteMessage')}
+        onConfirm={confirmDeletePayment}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        confirmText={t('common.delete')}
+        confirmColor="error"
+      />
     </Box>
   );
 }

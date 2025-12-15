@@ -31,8 +31,9 @@ import {
 } from '@mui/material';
 import { Add, Delete, Refresh, Send } from '@mui/icons-material';
 import { api } from '../lib/api';
-import toast from 'react-hot-toast';
 import { usePagination } from '../hooks/usePagination';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,10 +53,12 @@ function TabPanel(props: TabPanelProps) {
 export default function Notifications() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [tabValue, setTabValue] = useState(0);
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   
   // Send notification form
   const [notificationType, setNotificationType] = useState('sms');
@@ -92,11 +95,11 @@ export default function Notifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success(t('notifications.sent'));
+      showSnackbar(t('notifications.sent'), 'success');
       handleCloseSendDialog();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -107,11 +110,11 @@ export default function Notifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
-      toast.success(t('notifications.templateCreated'));
+      showSnackbar(t('notifications.templateCreated'), 'success');
       handleCloseTemplateDialog();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -122,7 +125,10 @@ export default function Notifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
-      toast.success(t('notifications.templateDeleted'));
+      showSnackbar(t('notifications.templateDeleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -133,7 +139,10 @@ export default function Notifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success(t('notifications.retried'));
+      showSnackbar(t('notifications.retried'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -153,7 +162,7 @@ export default function Notifications() {
 
   const handleSendNotification = () => {
     if (!recipient || !message) {
-      toast.error(t('common.fillRequired'));
+      showSnackbar(t('common.fillRequired'), 'error');
       return;
     }
 
@@ -166,7 +175,7 @@ export default function Notifications() {
 
   const handleCreateTemplate = () => {
     if (!templateName || !templateBody) {
-      toast.error(t('common.fillRequired'));
+      showSnackbar(t('common.fillRequired'), 'error');
       return;
     }
 
@@ -374,12 +383,8 @@ export default function Notifications() {
                     {!template.isDefault && (
                       <IconButton
                         size="small"
-                        color="error"
-                        onClick={() => {
-                          if (window.confirm(t('notifications.confirmDeleteTemplate'))) {
-                            deleteTemplate.mutate(template._id);
-                          }
-                        }}
+                      color="error"
+                      onClick={() => setConfirmDelete({ open: true, id: template._id })}
                       >
                         <Delete />
                       </IconButton>
@@ -499,6 +504,17 @@ export default function Notifications() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('notifications.confirmDeleteTemplate')}
+        message={t('notifications.deleteTemplateWarning')}
+        onConfirm={() => confirmDelete.id && deleteTemplate.mutate(confirmDelete.id)}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        loading={deleteTemplate.isPending}
+      />
+
+      {SnackbarComponent}
     </Box>
   );
 }

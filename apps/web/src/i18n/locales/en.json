@@ -41,6 +41,7 @@
     "templateCreated": "Template created",
     "templateDeleted": "Template deleted",
     "confirmDeleteTemplate": "Are you sure you want to delete this template?",
+    "deleteTemplateWarning": "This action cannot be undone",
     "variablesHelp": "Use {{variableName}} for variables",
     "availableVariables": "Available variables",
     "types": {
@@ -133,7 +134,12 @@
     "quantity": "Quantity",
     "unitPrice": "Unit Price",
     "amount": "Amount",
-    "total": "Total"
+    "total": "Total",
+    "close": "Close",
+    "deleteConfirm": "Delete Invoice?",
+    "deleteWarning": "Only draft invoices can be deleted",
+    "invoiceGenerated": "Invoice generated successfully",
+    "invoiceDeleted": "Invoice deleted successfully"
   },
   "common": {
     "all": "All",
@@ -254,7 +260,10 @@
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
     "floor": "Floor",
-    "description": "Description"
+    "description": "Description",
+    "unitCreated": "Unit created successfully",
+    "unitUpdated": "Unit updated successfully",
+    "unitDeleted": "Unit deleted successfully"
   },
   "customers": {
     "title": "Customers Management",
@@ -271,7 +280,10 @@
     "company": "Company",
     "noCustomers": "No customers found",
     "deleteConfirm": "Delete Customer?",
-    "deleteWarning": "This action cannot be undone"
+    "deleteWarning": "This action cannot be undone",
+    "customerCreated": "Customer created successfully",
+    "customerUpdated": "Customer updated successfully",
+    "customerDeleted": "Customer deleted successfully"
   },
   "contracts": {
     "title": "Contracts Management",
@@ -291,8 +303,13 @@
     "selectCustomer": "Select Customer",
     "terminate": "Terminate Contract",
     "terminateConfirm": "Terminate this contract?",
+    "terminateWarning": "The contract will be terminated and the unit will be released",
     "deleteConfirm": "Delete Contract?",
-    "deleteWarning": "This action cannot be undone"
+    "deleteWarning": "This action cannot be undone",
+    "contractCreated": "Contract created successfully",
+    "contractUpdated": "Contract updated successfully",
+    "contractDeleted": "Contract deleted successfully",
+    "contractTerminated": "Contract terminated successfully"
   },
   "dashboard": {
     "title": "Dashboard",

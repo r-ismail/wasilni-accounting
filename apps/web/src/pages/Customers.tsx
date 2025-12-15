@@ -10,6 +10,8 @@ import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/ico
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 interface Customer {
   _id: string;
@@ -23,10 +25,11 @@ interface Customer {
 export default function Customers() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [search, setSearch] = useState('');
   const [formDialog, setFormDialog] = useState<{ open: boolean; customer?: Customer }>({ open: false });
-  const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const { control, handleSubmit, reset } = useForm<Customer>();
 
   const { data: customers, isLoading } = useQuery({
@@ -51,6 +54,13 @@ export default function Customers() {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       setFormDialog({ open: false });
       reset();
+      showSnackbar(
+        formDialog.customer ? t('customers.customerUpdated') : t('customers.customerCreated'),
+        'success'
+      );
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -58,7 +68,11 @@ export default function Customers() {
     mutationFn: async (id: string) => await api.delete(`/customers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-      setDeleteDialog(null);
+      setConfirmDelete({ open: false, id: null });
+      showSnackbar(t('customers.customerDeleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -101,7 +115,7 @@ export default function Customers() {
                   <TableCell>{customer.email || '-'}</TableCell>
                   <TableCell align="right">
                     <IconButton size="small" onClick={() => openForm(customer)}><EditIcon /></IconButton>
-                    <IconButton size="small" color="error" onClick={() => setDeleteDialog(customer._id)}><DeleteIcon /></IconButton>
+                    <IconButton size="small" color="error" onClick={() => setConfirmDelete({ open: true, id: customer._id })}><DeleteIcon /></IconButton>
                   </TableCell>
                 </TableRow>
               ))}
@@ -150,18 +164,25 @@ export default function Customers() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setFormDialog({ open: false })}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained">{t('common.save')}</Button>
+            <Button onClick={() => setFormDialog({ open: false })} disabled={createMutation.isPending}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" variant="contained" disabled={createMutation.isPending}>
+              {createMutation.isPending ? t('common.saving') : t('common.save')}
+            </Button>
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={!!deleteDialog} onClose={() => setDeleteDialog(null)}>
-        <DialogTitle>{t('customers.deleteConfirm')}</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog(null)}>{t('common.cancel')}</Button>
-          <Button onClick={() => deleteDialog && deleteMutation.mutate(deleteDialog)} color="error" variant="contained">{t('common.delete')}</Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('customers.deleteConfirm')}
+        message={t('customers.deleteWarning')}
+        onConfirm={() => confirmDelete.id && deleteMutation.mutate(confirmDelete.id)}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        loading={deleteMutation.isPending}
+      />
+
+      {SnackbarComponent}
     </Box>
   );
 }

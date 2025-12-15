@@ -33,6 +33,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 interface Contract {
   _id: string;
@@ -61,12 +63,13 @@ interface Customer {
 export default function Contracts() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [formDialog, setFormDialog] = useState<{ open: boolean; contract?: Contract }>({
     open: false,
   });
-  const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
-  const [terminateDialog, setTerminateDialog] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [confirmTerminate, setConfirmTerminate] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const { control, handleSubmit, reset, watch, setValue } = useForm<any>();
 
   const selectedUnitId = watch('unitId');
@@ -109,6 +112,13 @@ export default function Contracts() {
       queryClient.invalidateQueries({ queryKey: ['units'] });
       setFormDialog({ open: false });
       reset();
+      showSnackbar(
+        formDialog.contract ? t('contracts.contractUpdated') : t('contracts.contractCreated'),
+        'success'
+      );
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -119,7 +129,11 @@ export default function Contracts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       queryClient.invalidateQueries({ queryKey: ['units'] });
-      setDeleteDialog(null);
+      setConfirmDelete({ open: false, id: null });
+      showSnackbar(t('contracts.contractDeleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -130,7 +144,11 @@ export default function Contracts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       queryClient.invalidateQueries({ queryKey: ['units'] });
-      setTerminateDialog(null);
+      setConfirmTerminate({ open: false, id: null });
+      showSnackbar(t('contracts.contractTerminated'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -232,19 +250,19 @@ export default function Contracts() {
                     </IconButton>
                     {contract.isActive && (
                       <IconButton
-                        size="small"
-                        color="warning"
-                        onClick={() => setTerminateDialog(contract._id)}
-                      >
-                        <BlockIcon />
+                      size="small"
+                      color="warning"
+                      onClick={() => setConfirmTerminate({ open: true, id: contract._id })}
+                    >
+                      <BlockIcon />
                       </IconButton>
                     )}
                     <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => setDeleteDialog(contract._id)}
-                    >
-                      <DeleteIcon />
+                    size="small"
+                    color="error"
+                    onClick={() => setConfirmDelete({ open: true, id: contract._id })}
+                  >
+                    <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -402,47 +420,36 @@ export default function Contracts() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setFormDialog({ open: false })}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained">
-              {t('common.save')}
+            <Button onClick={() => setFormDialog({ open: false })} disabled={saveMutation.isPending}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" variant="contained" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? t('common.saving') : t('common.save')}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      <Dialog open={!!terminateDialog} onClose={() => setTerminateDialog(null)}>
-        <DialogTitle>{t('contracts.terminateConfirm')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('contracts.deleteWarning')}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTerminateDialog(null)}>{t('common.cancel')}</Button>
-          <Button
-            onClick={() => terminateDialog && terminateMutation.mutate(terminateDialog)}
-            color="warning"
-            variant="contained"
-          >
-            {t('contracts.terminate')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={confirmTerminate.open}
+        title={t('contracts.terminateConfirm')}
+        message={t('contracts.terminateWarning')}
+        onConfirm={() => confirmTerminate.id && terminateMutation.mutate(confirmTerminate.id)}
+        onCancel={() => setConfirmTerminate({ open: false, id: null })}
+        loading={terminateMutation.isPending}
+        confirmColor="warning"
+      />
 
-      <Dialog open={!!deleteDialog} onClose={() => setDeleteDialog(null)}>
-        <DialogTitle>{t('contracts.deleteConfirm')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('contracts.deleteWarning')}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog(null)}>{t('common.cancel')}</Button>
-          <Button
-            onClick={() => deleteDialog && deleteMutation.mutate(deleteDialog)}
-            color="error"
-            variant="contained"
-          >
-            {t('common.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('contracts.deleteConfirm')}
+        message={t('contracts.deleteWarning')}
+        onConfirm={() => confirmDelete.id && deleteMutation.mutate(confirmDelete.id)}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        loading={deleteMutation.isPending}
+      />
+
+      {SnackbarComponent}
     </Box>
   );
 }

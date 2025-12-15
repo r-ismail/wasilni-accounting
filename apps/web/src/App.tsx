@@ -5,6 +5,7 @@ import { CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
+import { SnackbarProvider } from './contexts/SnackbarContext';
 import { getTheme } from './theme/theme';
 import ProtectedRoute from './components/ProtectedRoute';
 import SetupCheck from './components/SetupCheck';
@@ -43,8 +44,9 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter>
-          <AuthProvider>
+        <SnackbarProvider>
+          <BrowserRouter>
+            <AuthProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
@@ -82,8 +84,9 @@ const App: React.FC = () => {
                 }
               />
             </Routes>
-          </AuthProvider>
-        </BrowserRouter>
+            </AuthProvider>
+          </BrowserRouter>
+        </SnackbarProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

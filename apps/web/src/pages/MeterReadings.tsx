@@ -9,12 +9,13 @@ import {
 import { Add } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
-import { toast } from 'react-hot-toast';
 import { usePagination } from '../hooks/usePagination';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 export default function MeterReadings() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,11 +45,11 @@ export default function MeterReadings() {
     mutationFn: (data: any) => api.post('/meters/readings', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meter-readings'] });
-      toast.success(t('readings.created'));
+      showSnackbar(t('readings.created'), 'success');
       handleCloseDialog();
     },
-    onError: () => {
-      toast.error(t('readings.error'));
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('readings.error'), 'error');
     },
   });
 
@@ -68,7 +69,7 @@ export default function MeterReadings() {
 
   const handleSubmit = () => {
     if (!formData.meterId || !formData.currentReading) {
-      toast.error(t('readings.fillRequired'));
+      showSnackbar(t('readings.fillRequired'), 'error');
       return;
     }
     createMutation.mutate(formData);
@@ -192,12 +193,16 @@ export default function MeterReadings() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {t('common.create')}
+          <Button onClick={handleCloseDialog} disabled={createMutation.isPending}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={createMutation.isPending}>
+            {createMutation.isPending ? t('common.saving') : t('common.create')}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {SnackbarComponent}
     </Box>
   );
 }

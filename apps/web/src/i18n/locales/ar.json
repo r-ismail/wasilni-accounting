@@ -41,6 +41,7 @@
     "templateCreated": "تم إنشاء القالب",
     "templateDeleted": "تم حذف القالب",
     "confirmDeleteTemplate": "هل أنت متأكد من حذف هذا القالب؟",
+    "deleteTemplateWarning": "لا يمكن التراجع عن هذا الإجراء",
     "variablesHelp": "استخدم {{variableName}} للمتغيرات",
     "availableVariables": "المتغيرات المتاحة",
     "types": {
@@ -134,7 +135,11 @@
     "unitPrice": "سعر الوحدة",
     "amount": "المبلغ",
     "total": "الإجمالي",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "deleteConfirm": "حذف الفاتورة؟",
+    "deleteWarning": "لا يمكن حذف إلا الفواتير بحالة مسودة",
+    "invoiceGenerated": "تم إنشاء الفاتورة بنجاح",
+    "invoiceDeleted": "تم حذف الفاتورة بنجاح"
   },
   "common": {
     "all": "الكل",
@@ -255,7 +260,10 @@
     "bedrooms": "عدد الغرف",
     "bathrooms": "عدد الحمامات",
     "floor": "الطابق",
-    "description": "الوصف"
+    "description": "الوصف",
+    "unitCreated": "تم إنشاء الوحدة بنجاح",
+    "unitUpdated": "تم تحديث الوحدة بنجاح",
+    "unitDeleted": "تم حذف الوحدة بنجاح"
   },
   "customers": {
     "title": "إدارة العملاء",
@@ -272,7 +280,10 @@
     "company": "شركة",
     "noCustomers": "لا يوجد عملاء",
     "deleteConfirm": "حذف العميل؟",
-    "deleteWarning": "لا يمكن التراجع عن هذا الإجراء"
+    "deleteWarning": "لا يمكن التراجع عن هذا الإجراء",
+    "customerCreated": "تم إنشاء العميل بنجاح",
+    "customerUpdated": "تم تحديث العميل بنجاح",
+    "customerDeleted": "تم حذف العميل بنجاح"
   },
   "contracts": {
     "title": "إدارة العقود",
@@ -292,8 +303,13 @@
     "selectCustomer": "اختر العميل",
     "terminate": "إنهاء العقد",
     "terminateConfirm": "إنهاء هذا العقد؟",
+    "terminateWarning": "سيتم إنهاء العقد وتحرير الوحدة",
     "deleteConfirm": "حذف العقد؟",
-    "deleteWarning": "لا يمكن التراجع عن هذا الإجراء"
+    "deleteWarning": "لا يمكن التراجع عن هذا الإجراء",
+    "contractCreated": "تم إنشاء العقد بنجاح",
+    "contractUpdated": "تم تحديث العقد بنجاح",
+    "contractDeleted": "تم حذف العقد بنجاح",
+    "contractTerminated": "تم إنهاء العقد بنجاح"
   },
   "dashboard": {
     "title": "لوحة التحكم",
