@@ -132,21 +132,42 @@ export default function Units() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">{t('units.title')}</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => openForm()}>
-          {t('units.addUnit')}
-        </Button>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
+              {t('units.title')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {units?.length || 0} {t('units.totalUnits')}
+            </Typography>
+          </Box>
+          <Button 
+            variant="contained" 
+            startIcon={<AddIcon />} 
+            onClick={() => openForm()}
+            size="large"
+            sx={{ px: 3, py: 1.5, fontWeight: 600 }}
+          >
+            {t('units.addUnit')}
+          </Button>
+        </Box>
       </Box>
 
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+      {/* Filters */}
+      <Paper elevation={0} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+        <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'text.secondary' }}>
+          {t('common.filters')}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <TextField
             select
             label={t('units.filterByStatus')}
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            sx={{ minWidth: 200 }}
+            sx={{ minWidth: 220 }}
+            size="small"
           >
             <MenuItem value="">{t('common.all')}</MenuItem>
             <MenuItem value="available">{t('units.available')}</MenuItem>
@@ -159,7 +180,8 @@ export default function Units() {
             label={t('units.filterByFurnishing')}
             value={filters.furnishing}
             onChange={(e) => setFilters({ ...filters, furnishing: e.target.value })}
-            sx={{ minWidth: 200 }}
+            sx={{ minWidth: 220 }}
+            size="small"
           >
             <MenuItem value="">{t('common.all')}</MenuItem>
             <MenuItem value="furnished">{t('units.furnished')}</MenuItem>
@@ -173,42 +195,42 @@ export default function Units() {
       ) : units?.length === 0 ? (
         <Alert severity="info">{t('units.noUnits')}</Alert>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
           <Table>
-            <TableHead>
+            <TableHead sx={{ bgcolor: 'grey.50' }}>
               <TableRow>
-                <TableCell>{t('units.unitNumber')}</TableCell>
-                <TableCell>{t('units.building')}</TableCell>
-                <TableCell>{t('units.furnishing')}</TableCell>
-                <TableCell>{t('units.status')}</TableCell>
-                <TableCell>{t('units.monthlyRent')}</TableCell>
-                <TableCell>{t('units.dailyRent')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.unitNumber')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.building')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.furnishing')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.status')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.monthlyRent')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('units.dailyRent')}</TableCell>
                 <TableCell align="right">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {units?.map((unit: Unit) => (
                 <TableRow key={unit._id}>
-                  <TableCell>{unit.unitNumber}</TableCell>
-                  <TableCell>
+                  <TableCell sx={{  }}>{unit.unitNumber}</TableCell>
+                  <TableCell sx={{  }}>
                     {typeof unit.buildingId === 'object' ? unit.buildingId.name : '-'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{  }}>
                     <Chip
                       label={t(`units.${unit.furnishingStatus}`)}
                       color={getFurnishingColor(unit.furnishingStatus)}
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{  }}>
                     <Chip
                       label={t(`units.${unit.status}`)}
                       color={getStatusColor(unit.status)}
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>{unit.defaultRentMonthly}</TableCell>
-                  <TableCell>{unit.defaultRentDaily || '-'}</TableCell>
+                  <TableCell sx={{  }}>{unit.defaultRentMonthly}</TableCell>
+                  <TableCell sx={{  }}>{unit.defaultRentDaily || '-'}</TableCell>
                   <TableCell align="right">
                     <IconButton size="small" color="primary" onClick={() => openForm(unit)}>
                       <EditIcon />
