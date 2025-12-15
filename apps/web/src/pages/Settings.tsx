@@ -89,6 +89,7 @@ const Settings: React.FC = () => {
     currency: 'YER',
     defaultLanguage: 'ar',
     mergeServicesWithRent: true,
+    logo: undefined as string | undefined,
   });
 
   // Notifications form state
@@ -113,6 +114,7 @@ const Settings: React.FC = () => {
         currency: company.currency || 'YER',
         defaultLanguage: company.defaultLanguage || 'ar',
         mergeServicesWithRent: company.mergeServicesWithRent ?? true,
+        logo: company.logo,
       });
     }
   }, [company]);
@@ -313,7 +315,61 @@ const Settings: React.FC = () => {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            🖼️ {t('settings.company.logo')}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('settings.company.logoHelp')}
+                          </Typography>
+                        </Box>
+                        {companyForm.logo && (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                            <img src={companyForm.logo} alt="Company Logo" style={{ maxHeight: 100, maxWidth: 300, objectFit: 'contain' }} />
+                          </Box>
+                        )}
+                        <Button
+                          variant="outlined"
+                          component="label"
+                          startIcon={<BusinessIcon />}
+                        >
+                          {companyForm.logo ? t('settings.company.changeLogo') : t('settings.company.uploadLogo')}
+                          <input
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setCompanyForm({ ...companyForm, logo: reader.result as string });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </Button>
+                        {companyForm.logo && (
+                          <Button
+                            variant="text"
+                            color="error"
+                            size="small"
+                            onClick={() => setCompanyForm({ ...companyForm, logo: undefined })}
+                          >
+                            {t('settings.company.removeLogo')}
+                          </Button>
+                        )}
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Card variant="outlined">
                     <CardContent>
                       <FormControlLabel
                         control={

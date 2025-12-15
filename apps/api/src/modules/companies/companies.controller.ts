@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Patch, UseGuards, Request, Body } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -10,5 +10,10 @@ export class CompaniesController {
   @Get('my-company')
   async getMyCompany(@Request() req: any) {
     return this.companiesService.findById(req.user.companyId);
+  }
+
+  @Patch('my-company/logo')
+  async updateLogo(@Request() req: any, @Body('logo') logo: string) {
+    return this.companiesService.updateLogo(req.user.companyId, logo);
   }
 }

@@ -365,6 +365,7 @@ export class InvoicesService {
         name: company.name,
         currency: company.currency,
         defaultLanguage: company.defaultLanguage,
+        logo: company.logo,
       },
       customer: {
         name: customer.name,
@@ -432,6 +433,7 @@ export class InvoicesService {
         name: company.name,
         currency: company.currency,
         defaultLanguage: company.defaultLanguage,
+        logo: company.logo,
       },
       customer: {
         name: customer.name,

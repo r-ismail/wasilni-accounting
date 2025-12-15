@@ -13,6 +13,7 @@ export interface InvoicePrintData {
     name: string;
     currency: string;
     defaultLanguage: string;
+    logo?: string;
   };
   customer: {
     name: string;
@@ -242,7 +243,7 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
   
   <div class="invoice-container">
     <div class="header">
-      <div class="company-name">${data.company.name}</div>
+      ${data.company.logo ? `<img src="${data.company.logo}" alt="Logo" style="max-height: 80px; max-width: 200px; object-fit: contain;">` : `<div class="company-name">${data.company.name}</div>`}
       <div class="invoice-title">${isRTL ? 'فاتورة' : 'INVOICE'}</div>
     </div>
 

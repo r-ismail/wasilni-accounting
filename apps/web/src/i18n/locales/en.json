@@ -311,6 +311,11 @@
       "defaultLanguage": "Default Language",
       "mergeServices": "Merge Services with Rent",
       "mergeServicesHelp": "When enabled, fixed services will be automatically merged with rent invoices",
+      "logo": "Company Logo",
+      "logoHelp": "Upload your company logo to appear on invoices and system (PNG, JPG, SVG)",
+      "uploadLogo": "Upload Logo",
+      "changeLogo": "Change Logo",
+      "removeLogo": "Remove Logo",
       "updated": "Company settings updated successfully"
     },
     "language": {

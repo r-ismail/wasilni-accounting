@@ -18,6 +18,9 @@ export class Company {
   @Prop({ required: true, default: false })
   mergeServicesWithRent: boolean;
 
+  @Prop()
+  logo?: string; // URL or base64 encoded image
+
   @Prop({ default: true })
   isActive: boolean;
 

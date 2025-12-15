@@ -11,6 +11,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InvoicesService } from './invoices.service';
 import { GenerateInvoiceDto, UpdateInvoiceDto, UpdateInvoiceStatusDto } from './dto/generate-invoice.dto';
@@ -116,8 +117,9 @@ export class InvoicesController {
     return pdfBuffer;
   }
 
+  @Public()
   @Get(':id/print')
-  @ApiOperation({ summary: 'Get invoice print HTML' })
+  @ApiOperation({ summary: 'Get invoice print HTML (public)' })
   async getPrintHtml(@Param('id') id: string) {
     const html = await this.invoicesService.generatePrintHtml(id);
     return html;

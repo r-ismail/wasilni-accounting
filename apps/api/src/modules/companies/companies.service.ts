@@ -22,4 +22,12 @@ export class CompaniesService {
   async markSetupCompleted(id: string): Promise<void> {
     await this.companyModel.findByIdAndUpdate(id, { setupCompleted: true });
   }
+
+  async updateLogo(id: string, logo: string): Promise<CompanyDocument | null> {
+    return this.companyModel.findByIdAndUpdate(
+      id,
+      { logo },
+      { new: true }
+    );
+  }
 }
