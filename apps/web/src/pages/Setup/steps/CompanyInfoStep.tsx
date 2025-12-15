@@ -21,6 +21,7 @@ interface CompanyInfoStepProps {
 
 const currencies = [
   { value: 'SAR', label: 'SAR - Saudi Riyal' },
+  { value: 'YER', label: 'YER - Yemeni Rial' },
   { value: 'USD', label: 'USD - US Dollar' },
   { value: 'EUR', label: 'EUR - Euro' },
   { value: 'AED', label: 'AED - UAE Dirham' },

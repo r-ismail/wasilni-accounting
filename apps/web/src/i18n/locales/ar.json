@@ -12,6 +12,44 @@
     "loginError": "اسم المستخدم أو كلمة المرور غير صحيحة",
     "welcome": "مرحباً بعودتك!"
   },
+  "notifications": {
+    "title": "الإشعارات",
+    "sendNotification": "إرسال إشعار",
+    "send": "إرسال",
+    "type": "النوع",
+    "recipient": "المستلم",
+    "message": "الرسالة",
+    "status": {
+      "pending": "قيد الإرسال",
+      "sent": "تم الإرسال",
+      "failed": "فشل"
+    },
+    "sentAt": "وقت الإرسال",
+    "sent": "تم إرسال الإشعار",
+    "retried": "تمت إعادة المحاولة",
+    "total": "الإجمالي",
+    "pending": "قيد الإرسال",
+    "failed": "فشلت",
+    "history": "السجل",
+    "templates": "القوالب",
+    "addTemplate": "إضافة قالب",
+    "templateName": "اسم القالب",
+    "templateType": "نوع القالب",
+    "body": "المحتوى",
+    "isDefault": "افتراضي",
+    "templateCreated": "تم إنشاء القالب",
+    "templateDeleted": "تم حذف القالب",
+    "confirmDeleteTemplate": "هل أنت متأكد من حذف هذا القالب؟",
+    "variablesHelp": "استخدم {{variableName}} للمتغيرات",
+    "availableVariables": "المتغيرات المتاحة",
+    "types": {
+      "paymentReminder": "تذكير بالدفع",
+      "paymentReceived": "تم استلام الدفعة",
+      "invoiceGenerated": "تم إصدار فاتورة",
+      "contractExpiring": "انتهاء العقد",
+      "overdueNotice": "إشعار تأخير"
+    }
+  },
   "meters": {
     "title": "العدادات",
     "addMeter": "إضافة عداد",

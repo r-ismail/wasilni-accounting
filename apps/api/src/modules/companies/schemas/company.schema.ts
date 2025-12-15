@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Language } from '@wasilni/shared';
+import { Language, Currency } from '@wasilni/shared';
 
 export type CompanyDocument = Company & Document;
 
@@ -9,8 +9,8 @@ export class Company {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
-  currency: string;
+  @Prop({ required: true, enum: Object.values(Currency) })
+  currency: Currency;
 
   @Prop({ required: true, enum: Object.values(Language) })
   defaultLanguage: Language;

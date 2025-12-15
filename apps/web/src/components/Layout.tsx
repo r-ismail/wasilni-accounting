@@ -25,6 +25,7 @@ import {
   People as PeopleIcon,
   Speed as SpeedIcon,
   TrendingUp as TrendingUpIcon,
+  Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   Language as LanguageIcon,
 } from '@mui/icons-material';
@@ -66,6 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
     { text: t('nav.meters'), icon: <SpeedIcon />, path: '/meters' },
     { text: t('nav.readings'), icon: <TrendingUpIcon />, path: '/readings' },
+    { text: t('nav.notifications'), icon: <NotificationsIcon />, path: '/notifications' },
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
   ];
 

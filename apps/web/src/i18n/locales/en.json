@@ -12,6 +12,44 @@
     "loginError": "Invalid username or password",
     "welcome": "Welcome back!"
   },
+  "notifications": {
+    "title": "Notifications",
+    "sendNotification": "Send Notification",
+    "send": "Send",
+    "type": "Type",
+    "recipient": "Recipient",
+    "message": "Message",
+    "status": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "sentAt": "Sent At",
+    "sent": "Notification sent",
+    "retried": "Notification retried",
+    "total": "Total",
+    "pending": "Pending",
+    "failed": "Failed",
+    "history": "History",
+    "templates": "Templates",
+    "addTemplate": "Add Template",
+    "templateName": "Template Name",
+    "templateType": "Template Type",
+    "body": "Body",
+    "isDefault": "Default",
+    "templateCreated": "Template created",
+    "templateDeleted": "Template deleted",
+    "confirmDeleteTemplate": "Are you sure you want to delete this template?",
+    "variablesHelp": "Use {{variableName}} for variables",
+    "availableVariables": "Available variables",
+    "types": {
+      "paymentReminder": "Payment Reminder",
+      "paymentReceived": "Payment Received",
+      "invoiceGenerated": "Invoice Generated",
+      "contractExpiring": "Contract Expiring",
+      "overdueNotice": "Overdue Notice"
+    }
+  },
   "meters": {
     "title": "Meters",
     "addMeter": "Add Meter",
