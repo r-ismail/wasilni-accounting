@@ -2291,7 +2291,7 @@ const Settings: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <Typography variant="caption" color="text.secondary">
-              © 2025 {company?.name || 'Wasilni Accounting'}
+              © 2025 {company?.name || 'Aqarat Property Management'}
             </Typography>
           </Grid>
         </Grid>

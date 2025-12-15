@@ -70,7 +70,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           setCompanyLogo(logo || null);
           
           // Update page title to company name
-          document.title = name || 'Wasilni Accounting';
+          document.title = name || 'Aqarat Property Management';
           
           // Update favicon if logo exists
           if (logo) {
@@ -81,12 +81,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           }
         } else {
           console.warn('[Layout] No company data received');
-          document.title = 'Wasilni Accounting';
+          document.title = 'Aqarat Property Management';
         }
       } catch (error) {
         console.error('[Layout] Failed to fetch company info:', error);
         // Fallback on error
-        document.title = 'Wasilni Accounting';
+        document.title = 'Aqarat Property Management';
       }
     };
 

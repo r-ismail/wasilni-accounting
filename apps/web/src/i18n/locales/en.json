@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "Aqarat Accounting",
-    "description": "Property Management Accounting System"
+    "title": "Aqarat Property Management",
+    "description": "Professional Real Estate Management System"
   },
   "auth": {
     "login": "Login",
