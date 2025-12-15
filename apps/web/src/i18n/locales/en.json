@@ -19,6 +19,7 @@
     "type": "Type",
     "recipient": "Recipient",
     "message": "Message",
+    "statusLabel": "Status",
     "status": {
       "pending": "Pending",
       "sent": "Sent",
@@ -95,6 +96,8 @@
     "currentReading": "Current Reading",
     "consumption": "Consumption",
     "notes": "Notes",
+    "service": "Service",
+    "location": "Location",
     "created": "Reading added successfully",
     "error": "Error adding reading",
     "fillRequired": "Please fill all required fields"
@@ -117,6 +120,7 @@
     "overdue": "Overdue",
     "days": "days",
     "balance": "Balance",
+    "statusLabel": "Status",
     "status": {
       "draft": "Draft",
       "posted": "Posted",
@@ -156,6 +160,8 @@
     "filters": "Filters",
     "fillRequired": "Please fill all required fields",
     "reset": "Reset",
+    "create": "Create",
+    "update": "Update",
     "currentPhase": "Current Phase",
     "phase1Complete": "Phase 1 - Authentication & i18n ✅",
     "nextPhase": "Next Phase",
@@ -170,6 +176,7 @@
     "customers": "Customers",
     "meters": "Meters",
     "readings": "Readings",
+    "notifications": "Notifications",
     "settings": "Settings"
   },
   "setup": {

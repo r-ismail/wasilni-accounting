@@ -271,7 +271,7 @@ export default function Notifications() {
                 <TableCell>{t('notifications.type')}</TableCell>
                 <TableCell>{t('notifications.recipient')}</TableCell>
                 <TableCell>{t('notifications.message')}</TableCell>
-                <TableCell>{t('notifications.status')}</TableCell>
+                <TableCell>{t('notifications.statusLabel')}</TableCell>
                 <TableCell>{t('notifications.sentAt')}</TableCell>
                 <TableCell align="right">{t('common.actions')}</TableCell>
               </TableRow>

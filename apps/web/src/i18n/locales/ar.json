@@ -19,6 +19,7 @@
     "type": "النوع",
     "recipient": "المستلم",
     "message": "الرسالة",
+    "statusLabel": "الحالة",
     "status": {
       "pending": "قيد الإرسال",
       "sent": "تم الإرسال",
@@ -95,6 +96,8 @@
     "currentReading": "القراءة الحالية",
     "consumption": "الاستهلاك",
     "notes": "ملاحظات",
+    "service": "الخدمة",
+    "location": "الموقع",
     "created": "تم إضافة القراءة بنجاح",
     "error": "خطأ في إضافة القراءة",
     "fillRequired": "يرجى ملء جميع الحقول المطلوبة"
@@ -117,6 +120,7 @@
     "overdue": "متأخر",
     "days": "يوم",
     "balance": "المتبقي",
+    "statusLabel": "الحالة",
     "status": {
       "draft": "مسودة",
       "posted": "منشورة",
@@ -157,6 +161,8 @@
     "filters": "الفلاتر",
     "fillRequired": "يرجى ملء جميع الحقول المطلوبة",
     "reset": "إعادة تعيين",
+    "create": "إنشاء",
+    "update": "تحديث",
     "currentPhase": "المرحلة الحالية",
     "phase1Complete": "المرحلة 1 - المصادقة والترجمة ✅",
     "nextPhase": "المرحلة القادمة",
@@ -171,6 +177,7 @@
     "customers": "العملاء",
     "meters": "العدادات",
     "readings": "القراءات",
+    "notifications": "الإشعارات",
     "settings": "الإعدادات"
   },
   "setup": {

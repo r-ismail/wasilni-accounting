@@ -152,7 +152,7 @@ export default function Invoices() {
                 <TableCell>{t('invoices.totalAmount')}</TableCell>
                 <TableCell>{t('invoices.paidAmount')}</TableCell>
                 <TableCell>{t('invoices.remainingAmount')}</TableCell>
-                <TableCell>{t('invoices.status')}</TableCell>
+                <TableCell>{t('invoices.statusLabel')}</TableCell>
                 <TableCell align="right">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -294,7 +294,7 @@ function InvoiceDetailsDialog({ open, onClose, invoice }: any) {
       <DialogContent>
         <Box mb={2}>
           <Typography variant="subtitle2">{t('invoices.invoiceNumber')}: {invoice.invoiceNumber}</Typography>
-          <Typography variant="subtitle2">{t('invoices.status')}: {invoice.status}</Typography>
+          <Typography variant="subtitle2">{t('invoices.statusLabel')}: {invoice.status}</Typography>
         </Box>
         <TableContainer>
           <Table size="small">
