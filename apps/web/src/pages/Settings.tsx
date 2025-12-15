@@ -2305,7 +2305,18 @@ const Settings: React.FC = () => {
           setEditingService(null);
         }}
         onSubmit={handleServiceSubmit}
-        initialData={editingService}
+        initialData={editingService ? {
+          nameAr: editingService.nameAr || '',
+          nameEn: editingService.nameEn || '',
+          description: editingService.description || '',
+          type: editingService.type || 'fixed_fee',
+          defaultPrice: editingService.defaultPrice || 0,
+          unit: editingService.unit || 'month',
+          category: editingService.category || 'utilities',
+          taxRate: editingService.taxRate || 0,
+          isActive: editingService.isActive ?? true,
+          requiresApproval: editingService.requiresApproval ?? false,
+        } : null}
         isLoading={createServiceMutation.isPending || updateServiceMutation.isPending}
       />
 

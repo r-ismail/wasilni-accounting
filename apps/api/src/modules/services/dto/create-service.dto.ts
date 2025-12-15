@@ -57,4 +57,26 @@ export class CreateServiceDto {
   @IsBoolean()
   @IsOptional()
   requiresApproval?: boolean;
+
+  @ApiPropertyOptional({ description: 'Is service taxable', example: false })
+  @IsBoolean()
+  @IsOptional()
+  taxable?: boolean;
+
+  @ApiPropertyOptional({ description: 'Minimum charge', example: 0 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  minCharge?: number;
+
+  @ApiPropertyOptional({ description: 'Maximum charge (0 = no limit)', example: 0 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  maxCharge?: number;
+
+  @ApiPropertyOptional({ description: 'Display order', example: 1 })
+  @IsNumber()
+  @IsOptional()
+  displayOrder?: number;
 }
