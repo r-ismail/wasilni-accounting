@@ -29,7 +29,7 @@ const defaultServices = [
   { name: 'Internet', nameAr: 'إنترنت', type: 'fixed_fee' as const, defaultPrice: 100 },
 ];
 
-export default function ServicesStep({ data, onNext, onBack }: ServicesStepProps) {
+export default function ServicesStep({ data, onNext, onBack: _onBack }: ServicesStepProps) {
   const { t, i18n } = useTranslation();
   const {
     control,

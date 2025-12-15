@@ -10,7 +10,7 @@ interface AdminUserStepProps {
   onBack: () => void;
 }
 
-export default function AdminUserStep({ data, onNext, onBack }: AdminUserStepProps) {
+export default function AdminUserStep({ data, onNext, onBack: _onBack }: AdminUserStepProps) {
   const { t } = useTranslation();
   const {
     control,

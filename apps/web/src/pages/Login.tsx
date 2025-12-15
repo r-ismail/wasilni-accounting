@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { Language as LanguageIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { LoginDto } from '@wasilni/shared';
+import { LoginDto } from '@aqarat/shared';
 
 const Login: React.FC = () => {
   const { t, i18n } = useTranslation();

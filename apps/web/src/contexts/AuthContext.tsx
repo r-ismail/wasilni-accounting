@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../lib/api';
-import { LoginDto, LoginResponseDto } from '@wasilni/shared';
+import { LoginDto, LoginResponseDto } from '@aqarat/shared';
 
 interface AuthContextType {
   isAuthenticated: boolean;

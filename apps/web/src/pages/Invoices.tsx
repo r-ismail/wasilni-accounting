@@ -215,7 +215,7 @@ export default function Invoices() {
         open={generateOpen}
         onClose={() => setGenerateOpen(false)}
         contracts={contracts}
-        onGenerate={(data) => generateMutation.mutate(data)}
+        onGenerate={(data: any) => generateMutation.mutate(data)}
         loading={generateMutation.isPending}
       />
 

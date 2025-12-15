@@ -26,7 +26,7 @@ interface BuildingsUnitsStepProps {
 export default function BuildingsUnitsStep({
   data,
   onNext,
-  onBack,
+  onBack: _onBack,
 }: BuildingsUnitsStepProps) {
   const { t } = useTranslation();
   const {
