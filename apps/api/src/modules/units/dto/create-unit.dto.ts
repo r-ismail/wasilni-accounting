@@ -50,6 +50,34 @@ export class CreateUnitDto {
   @Min(0)
   @IsOptional()
   defaultRentDaily?: number;
+
+  @ApiPropertyOptional({ description: 'Unit area in square meters', example: 120 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  area?: number;
+
+  @ApiPropertyOptional({ description: 'Number of bedrooms', example: 3 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  bedrooms?: number;
+
+  @ApiPropertyOptional({ description: 'Number of bathrooms', example: 2 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  bathrooms?: number;
+
+  @ApiPropertyOptional({ description: 'Floor number or name', example: '5' })
+  @IsString()
+  @IsOptional()
+  floor?: string;
+
+  @ApiPropertyOptional({ description: 'Unit description' })
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
 
 export class UpdateUnitDto {
@@ -93,4 +121,32 @@ export class UpdateUnitDto {
   @IsEnum(['available', 'occupied', 'maintenance'])
   @IsOptional()
   status?: 'available' | 'occupied' | 'maintenance';
+
+  @ApiPropertyOptional({ description: 'Unit area in square meters' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  area?: number;
+
+  @ApiPropertyOptional({ description: 'Number of bedrooms' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  bedrooms?: number;
+
+  @ApiPropertyOptional({ description: 'Number of bathrooms' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  bathrooms?: number;
+
+  @ApiPropertyOptional({ description: 'Floor number or name' })
+  @IsString()
+  @IsOptional()
+  floor?: string;
+
+  @ApiPropertyOptional({ description: 'Unit description' })
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
