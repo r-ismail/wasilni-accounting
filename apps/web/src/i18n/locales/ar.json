@@ -28,6 +28,24 @@
     "deleted": "تم حذف العداد بنجاح",
     "confirmDelete": "هل أنت متأكد من حذف هذا العداد؟"
   },
+  "payments": {
+    "title": "المدفوعات",
+    "recordPayment": "تسجيل دفعة",
+    "record": "تسجيل",
+    "selectInvoice": "اختر الفاتورة",
+    "invoice": "الفاتورة",
+    "amount": "المبلغ",
+    "paymentDate": "تاريخ الدفع",
+    "notes": "ملاحظات",
+    "recordedBy": "سجلت بواسطة",
+    "paymentRecorded": "تم تسجيل الدفعة بنجاح",
+    "paymentDeleted": "تم حذف الدفعة بنجاح",
+    "confirmDelete": "هل أنت متأكد من حذف هذه الدفعة؟",
+    "totalPayments": "إجمالي المدفوعات",
+    "paymentsCount": "عدد الدفعات",
+    "unpaidInvoices": "الفواتير غير المدفوعة",
+    "filterByInvoice": "تصفية حسب الفاتورة"
+  },
   "readings": {
     "title": "قراءات العدادات",
     "addReading": "إضافة قراءة",
@@ -57,6 +75,9 @@
     "periodEnd": "نهاية الفترة",
     "totalAmount": "المبلغ الإجمالي",
     "paidAmount": "المبلغ المدفوع",
+    "remainingAmount": "المبلغ المتبقي",
+    "overdue": "متأخر",
+    "days": "يوم",
     "balance": "المتبقي",
     "status": {
       "draft": "مسودة",
@@ -94,6 +115,8 @@
     "finish": "إنهاء",
     "comingSoon": "قريباً",
     "availableInPhase": "هذه الميزة ستكون متاحة في المرحلة {{phase}}",
+    "remaining": "المتبقي",
+    "fillRequired": "يرجى ملء جميع الحقول المطلوبة",
     "currentPhase": "المرحلة الحالية",
     "phase1Complete": "المرحلة 1 - المصادقة والترجمة ✅",
     "nextPhase": "المرحلة القادمة",

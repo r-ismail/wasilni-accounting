@@ -152,6 +152,8 @@ export default function Invoices() {
                 <TableCell>{t('invoices.issueDate')}</TableCell>
                 <TableCell>{t('invoices.dueDate')}</TableCell>
                 <TableCell>{t('invoices.totalAmount')}</TableCell>
+                <TableCell>{t('invoices.paidAmount')}</TableCell>
+                <TableCell>{t('invoices.remainingAmount')}</TableCell>
                 <TableCell>{t('invoices.status')}</TableCell>
                 <TableCell align="right">{t('common.actions')}</TableCell>
               </TableRow>
@@ -165,6 +167,18 @@ export default function Invoices() {
                   <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
                   <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
                   <TableCell>{invoice.totalAmount.toFixed(2)}</TableCell>
+                  <TableCell>{invoice.paidAmount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    {(invoice.totalAmount - invoice.paidAmount).toFixed(2)}
+                    {invoice.isOverdue && (
+                      <Chip
+                        label={`${t('invoices.overdue')} (${invoice.overdueDays} ${t('invoices.days')})`}
+                        color="error"
+                        size="small"
+                        sx={{ ml: 1 }}
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={t(`invoices.status.${invoice.status}`)}

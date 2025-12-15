@@ -137,6 +137,7 @@ export class InvoicesService {
       contractId?: string;
       fromDate?: string;
       toDate?: string;
+      overdue?: string;
     },
   ): Promise<InvoiceDocument[]> {
     const query: any = { companyId: new Types.ObjectId(companyId) };
@@ -158,6 +159,12 @@ export class InvoicesService {
         ...query.issueDate,
         $lte: new Date(filters.toDate),
       };
+    }
+
+    // Filter for overdue invoices
+    if (filters?.overdue === 'true') {
+      query.status = { $in: ['draft', 'posted'] };
+      query.dueDate = { $lt: new Date() };
     }
 
     return this.invoiceModel
