@@ -60,8 +60,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           const name = response.data.data.name;
           setCompanyName(name);
           setCompanyLogo(response.data.data.logo || null);
-          // Update page title
-          document.title = `${name} - ${t('app.title')}`;
+          // Update page title to company name only
+          document.title = name;
+          
+          // Update favicon if logo exists
+          if (response.data.data.logo) {
+            const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+            if (favicon) {
+              favicon.href = response.data.data.logo;
+            }
+          }
         }
       } catch (error) {
         console.error('Failed to fetch company info:', error);
@@ -131,13 +139,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           )}
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-              {t('app.title')}
+              {companyName || t('app.title')}
             </Typography>
-            {companyName && (
-              <Typography variant="caption" sx={{ opacity: 0.9, display: 'block', mt: 0.5 }}>
-                {companyName}
-              </Typography>
-            )}
           </Box>
         </Box>
       </Box>
@@ -235,7 +238,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           
           {/* Page Title */}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || t('app.title')}
+            {menuItems.find(item => item.path === location.pathname)?.text || companyName || t('app.title')}
           </Typography>
 
           {/* Company Logo/Name Badge */}
