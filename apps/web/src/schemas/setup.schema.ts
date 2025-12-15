@@ -24,6 +24,7 @@ export const unitsConfigSchema = z.object({
 export const buildingSchema = z.object({
   name: z.string().min(1, 'Building name is required'),
   address: z.string().optional(),
+  buildingType: z.enum(['apartment', 'hotel']).default('apartment'),
   furnishedUnits: unitsConfigSchema,
   unfurnishedUnits: unitsConfigSchema,
 });

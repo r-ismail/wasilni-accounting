@@ -55,6 +55,24 @@ export class Unit extends Document {
   })
   status: UnitStatus;
 
+  @Prop({ min: 0 })
+  area?: number; // in square meters
+
+  @Prop({ min: 0 })
+  bedrooms?: number;
+
+  @Prop({ min: 0 })
+  bathrooms?: number;
+
+  @Prop()
+  floor?: string;
+
+  @Prop({ type: [String] })
+  features?: string[]; // e.g., ['balcony', 'parking', 'wifi', 'kitchen']
+
+  @Prop({ trim: true })
+  description?: string;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 

@@ -214,7 +214,10 @@
     "setupError": "خطأ أثناء الإعداد",
     "pleaseFillAllFields": "يرجى ملء جميع الحقول المطلوبة",
     "arabic": "العربية",
-    "english": "الإنجليزية"
+    "english": "الإنجليزية",
+    "buildingType": "نوع المبنى",
+    "apartment": "شقة",
+    "hotel": "فندق"
   },
   "units": {
     "title": "إدارة الوحدات",
@@ -236,7 +239,13 @@
     "deleteConfirm": "حذف الوحدة؟",
     "deleteWarning": "لا يمكن التراجع عن هذا الإجراء",
     "addUnit": "إضافة وحدة",
-    "editUnit": "تعديل الوحدة"
+    "editUnit": "تعديل الوحدة",
+    "additionalDetails": "تفاصيل إضافية",
+    "area": "المساحة (م²)",
+    "bedrooms": "عدد الغرف",
+    "bathrooms": "عدد الحمامات",
+    "floor": "الطابق",
+    "description": "الوصف"
   },
   "customers": {
     "title": "إدارة العملاء",

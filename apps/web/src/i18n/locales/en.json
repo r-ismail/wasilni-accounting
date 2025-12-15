@@ -213,7 +213,10 @@
     "setupError": "Error during setup",
     "pleaseFillAllFields": "Please fill all required fields",
     "arabic": "Arabic",
-    "english": "English"
+    "english": "English",
+    "buildingType": "Building Type",
+    "apartment": "Apartment",
+    "hotel": "Hotel"
   },
   "units": {
     "title": "Units Management",
@@ -235,7 +238,13 @@
     "deleteConfirm": "Delete Unit?",
     "deleteWarning": "This action cannot be undone",
     "addUnit": "Add Unit",
-    "editUnit": "Edit Unit"
+    "editUnit": "Edit Unit",
+    "additionalDetails": "Additional Details",
+    "area": "Area (m²)",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "floor": "Floor",
+    "description": "Description"
   },
   "customers": {
     "title": "Customers Management",

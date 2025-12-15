@@ -11,6 +11,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import MenuItem from '@mui/material/MenuItem';
 import { useTranslation } from 'react-i18next';
 import {
   buildingsUnitsSchema,
@@ -40,6 +41,7 @@ export default function BuildingsUnitsStep({
         {
           name: '',
           address: '',
+          buildingType: 'apartment',
           furnishedUnits: {
             count: 0,
             startNumber: 101,
@@ -70,6 +72,7 @@ export default function BuildingsUnitsStep({
     append({
       name: '',
       address: '',
+      buildingType: 'apartment',
       furnishedUnits: {
         count: 0,
         startNumber: 101,
@@ -139,6 +142,25 @@ export default function BuildingsUnitsStep({
                 error={!!errors.buildings?.[index]?.address}
                 helperText={errors.buildings?.[index]?.address?.message}
               />
+            )}
+          />
+
+          <Controller
+            name={`buildings.${index}.buildingType`}
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                select
+                label={t('setup.buildingType')}
+                fullWidth
+                margin="normal"
+                error={!!errors.buildings?.[index]?.buildingType}
+                helperText={errors.buildings?.[index]?.buildingType?.message}
+              >
+                <MenuItem value="apartment">{t('setup.apartment')}</MenuItem>
+                <MenuItem value="hotel">{t('setup.hotel')}</MenuItem>
+              </TextField>
             )}
           />
 

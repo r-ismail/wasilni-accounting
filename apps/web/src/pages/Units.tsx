@@ -322,6 +322,69 @@ export default function Units() {
                   )}
                 />
               </Grid>
+              
+              {/* Additional Details */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  {t('units.additionalDetails')}
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <Controller
+                  name="area"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField {...field} type="number" label={t('units.area')} fullWidth />
+                  )}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <Controller
+                  name="bedrooms"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField {...field} type="number" label={t('units.bedrooms')} fullWidth />
+                  )}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <Controller
+                  name="bathrooms"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField {...field} type="number" label={t('units.bathrooms')} fullWidth />
+                  )}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <Controller
+                  name="floor"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField {...field} label={t('units.floor')} fullWidth />
+                  )}
+                />
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField 
+                      {...field} 
+                      label={t('units.description')} 
+                      fullWidth 
+                      multiline 
+                      rows={3}
+                    />
+                  )}
+                />
+              </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>

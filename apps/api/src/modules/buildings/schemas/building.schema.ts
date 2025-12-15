@@ -12,6 +12,9 @@ export class Building extends Document {
   @Prop({ trim: true })
   address?: string;
 
+  @Prop({ enum: ['apartment', 'hotel'], default: 'apartment' })
+  buildingType: string;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 
