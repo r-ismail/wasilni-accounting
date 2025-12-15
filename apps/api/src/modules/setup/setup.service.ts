@@ -112,7 +112,8 @@ export class SetupService {
       // Create services
       for (const serviceDto of setupDto.services) {
         await this.servicesService.create(companyId, {
-          name: serviceDto.name,
+          nameAr: serviceDto.name,
+          nameEn: serviceDto.name,
           type: serviceDto.type,
           defaultPrice: serviceDto.defaultPrice,
         });
