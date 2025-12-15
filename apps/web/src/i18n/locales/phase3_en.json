@@ -1,0 +1,50 @@
+{
+  "units": {
+    "title": "Units Management",
+    "unitNumber": "Unit Number",
+    "building": "Building",
+    "furnishing": "Furnishing",
+    "status": "Status",
+    "monthlyRent": "Monthly Rent",
+    "dailyRent": "Daily Rent",
+    "filterByStatus": "Filter by Status",
+    "filterByFurnishing": "Filter by Furnishing",
+    "furnished": "Furnished",
+    "unfurnished": "Unfurnished",
+    "available": "Available",
+    "occupied": "Occupied",
+    "maintenance": "Maintenance",
+    "noUnits": "No units found",
+    "deleteConfirm": "Delete Unit?",
+    "deleteWarning": "This action cannot be undone"
+  },
+  "customers": {
+    "title": "Customers Management",
+    "addCustomer": "Add Customer",
+    "editCustomer": "Edit Customer",
+    "name": "Name",
+    "type": "Type",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "search": "Search",
+    "searchPlaceholder": "Search by name, phone, or email",
+    "individual": "Individual",
+    "company": "Company",
+    "noCustomers": "No customers found",
+    "deleteConfirm": "Delete Customer?"
+  },
+  "contracts": {
+    "title": "Contracts Management",
+    "unit": "Unit",
+    "customer": "Customer",
+    "rentType": "Rent Type",
+    "amount": "Amount",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "status": "Status",
+    "monthly": "Monthly",
+    "daily": "Daily",
+    "noContracts": "No contracts found"
+  }
+}
