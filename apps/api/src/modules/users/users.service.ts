@@ -57,6 +57,10 @@ export class UsersService {
     await this.userModel.findByIdAndUpdate(userId, { companyId });
   }
 
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { password: hashedPassword });
+  }
+
   async validatePassword(
     plainPassword: string,
     hashedPassword: string,

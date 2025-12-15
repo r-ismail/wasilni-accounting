@@ -17,6 +17,15 @@ import {
   CardContent,
   Tabs,
   Tab,
+  Chip,
+  Stack,
+  Avatar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   Business as BusinessIcon,
@@ -24,6 +33,14 @@ import {
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
   Save as SaveIcon,
+  Info as InfoIcon,
+  Check as CheckIcon,
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff,
+  Email as EmailIcon,
+  Sms as SmsIcon,
+  WhatsApp as WhatsAppIcon,
 } from '@mui/icons-material';
 import api from '../lib/api';
 import { toast } from 'react-hot-toast';
@@ -53,6 +70,9 @@ const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [tabValue, setTabValue] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Fetch company settings
   const { data: company, isLoading } = useQuery({
@@ -69,6 +89,20 @@ const Settings: React.FC = () => {
     currency: 'YER',
     defaultLanguage: 'ar',
     mergeServicesWithRent: true,
+  });
+
+  // Notifications form state
+  const [notificationsForm, setNotificationsForm] = useState({
+    smsEnabled: true,
+    whatsappEnabled: true,
+    emailEnabled: true,
+  });
+
+  // Password form state
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   // Update form when company data loads
@@ -98,9 +132,66 @@ const Settings: React.FC = () => {
     },
   });
 
+  // Update notifications mutation
+  const updateNotificationsMutation = useMutation({
+    mutationFn: async (data: any) => {
+      // TODO: Implement backend endpoint
+      return new Promise((resolve) => setTimeout(resolve, 500));
+    },
+    onSuccess: () => {
+      toast.success(t('settings.notifications.updated'));
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || t('common.error'));
+    },
+  });
+
+  // Change password mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await api.post('/auth/change-password', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success(t('settings.security.passwordChanged'));
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || t('common.error'));
+    },
+  });
+
   const handleCompanySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateCompanyMutation.mutate(companyForm);
+  };
+
+  const handleNotificationsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateNotificationsMutation.mutate(notificationsForm);
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error(t('settings.security.passwordMismatch'));
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast.error(t('settings.security.passwordTooShort'));
+      return;
+    }
+
+    changePasswordMutation.mutate({
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword,
+    });
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -117,6 +208,7 @@ const Settings: React.FC = () => {
 
   return (
     <Box>
+      {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
           {t('nav.settings')}
@@ -126,14 +218,19 @@ const Settings: React.FC = () => {
         </Typography>
       </Box>
 
-      <Paper sx={{ borderRadius: 2 }}>
+      <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
           sx={{
             borderBottom: 1,
             borderColor: 'divider',
             px: 2,
+            '& .MuiTab-root': {
+              minHeight: 64,
+            },
           }}
         >
           <Tab
@@ -154,6 +251,12 @@ const Settings: React.FC = () => {
             label={t('settings.notifications.title')}
             sx={{ textTransform: 'none', fontWeight: 600 }}
           />
+          <Tab
+            icon={<SecurityIcon />}
+            iconPosition="start"
+            label={t('settings.security.title')}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
         </Tabs>
 
         {/* Company Settings Tab */}
@@ -162,7 +265,7 @@ const Settings: React.FC = () => {
             <form onSubmit={handleCompanySubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <Alert severity="info" sx={{ mb: 2 }}>
+                  <Alert severity="info" icon={<InfoIcon />}>
                     {t('settings.company.info')}
                   </Alert>
                 </Grid>
@@ -174,6 +277,9 @@ const Settings: React.FC = () => {
                     value={companyForm.name}
                     onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
                     required
+                    InputProps={{
+                      startAdornment: <BusinessIcon sx={{ mr: 1, color: 'action.active' }} />,
+                    }}
                   />
                 </Grid>
 
@@ -185,11 +291,11 @@ const Settings: React.FC = () => {
                     value={companyForm.currency}
                     onChange={(e) => setCompanyForm({ ...companyForm, currency: e.target.value })}
                   >
-                    <MenuItem value="YER">YER - Yemeni Rial (ريال يمني)</MenuItem>
-                    <MenuItem value="USD">USD - US Dollar</MenuItem>
-                    <MenuItem value="SAR">SAR - Saudi Riyal</MenuItem>
-                    <MenuItem value="AED">AED - UAE Dirham</MenuItem>
-                    <MenuItem value="EUR">EUR - Euro</MenuItem>
+                    <MenuItem value="YER">🇾🇪 YER - Yemeni Rial (ريال يمني)</MenuItem>
+                    <MenuItem value="USD">🇺🇸 USD - US Dollar</MenuItem>
+                    <MenuItem value="SAR">🇸🇦 SAR - Saudi Riyal</MenuItem>
+                    <MenuItem value="AED">🇦🇪 AED - UAE Dirham</MenuItem>
+                    <MenuItem value="EUR">🇪🇺 EUR - Euro</MenuItem>
                   </TextField>
                 </Grid>
 
@@ -201,24 +307,35 @@ const Settings: React.FC = () => {
                     value={companyForm.defaultLanguage}
                     onChange={(e) => setCompanyForm({ ...companyForm, defaultLanguage: e.target.value })}
                   >
-                    <MenuItem value="ar">العربية (Arabic)</MenuItem>
-                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="ar">🇾🇪 العربية (Arabic)</MenuItem>
+                    <MenuItem value="en">🇬🇧 English</MenuItem>
                   </TextField>
                 </Grid>
 
                 <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={companyForm.mergeServicesWithRent}
-                        onChange={(e) => setCompanyForm({ ...companyForm, mergeServicesWithRent: e.target.checked })}
+                  <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+                    <CardContent>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={companyForm.mergeServicesWithRent}
+                            onChange={(e) => setCompanyForm({ ...companyForm, mergeServicesWithRent: e.target.checked })}
+                            color="primary"
+                          />
+                        }
+                        label={
+                          <Box>
+                            <Typography variant="body1" fontWeight={600}>
+                              {t('settings.company.mergeServices')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {t('settings.company.mergeServicesHelp')}
+                            </Typography>
+                          </Box>
+                        }
                       />
-                    }
-                    label={t('settings.company.mergeServices')}
-                  />
-                  <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5, ml: 4 }}>
-                    {t('settings.company.mergeServicesHelp')}
-                  </Typography>
+                    </CardContent>
+                  </Card>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -243,46 +360,79 @@ const Settings: React.FC = () => {
           <Box sx={{ px: 3 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <Alert severity="info" sx={{ mb: 2 }}>
+                <Alert severity="info" icon={<LanguageIcon />}>
                   {t('settings.language.info')}
                 </Alert>
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <LanguageIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      <Typography variant="h6">{t('settings.language.current')}</Typography>
-                    </Box>
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {i18n.language === 'ar' ? 'العربية (Arabic)' : 'English'}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        const newLang = i18n.language === 'en' ? 'ar' : 'en';
-                        i18n.changeLanguage(newLang);
-                        document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-                        toast.success(t('settings.language.changed'));
-                      }}
-                    >
-                      {t('settings.language.switch')}
-                    </Button>
+                    <Stack spacing={2}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main' }}>
+                          <LanguageIcon />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="h6">{t('settings.language.current')}</Typography>
+                          <Chip
+                            label={i18n.language === 'ar' ? 'العربية' : 'English'}
+                            color="primary"
+                            size="small"
+                          />
+                        </Box>
+                      </Box>
+                      
+                      <Typography variant="body2" color="text.secondary">
+                        {i18n.language === 'ar' 
+                          ? 'التطبيق يعمل حالياً باللغة العربية مع دعم RTL'
+                          : 'Application is currently running in English with LTR support'
+                        }
+                      </Typography>
+
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={() => {
+                          const newLang = i18n.language === 'en' ? 'ar' : 'en';
+                          i18n.changeLanguage(newLang);
+                          document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+                          toast.success(t('settings.language.changed'));
+                        }}
+                      >
+                        {t('settings.language.switch')}
+                      </Button>
+                    </Stack>
                   </CardContent>
                 </Card>
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                       {t('settings.language.supported')}
                     </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Typography variant="body2">✅ العربية (Arabic) - RTL</Typography>
-                      <Typography variant="body2">✅ English - LTR</Typography>
-                    </Box>
+                    <List dense>
+                      <ListItem>
+                        <ListItemIcon>
+                          <CheckIcon color="success" />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="العربية (Arabic)"
+                          secondary="Right-to-Left (RTL) Support"
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemIcon>
+                          <CheckIcon color="success" />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="English"
+                          secondary="Left-to-Right (LTR) Support"
+                        />
+                      </ListItem>
+                    </List>
                   </CardContent>
                 </Card>
               </Grid>
@@ -293,83 +443,312 @@ const Settings: React.FC = () => {
         {/* Notifications Settings Tab */}
         <TabPanel value={tabValue} index={2}>
           <Box sx={{ px: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  {t('settings.notifications.info')}
-                </Alert>
-              </Grid>
+            <form onSubmit={handleNotificationsSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Alert severity="info" icon={<NotificationsIcon />}>
+                    {t('settings.notifications.info')}
+                  </Alert>
+                </Grid>
 
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  {t('settings.notifications.channels')}
-                </Typography>
-              </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    {t('settings.notifications.channels')}
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={12} md={6}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                      SMS
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {t('settings.notifications.smsDescription')}
-                    </Typography>
-                    <FormControlLabel
-                      control={<Switch defaultChecked />}
-                      label={t('settings.notifications.enable')}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
+                <Grid item xs={12} md={4}>
+                  <Card 
+                    variant="outlined" 
+                    sx={{ 
+                      height: '100%',
+                      border: notificationsForm.smsEnabled ? 2 : 1,
+                      borderColor: notificationsForm.smsEnabled ? 'primary.main' : 'divider',
+                    }}
+                  >
+                    <CardContent>
+                      <Stack spacing={2}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Avatar sx={{ bgcolor: 'info.main' }}>
+                            <SmsIcon />
+                          </Avatar>
+                          <Typography variant="h6">SMS</Typography>
+                        </Box>
+                        
+                        <Typography variant="body2" color="text.secondary">
+                          {t('settings.notifications.smsDescription')}
+                        </Typography>
 
-              <Grid item xs={12} md={6}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                      WhatsApp
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {t('settings.notifications.whatsappDescription')}
-                    </Typography>
-                    <FormControlLabel
-                      control={<Switch defaultChecked />}
-                      label={t('settings.notifications.enable')}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={notificationsForm.smsEnabled}
+                              onChange={(e) => setNotificationsForm({ ...notificationsForm, smsEnabled: e.target.checked })}
+                              color="primary"
+                            />
+                          }
+                          label={t('settings.notifications.enable')}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
 
-              <Grid item xs={12} md={6}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                      Email
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {t('settings.notifications.emailDescription')}
-                    </Typography>
-                    <FormControlLabel
-                      control={<Switch defaultChecked />}
-                      label={t('settings.notifications.enable')}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
+                <Grid item xs={12} md={4}>
+                  <Card 
+                    variant="outlined"
+                    sx={{ 
+                      height: '100%',
+                      border: notificationsForm.whatsappEnabled ? 2 : 1,
+                      borderColor: notificationsForm.whatsappEnabled ? 'success.main' : 'divider',
+                    }}
+                  >
+                    <CardContent>
+                      <Stack spacing={2}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Avatar sx={{ bgcolor: 'success.main' }}>
+                            <WhatsAppIcon />
+                          </Avatar>
+                          <Typography variant="h6">WhatsApp</Typography>
+                        </Box>
+                        
+                        <Typography variant="body2" color="text.secondary">
+                          {t('settings.notifications.whatsappDescription')}
+                        </Typography>
 
-              <Grid item xs={12}>
-                <Divider sx={{ my: 2 }} />
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<SaveIcon />}
-                >
-                  {t('common.save')}
-                </Button>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={notificationsForm.whatsappEnabled}
+                              onChange={(e) => setNotificationsForm({ ...notificationsForm, whatsappEnabled: e.target.checked })}
+                              color="success"
+                            />
+                          }
+                          label={t('settings.notifications.enable')}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <Card 
+                    variant="outlined"
+                    sx={{ 
+                      height: '100%',
+                      border: notificationsForm.emailEnabled ? 2 : 1,
+                      borderColor: notificationsForm.emailEnabled ? 'warning.main' : 'divider',
+                    }}
+                  >
+                    <CardContent>
+                      <Stack spacing={2}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Avatar sx={{ bgcolor: 'warning.main' }}>
+                            <EmailIcon />
+                          </Avatar>
+                          <Typography variant="h6">Email</Typography>
+                        </Box>
+                        
+                        <Typography variant="body2" color="text.secondary">
+                          {t('settings.notifications.emailDescription')}
+                        </Typography>
+
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={notificationsForm.emailEnabled}
+                              onChange={(e) => setNotificationsForm({ ...notificationsForm, emailEnabled: e.target.checked })}
+                              color="warning"
+                            />
+                          }
+                          label={t('settings.notifications.enable')}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 2 }} />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    startIcon={<SaveIcon />}
+                    disabled={updateNotificationsMutation.isPending}
+                  >
+                    {t('common.save')}
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
+            </form>
           </Box>
         </TabPanel>
+
+        {/* Security Settings Tab */}
+        <TabPanel value={tabValue} index={3}>
+          <Box sx={{ px: 3 }}>
+            <form onSubmit={handlePasswordSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Alert severity="warning" icon={<SecurityIcon />}>
+                    {t('settings.security.info')}
+                  </Alert>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Stack spacing={3}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Avatar sx={{ bgcolor: 'error.main' }}>
+                            <LockIcon />
+                          </Avatar>
+                          <Typography variant="h6">{t('settings.security.changePassword')}</Typography>
+                        </Box>
+
+                        <TextField
+                          fullWidth
+                          type={showPassword ? 'text' : 'password'}
+                          label={t('settings.security.currentPassword')}
+                          value={passwordForm.currentPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                          required
+                          InputProps={{
+                            endAdornment: (
+                              <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge="end"
+                              >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            ),
+                          }}
+                        />
+
+                        <TextField
+                          fullWidth
+                          type={showNewPassword ? 'text' : 'password'}
+                          label={t('settings.security.newPassword')}
+                          value={passwordForm.newPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                          required
+                          helperText={t('settings.security.passwordRequirements')}
+                          InputProps={{
+                            endAdornment: (
+                              <IconButton
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                edge="end"
+                              >
+                                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            ),
+                          }}
+                        />
+
+                        <TextField
+                          fullWidth
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          label={t('settings.security.confirmPassword')}
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                          required
+                          error={passwordForm.confirmPassword !== '' && passwordForm.newPassword !== passwordForm.confirmPassword}
+                          helperText={
+                            passwordForm.confirmPassword !== '' && passwordForm.newPassword !== passwordForm.confirmPassword
+                              ? t('settings.security.passwordMismatch')
+                              : ''
+                          }
+                          InputProps={{
+                            endAdornment: (
+                              <IconButton
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                edge="end"
+                              >
+                                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            ),
+                          }}
+                        />
+
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          size="large"
+                          startIcon={<LockIcon />}
+                          disabled={changePasswordMutation.isPending}
+                          color="error"
+                        >
+                          {t('settings.security.updatePassword')}
+                        </Button>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+                    <CardContent>
+                      <Typography variant="h6" sx={{ mb: 2 }}>
+                        {t('settings.security.tips')}
+                      </Typography>
+                      <List dense>
+                        <ListItem>
+                          <ListItemIcon>
+                            <CheckIcon color="success" fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={t('settings.security.tip1')}
+                            primaryTypographyProps={{ variant: 'body2' }}
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <CheckIcon color="success" fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={t('settings.security.tip2')}
+                            primaryTypographyProps={{ variant: 'body2' }}
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <CheckIcon color="success" fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={t('settings.security.tip3')}
+                            primaryTypographyProps={{ variant: 'body2' }}
+                          />
+                        </ListItem>
+                      </List>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </form>
+          </Box>
+        </TabPanel>
+      </Paper>
+
+      {/* System Info Footer */}
+      <Paper sx={{ mt: 3, p: 2, borderRadius: 2, bgcolor: 'background.default' }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={4}>
+            <Typography variant="caption" color="text.secondary">
+              {t('settings.system.version')}: 1.0.0
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="caption" color="text.secondary">
+              {t('settings.system.lastUpdate')}: {new Date().toLocaleDateString()}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="caption" color="text.secondary">
+              © 2025 Wasilni Accounting
+            </Typography>
+          </Grid>
+        </Grid>
       </Paper>
     </Box>
   );

@@ -40,4 +40,23 @@ export class AuthController {
       message: 'Logged out successfully',
     };
   }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @Request() req: any,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    await this.authService.changePassword(
+      req.user.userId,
+      body.currentPassword,
+      body.newPassword,
+    );
+    return {
+      success: true,
+      message: 'Password changed successfully',
+    };
+  }
 }

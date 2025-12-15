@@ -328,7 +328,29 @@
       "enable": "Enable",
       "smsDescription": "Send SMS text messages to customers",
       "whatsappDescription": "Send WhatsApp messages to customers",
-      "emailDescription": "Send email messages to customers"
+      "emailDescription": "Send email messages to customers",
+      "updated": "Notification settings updated successfully"
+    },
+    "security": {
+      "title": "Security",
+      "info": "Update your password and security settings",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "updatePassword": "Update Password",
+      "passwordChanged": "Password changed successfully",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordRequirements": "Must be at least 6 characters",
+      "tips": "Security Tips",
+      "tip1": "Use a strong password with letters, numbers, and symbols",
+      "tip2": "Never share your password with anyone",
+      "tip3": "Change your password regularly"
+    },
+    "system": {
+      "version": "Version",
+      "lastUpdate": "Last Update"
     }
   }
 }
