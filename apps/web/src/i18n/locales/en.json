@@ -300,5 +300,35 @@
     "totalRevenue": "Total Revenue",
     "overdueInvoices": "Overdue Invoices",
     "unpaidAmount": "Unpaid amount"
+  },
+  "settings": {
+    "description": "Manage system and company settings",
+    "company": {
+      "title": "Company Settings",
+      "info": "Update your company information and basic settings",
+      "name": "Company Name",
+      "currency": "Currency",
+      "defaultLanguage": "Default Language",
+      "mergeServices": "Merge Services with Rent",
+      "mergeServicesHelp": "When enabled, fixed services will be automatically merged with rent invoices",
+      "updated": "Company settings updated successfully"
+    },
+    "language": {
+      "title": "Language & Appearance",
+      "info": "Choose system interface language and text direction",
+      "current": "Current Language",
+      "switch": "Switch Language",
+      "changed": "Language changed successfully",
+      "supported": "Supported Languages"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "info": "Manage notification channels and alerts",
+      "channels": "Notification Channels",
+      "enable": "Enable",
+      "smsDescription": "Send SMS text messages to customers",
+      "whatsappDescription": "Send WhatsApp messages to customers",
+      "emailDescription": "Send email messages to customers"
+    }
   }
 }
