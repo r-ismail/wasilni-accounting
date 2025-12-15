@@ -41,11 +41,12 @@ COPY packages/ ./packages/
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy built shared package
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+# Copy built shared package to correct location relative to root
+COPY --from=builder /app/packages/shared/dist /app/packages/shared/dist
+COPY --from=builder /app/packages/shared/package.json /app/packages/shared/
 
-# Copy built application
-COPY --from=builder /app/apps/api/dist ./apps/api/dist
+# Copy built application to dist folder
+COPY --from=builder /app/apps/api/dist ./dist
 
 # Set working directory to api app
 WORKDIR /app/apps/api
@@ -54,4 +55,4 @@ WORKDIR /app/apps/api
 EXPOSE 3001
 
 # Start the application
-CMD ["node", "dist/apps/api/src/main.js"]
+CMD ["node", "dist/main.js"]
