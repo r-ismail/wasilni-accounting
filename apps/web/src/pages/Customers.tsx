@@ -107,7 +107,7 @@ export default function Customers() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginateData(customers).map((customer: Customer) => (
+              {paginateData(customers).map((customer: any) => (
                 <TableRow key={customer._id}>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell><Chip label={t(`customers.${customer.type}`)} size="small" /></TableCell>

@@ -42,12 +42,12 @@ const Dashboard: React.FC = () => {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       // Fetch all data in parallel
-      const [unitsRes, customersRes, contractsRes, invoicesRes, paymentsRes] = await Promise.all([
+      const [unitsRes, customersRes, contractsRes, invoicesRes] = await Promise.all([
         api.get('/units').then(res => res.data),
         api.get('/customers').then(res => res.data),
         api.get('/contracts').then(res => res.data),
         api.get('/invoices').then(res => res.data),
-        api.get('/payments').then(res => res.data),
+        // api.get('/payments').then(res => res.data),
       ]);
 
       // Extract data arrays from API response format {success: true, data: [...]}
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
       const customers = Array.isArray(customersRes?.data) ? customersRes.data : (Array.isArray(customersRes) ? customersRes : []);
       const contracts = Array.isArray(contractsRes?.data) ? contractsRes.data : (Array.isArray(contractsRes) ? contractsRes : []);
       const invoices = Array.isArray(invoicesRes?.data) ? invoicesRes.data : (Array.isArray(invoicesRes) ? invoicesRes : []);
-      const payments = Array.isArray(paymentsRes?.data) ? paymentsRes.data : (Array.isArray(paymentsRes) ? paymentsRes : []);
+      // const payments = Array.isArray(paymentsRes?.data) ? paymentsRes.data : (Array.isArray(paymentsRes) ? paymentsRes : []);
 
       // Calculate statistics
       const totalUnits = units.length;
