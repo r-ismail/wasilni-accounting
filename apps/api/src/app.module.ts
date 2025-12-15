@@ -6,6 +6,10 @@ import * as winston from 'winston';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { BuildingsModule } from './modules/buildings/buildings.module';
+import { UnitsModule } from './modules/units/units.module';
+import { ServicesModule } from './modules/services/services.module';
+import { SetupModule } from './modules/setup/setup.module';
 
 @Module({
   imports: [
@@ -58,6 +62,10 @@ import { CompaniesModule } from './modules/companies/companies.module';
     AuthModule,
     UsersModule,
     CompaniesModule,
+    BuildingsModule,
+    UnitsModule,
+    ServicesModule,
+    SetupModule,
   ],
 })
 export class AppModule {}

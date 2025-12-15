@@ -11,12 +11,13 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
-  async create(
-    username: string,
-    password: string,
-    role: UserRole,
-    companyId?: string,
-  ): Promise<UserDocument> {
+  async create(userData: {
+    username: string;
+    password: string;
+    role: UserRole;
+    companyId?: string;
+  }): Promise<UserDocument> {
+    const { username, password, role, companyId } = userData;
     const existingUser = await this.userModel.findOne({ username });
     if (existingUser) {
       throw new ConflictException('Username already exists');
@@ -38,7 +39,11 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<UserDocument | null> {
-    return this.userModel.findById(id);
+    try {
+      return await this.userModel.findById(id).exec();
+    } catch (error) {
+      return null;
+    }
   }
 
   async updateRefreshToken(
@@ -46,6 +51,10 @@ export class UsersService {
     refreshToken: string | null,
   ): Promise<void> {
     await this.userModel.findByIdAndUpdate(userId, { refreshToken });
+  }
+
+  async updateCompany(userId: string, companyId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { companyId });
   }
 
   async validatePassword(
@@ -61,7 +70,11 @@ export class UsersService {
     });
 
     if (!superAdminExists) {
-      await this.create('admin', 'admin123', UserRole.SUPER_ADMIN);
+      await this.create({
+        username: 'admin',
+        password: 'admin123',
+        role: UserRole.SUPER_ADMIN,
+      });
       console.log('Super admin created: username=admin, password=admin123');
     }
   }

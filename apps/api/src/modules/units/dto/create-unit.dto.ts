@@ -1,0 +1,53 @@
+import {
+  IsString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsNotEmpty,
+  Min,
+  IsMongoId,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { FurnishingStatus, UsageType } from '../schemas/unit.schema';
+
+export class CreateUnitDto {
+  @ApiProperty({ description: 'Building ID' })
+  @IsMongoId()
+  @IsNotEmpty()
+  buildingId: string;
+
+  @ApiProperty({ description: 'Unit number', example: '101' })
+  @IsString()
+  @IsNotEmpty()
+  unitNumber: string;
+
+  @ApiProperty({
+    description: 'Furnishing status',
+    enum: FurnishingStatus,
+    example: FurnishingStatus.FURNISHED,
+  })
+  @IsEnum(FurnishingStatus)
+  @IsNotEmpty()
+  furnishingStatus: FurnishingStatus;
+
+  @ApiPropertyOptional({
+    description: 'Usage type',
+    enum: UsageType,
+    example: UsageType.APARTMENT,
+  })
+  @IsEnum(UsageType)
+  @IsOptional()
+  usageType?: UsageType;
+
+  @ApiProperty({ description: 'Default monthly rent', example: 5000 })
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  defaultRentMonthly: number;
+
+  @ApiPropertyOptional({ description: 'Default daily rent', example: 200 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  defaultRentDaily?: number;
+}
