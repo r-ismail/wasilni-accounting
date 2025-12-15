@@ -68,7 +68,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import api from '../lib/api';
-import { toast } from 'react-hot-toast';
+import { useSnackbar } from '../hooks/useSnackbar';
 import ServiceFormDialog from '../components/ServiceFormDialog';
 
 interface TabPanelProps {
@@ -95,6 +95,7 @@ function TabPanel(props: TabPanelProps) {
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const [tabValue, setTabValue] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -338,10 +339,10 @@ const Settings: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-settings'] });
-      toast.success(t('settings.company.updated'));
+      showSnackbar(t('settings.company.updated'), 'success');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -352,10 +353,10 @@ const Settings: React.FC = () => {
       return new Promise((resolve) => setTimeout(resolve, 500));
     },
     onSuccess: () => {
-      toast.success(t('settings.notifications.updated'));
+      showSnackbar(t('settings.notifications.updated'), 'success');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -366,7 +367,7 @@ const Settings: React.FC = () => {
       return res.data;
     },
     onSuccess: () => {
-      toast.success(t('settings.security.passwordChanged'));
+      showSnackbar(t('settings.security.passwordChanged'), 'success');
       setPasswordForm({
         currentPassword: '',
         newPassword: '',
@@ -374,7 +375,7 @@ const Settings: React.FC = () => {
       });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -385,12 +386,12 @@ const Settings: React.FC = () => {
       return res.data;
     },
     onSuccess: () => {
-      toast.success(t('services.created'));
+      showSnackbar(t('services.created'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setServiceDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -400,12 +401,12 @@ const Settings: React.FC = () => {
       return res.data;
     },
     onSuccess: () => {
-      toast.success(t('services.updated'));
+      showSnackbar(t('services.updated'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setServiceDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -415,13 +416,13 @@ const Settings: React.FC = () => {
       return res.data;
     },
     onSuccess: () => {
-      toast.success(t('services.deleted'));
+      showSnackbar(t('services.deleted'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setDeleteConfirmOpen(false);
       setDeletingServiceId(null);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || t('common.error'));
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -439,12 +440,12 @@ const Settings: React.FC = () => {
     e.preventDefault();
     
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error(t('settings.security.passwordMismatch'));
+      showSnackbar(t('settings.security.passwordMismatch'), 'error');
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      toast.error(t('settings.security.passwordTooShort'));
+      showSnackbar(t('settings.security.passwordTooShort'), 'error');
       return;
     }
 
@@ -748,7 +749,7 @@ const Settings: React.FC = () => {
                           const newLang = i18n.language === 'en' ? 'ar' : 'en';
                           i18n.changeLanguage(newLang);
                           document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-                          toast.success(t('settings.language.changed'));
+                          showSnackbar(t('settings.language.changed'), 'success');
                         }}
                       >
                         {t('settings.language.switch')}
@@ -2342,6 +2343,8 @@ const Settings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {SnackbarComponent}
     </Box>
   );
 };

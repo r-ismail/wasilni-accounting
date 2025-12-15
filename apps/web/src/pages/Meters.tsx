@@ -66,8 +66,11 @@ export default function Meters() {
     mutationFn: (data: any) => api.post('/meters', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
-      toast.success(t('meters.created'));
+      showSnackbar(t('meters.created'), 'success');
       handleCloseDialog();
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -75,8 +78,11 @@ export default function Meters() {
     mutationFn: ({ id, data }: any) => api.patch(`/meters/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
-      toast.success(t('meters.updated'));
+      showSnackbar(t('meters.updated'), 'success');
       handleCloseDialog();
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
@@ -84,7 +90,10 @@ export default function Meters() {
     mutationFn: (id: string) => api.delete(`/meters/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
-      toast.success(t('meters.deleted'));
+      showSnackbar(t('meters.deleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
     },
   });
 
