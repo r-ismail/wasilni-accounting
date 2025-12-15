@@ -54,7 +54,7 @@ All Phase 1 requirements have been successfully implemented and tested:
 ## 🏗️ Project Structure
 
 ```
-wasilni-accounting/
+aqarat-accounting/
 ├── apps/
 │   ├── api/                      # NestJS Backend
 │   │   ├── src/
@@ -109,14 +109,14 @@ wasilni-accounting/
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/r-ismail/wasilni-accounting.git
-cd wasilni-accounting
+git clone https://github.com/r-ismail/aqarat-accounting.git
+cd aqarat-accounting
 
 # Install dependencies
 pnpm install
 
 # Build shared package
-pnpm --filter @wasilni/shared build
+pnpm --filter @aqarat/shared build
 
 # Configure environment
 cp apps/api/.env.example apps/api/.env
@@ -272,11 +272,11 @@ Phase 2 will implement the **Setup Wizard**:
 
 ## 🔗 Repository
 
-**GitHub**: https://github.com/r-ismail/wasilni-accounting
+**GitHub**: https://github.com/r-ismail/aqarat-accounting
 
 ## 👥 Team
 
-Wasilni Development Team
+Aqarat Development Team
 
 ---
 

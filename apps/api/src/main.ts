@@ -33,7 +33,7 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('Wasilni Accounting API')
+    .setTitle('Aqarat Accounting API')
     .setDescription('Multi-tenant property management accounting system API')
     .setVersion('1.0')
     .addBearerAuth()

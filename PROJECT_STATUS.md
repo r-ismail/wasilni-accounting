@@ -1,8 +1,8 @@
-# 📊 Wasilni Accounting System - Project Status
+# 📊 Aqarat Accounting System - Project Status
 
 ## 🎯 Project Overview
 
-**Wasilni Accounting System** is a comprehensive multi-tenant property management and accounting platform designed for managing furnished/unfurnished apartments and hotels. Built with modern technologies and best practices.
+**Aqarat Accounting System** is a comprehensive multi-tenant property management and accounting platform designed for managing furnished/unfurnished apartments and hotels. Built with modern technologies and best practices.
 
 ---
 
@@ -245,8 +245,8 @@
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/r-ismail/wasilni-accounting.git
-cd wasilni-accounting
+git clone https://github.com/r-ismail/aqarat-accounting.git
+cd aqarat-accounting
 
 # Install dependencies
 pnpm install
@@ -345,7 +345,7 @@ curl -X GET http://localhost:3001/api/units \
 ## 📁 Project Structure
 
 ```
-wasilni-accounting/
+aqarat-accounting/
 ├── apps/
 │   ├── api/                    # NestJS Backend
 │   │   ├── src/
@@ -510,9 +510,9 @@ chore: Maintenance tasks
 
 ## 📞 Support
 
-- **GitHub:** https://github.com/r-ismail/wasilni-accounting
-- **Issues:** https://github.com/r-ismail/wasilni-accounting/issues
-- **Discussions:** https://github.com/r-ismail/wasilni-accounting/discussions
+- **GitHub:** https://github.com/r-ismail/aqarat-accounting
+- **Issues:** https://github.com/r-ismail/aqarat-accounting/issues
+- **Discussions:** https://github.com/r-ismail/aqarat-accounting/discussions
 
 ---
 

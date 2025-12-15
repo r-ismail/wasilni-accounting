@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Language } from '@wasilni/shared';
+import { Language } from '@aqarat/shared';
 import { FurnishingStatus, UsageType } from '../../units/schemas/unit.schema';
 import { ServiceType } from '../../services/schemas/service.schema';
 

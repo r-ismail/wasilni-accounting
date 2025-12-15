@@ -2,7 +2,7 @@
 
 ## 🎉 Project 100% Complete!
 
-**Phase 6** has been successfully completed! The Wasilni Accounting System is now **fully functional** with complete **Payments Management** and **Overdue Tracking**.
+**Phase 6** has been successfully completed! The Aqarat Accounting System is now **fully functional** with complete **Payments Management** and **Overdue Tracking**.
 
 ---
 
@@ -435,7 +435,7 @@ Authorization: Bearer {token}
 
 ## 📞 Support & Resources
 
-- **GitHub:** https://github.com/r-ismail/wasilni-accounting
+- **GitHub:** https://github.com/r-ismail/aqarat-accounting
 - **Swagger API:** http://localhost:3001/api/docs
 - **Frontend:** https://5174-ilxemyggv4dva8r60qy47-232f924d.manusvm.computer
 - **Login:** admin / admin123

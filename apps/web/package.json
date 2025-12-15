@@ -1,5 +1,5 @@
 {
-  "name": "@wasilni/web",
+  "name": "@aqarat/web",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -15,7 +15,7 @@
     "@mui/icons-material": "^5.18.0",
     "@mui/material": "^5.15.3",
     "@tanstack/react-query": "^5.17.9",
-    "@wasilni/shared": "workspace:*",
+    "@aqarat/shared": "workspace:*",
     "axios": "^1.6.5",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",

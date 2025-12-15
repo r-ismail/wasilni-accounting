@@ -2,7 +2,7 @@
 
 ## 🎉 Mission Accomplished!
 
-**Phase 7.1** has been successfully completed! The Wasilni Accounting System now has a **complete Notifications System** with SMS/WhatsApp/Email support and **Yemeni Rial (YER)** currency.
+**Phase 7.1** has been successfully completed! The Aqarat Accounting System now has a **complete Notifications System** with SMS/WhatsApp/Email support and **Yemeni Rial (YER)** currency.
 
 ---
 
@@ -236,7 +236,7 @@ WHATSAPP_PHONE_NUMBER=+1234567890
 
 # Email Provider (SendGrid example)
 SENDGRID_API_KEY=your_api_key
-SENDGRID_FROM_EMAIL=noreply@wasilni.com
+SENDGRID_FROM_EMAIL=noreply@aqarat.com
 ```
 
 ---

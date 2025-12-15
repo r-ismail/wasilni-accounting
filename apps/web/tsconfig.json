@@ -17,7 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@wasilni/shared": ["../../packages/shared/src"]
+      "@aqarat/shared": ["../../packages/shared/src"]
     }
   },
   "include": ["src"],

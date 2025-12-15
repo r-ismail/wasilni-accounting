@@ -1,7 +1,7 @@
 {
-  "name": "@wasilni/api",
+  "name": "@aqarat/api",
   "version": "1.0.0",
-  "description": "Wasilni Accounting API",
+  "description": "Aqarat Accounting API",
   "scripts": {
     "build": "nest build",
     "seed": "ts-node src/seed.ts",
@@ -29,7 +29,7 @@
     "@nestjs/schedule": "^6.1.0",
     "@nestjs/swagger": "^7.1.17",
     "@types/pdfmake": "^0.2.12",
-    "@wasilni/shared": "workspace:*",
+    "@aqarat/shared": "workspace:*",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.0.0",
     "class-transformer": "^0.5.1",

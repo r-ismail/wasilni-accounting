@@ -258,7 +258,7 @@ ServiceSchema.index({ companyId: 1, isActive: 1 });
 ## 🐛 Issues Fixed
 
 ### Issue 1: MongoDB Connection
-**Problem**: Wrong database name (wasilni vs wasilni-accounting)
+**Problem**: Wrong database name (aqarat vs aqarat-accounting)
 **Solution**: Verified correct database name in connection string
 
 ### Issue 2: User Not Found

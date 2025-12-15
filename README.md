@@ -1,11 +1,11 @@
-# Wasilni Accounting System
+# Aqarat Accounting System
 
 Multi-tenant property management accounting system for furnished/unfurnished apartments and hotels.
 
 ## 🏗️ Project Structure
 
 ```
-wasilni-accounting/
+aqarat-accounting/
 ├── apps/
 │   ├── api/          # NestJS Backend
 │   └── web/          # React Frontend
@@ -52,8 +52,8 @@ Before running the project, ensure you have the following installed:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/r-ismail/wasilni-accounting.git
-cd wasilni-accounting
+git clone https://github.com/r-ismail/aqarat-accounting.git
+cd aqarat-accounting
 ```
 
 ### 2. Install dependencies
@@ -75,7 +75,7 @@ Edit `apps/api/.env` with your configuration:
 ```env
 PORT=3001
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/wasilni-accounting
+MONGODB_URI=mongodb://localhost:27017/aqarat-accounting
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRES_IN=15m
 REFRESH_TOKEN_SECRET=your-super-secret-refresh-token-key-change-in-production
@@ -156,7 +156,7 @@ pnpm build
 
 ```bash
 # Build shared package
-pnpm --filter @wasilni/shared build
+pnpm --filter @aqarat/shared build
 
 # Build backend
 pnpm build:api
@@ -323,8 +323,8 @@ ISC
 
 ## 👥 Authors
 
-Wasilni Development Team
+Aqarat Development Team
 
 ## 🐛 Issues
 
-Report issues at: https://github.com/r-ismail/wasilni-accounting/issues
+Report issues at: https://github.com/r-ismail/aqarat-accounting/issues

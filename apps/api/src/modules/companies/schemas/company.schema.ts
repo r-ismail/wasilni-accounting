@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Language, Currency } from '@wasilni/shared';
+import { Language, Currency } from '@aqarat/shared';
 
 export type CompanyDocument = Company & Document;
 
