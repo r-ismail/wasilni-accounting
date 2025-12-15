@@ -66,7 +66,8 @@
     "created": "Meter created successfully",
     "updated": "Meter updated successfully",
     "deleted": "Meter deleted successfully",
-    "confirmDelete": "Are you sure you want to delete this meter?"
+    "confirmDelete": "Are you sure you want to delete this meter?",
+    "confirmDeleteMessage": "Are you sure you want to delete this meter? This action cannot be undone."
   },
   "payments": {
     "title": "Payments",
@@ -81,6 +82,7 @@
     "paymentRecorded": "Payment recorded successfully",
     "paymentDeleted": "Payment deleted successfully",
     "confirmDelete": "Are you sure you want to delete this payment?",
+    "confirmDeleteMessage": "Are you sure you want to delete this payment? This action cannot be undone.",
     "totalPayments": "Total Payments",
     "paymentsCount": "Payments Count",
     "unpaidInvoices": "Unpaid Invoices",
@@ -170,6 +172,11 @@
     "update": "Update",
     "deleting": "Deleting...",
     "saving": "Saving...",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "currency": "Currency",
+    "confirmDelete": "Confirm Delete",
     "currentPhase": "Current Phase",
     "phase1Complete": "Phase 1 - Authentication & i18n ✅",
     "nextPhase": "Next Phase",
@@ -570,6 +577,7 @@
     "requiredFields": "Please fill all required fields (Name in Arabic and English)",
     "types": {
       "fixed_fee": "Fixed Fee",
+      "fixedFee": "Fixed Fee",
       "metered": "Metered",
       "variable": "Variable"
     },
