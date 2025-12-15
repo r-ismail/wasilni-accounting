@@ -188,7 +188,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
+          ml: i18n.language === 'ar' ? 0 : { sm: `${drawerWidth}px` },
+          mr: i18n.language === 'ar' ? { sm: `${drawerWidth}px` } : 0,
           bgcolor: 'white',
           color: 'text.primary',
           borderBottom: '1px solid',
@@ -262,6 +263,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Mobile Drawer */}
         <Drawer
           variant="temporary"
+          anchor={i18n.language === 'ar' ? 'right' : 'left'}
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
@@ -282,13 +284,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Desktop Drawer */}
         <Drawer
           variant="permanent"
+          anchor={i18n.language === 'ar' ? 'right' : 'left'}
           sx={{
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
               border: 'none',
-              borderRight: '1px solid',
+              borderRight: i18n.language === 'ar' ? 'none' : '1px solid',
+              borderLeft: i18n.language === 'ar' ? '1px solid' : 'none',
               borderColor: 'divider',
             },
           }}
@@ -306,6 +310,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           p: { xs: 2, sm: 3 },
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           minHeight: '100vh',
+          ml: i18n.language === 'ar' ? 0 : { sm: `${drawerWidth}px` },
+          mr: i18n.language === 'ar' ? { sm: `${drawerWidth}px` } : 0,
         }}
       >
         <Toolbar />

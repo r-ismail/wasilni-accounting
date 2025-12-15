@@ -284,10 +284,23 @@
     "terminateConfirm": "إنهاء هذا العقد؟",
     "deleteConfirm": "حذف العقد؟",
     "deleteWarning": "لا يمكن التراجع عن هذا الإجراء"
-  },
-  "dashboard": {
+  },  "dashboard": {
     "title": "لوحة التحكم",
+    "subtitle": "نظرة عامة على نظام إدارة العقارات",
     "totalUnits": "إجمالي الوحدات",
+    "available": "متاحة",
+    "occupied": "مشغولة",
+    "totalCustomers": "إجمالي العملاء",
+    "registeredCustomers": "العملاء المسجلين",
+    "activeContracts": "العقود النشطة",
+    "currentlyActive": "نشطة حالياً",
+    "totalInvoices": "إجمالي الفواتير",
+    "paid": "مدفوعة",
+    "unpaid": "غير مدفوعة",
+    "totalRevenue": "إجمالي الإيرادات",
+    "overdueInvoices": "الفواتير المتأخرة",
+    "unpaidAmount": "المبلغ غير المدفوع"
+  },  "totalUnits": "إجمالي الوحدات",
     "occupiedUnits": "الوحدات المشغولة",
     "availableUnits": "الوحدات المتاحة",
     "monthlyRevenue": "الإيرادات الشهرية"

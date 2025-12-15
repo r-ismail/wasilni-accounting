@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { api } from '../lib/api';
+import api from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 export default function Meters() {

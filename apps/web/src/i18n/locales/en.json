@@ -283,10 +283,23 @@
     "terminateConfirm": "Terminate this contract?",
     "deleteConfirm": "Delete Contract?",
     "deleteWarning": "This action cannot be undone"
-  },
-  "dashboard": {
+  },  "dashboard": {
     "title": "Dashboard",
+    "subtitle": "Overview of your property management system",
     "totalUnits": "Total Units",
+    "available": "available",
+    "occupied": "occupied",
+    "totalCustomers": "Total Customers",
+    "registeredCustomers": "Registered customers",
+    "activeContracts": "Active Contracts",
+    "currentlyActive": "Currently active",
+    "totalInvoices": "Total Invoices",
+    "paid": "paid",
+    "unpaid": "unpaid",
+    "totalRevenue": "Total Revenue",
+    "overdueInvoices": "Overdue Invoices",
+    "unpaidAmount": "Unpaid amount"
+  },  "totalUnits": "Total Units",
     "occupiedUnits": "Occupied Units",
     "availableUnits": "Available Units",
     "monthlyRevenue": "Monthly Revenue"
