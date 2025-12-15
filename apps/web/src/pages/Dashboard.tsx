@@ -42,13 +42,20 @@ const Dashboard: React.FC = () => {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       // Fetch all data in parallel
-      const [units, customers, contracts, invoices, payments] = await Promise.all([
+      const [unitsRes, customersRes, contractsRes, invoicesRes, paymentsRes] = await Promise.all([
         api.get('/units').then(res => res.data),
         api.get('/customers').then(res => res.data),
         api.get('/contracts').then(res => res.data),
         api.get('/invoices').then(res => res.data),
         api.get('/payments').then(res => res.data),
       ]);
+
+      // Ensure arrays
+      const units = Array.isArray(unitsRes) ? unitsRes : [];
+      const customers = Array.isArray(customersRes) ? customersRes : [];
+      const contracts = Array.isArray(contractsRes) ? contractsRes : [];
+      const invoices = Array.isArray(invoicesRes) ? invoicesRes : [];
+      const payments = Array.isArray(paymentsRes) ? paymentsRes : [];
 
       // Calculate statistics
       const totalUnits = units.length;
