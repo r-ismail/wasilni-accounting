@@ -31,7 +31,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { api } from '../lib/api';
-import toast from 'react-hot-toast';
+
 import { usePagination } from '../hooks/usePagination';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useSnackbar } from '../contexts/SnackbarContext';

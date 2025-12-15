@@ -25,7 +25,7 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  Tooltip,
+
   Table,
   TableBody,
   TableCell,
@@ -54,16 +54,16 @@ import {
   Sms as SmsIcon,
   WhatsApp as WhatsAppIcon,
   Palette as PaletteIcon,
-  ColorLens as ColorLensIcon,
+
   Receipt as ReceiptIcon,
   Settings as SettingsIcon,
   FormatListNumbered as FormatListNumberedIcon,
-  CalendarToday as CalendarTodayIcon,
+
   NotificationsActive as NotificationsActiveIcon,
   Description as DescriptionIcon,
   Timer as TimerIcon,
-  Dashboard as DashboardIcon,
-  TableChart as TableChartIcon,
+
+
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
@@ -348,7 +348,7 @@ const Settings: React.FC = () => {
 
   // Update notifications mutation
   const updateNotificationsMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (_data: any) => {
       // TODO: Implement backend endpoint
       return new Promise((resolve) => setTimeout(resolve, 500));
     },
@@ -474,7 +474,7 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

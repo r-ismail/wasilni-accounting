@@ -17,6 +17,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   confirmColor?: 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning';
+  loading?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -28,6 +29,7 @@ export default function ConfirmDialog({
   confirmText,
   cancelText,
   confirmColor = 'error',
+  loading = false,
 }: ConfirmDialogProps) {
   const { t } = useTranslation();
 
@@ -48,8 +50,14 @@ export default function ConfirmDialog({
         <Button onClick={onCancel} color="inherit">
           {cancelText || t('common.cancel')}
         </Button>
-        <Button onClick={onConfirm} color={confirmColor} variant="contained" autoFocus>
-          {confirmText || t('common.confirm')}
+        <Button 
+          onClick={onConfirm} 
+          color={confirmColor} 
+          variant="contained" 
+          autoFocus
+          disabled={loading}
+        >
+          {loading ? t('common.loading') : (confirmText || t('common.confirm'))}
         </Button>
       </DialogActions>
     </Dialog>

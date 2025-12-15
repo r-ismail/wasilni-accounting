@@ -226,7 +226,7 @@ export default function Units() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginateData(units).map((unit: Unit) => (
+              {paginateData(units).map((unit: any) => (
                 <TableRow key={unit._id}>
                   <TableCell sx={{  }}>{unit.unitNumber}</TableCell>
                   <TableCell sx={{  }}>

@@ -223,7 +223,7 @@ export default function Contracts() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginateData(contracts).map((contract: Contract) => (
+              {paginateData(contracts).map((contract: any) => (
                 <TableRow key={contract._id}>
                   <TableCell>{contract.unitId.unitNumber}</TableCell>
                   <TableCell>{contract.customerId.name}</TableCell>
