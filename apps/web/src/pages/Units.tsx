@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Box,
   Button,
@@ -20,26 +21,34 @@ import {
   DialogContent,
   DialogActions,
   Alert,
+  Grid,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 
 interface Unit {
   _id: string;
   unitNumber: string;
-  buildingId: { _id: string; name: string };
+  buildingId: string | { _id: string; name: string };
   furnishingStatus: 'furnished' | 'unfurnished';
   status: 'available' | 'occupied' | 'maintenance';
   defaultRentMonthly: number;
   defaultRentDaily?: number;
 }
 
+interface Building {
+  _id: string;
+  name: string;
+}
+
 export default function Units() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState({ status: '', furnishing: '' });
+  const [formDialog, setFormDialog] = useState<{ open: boolean; unit?: Unit }>({ open: false });
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
+  const { control, handleSubmit, reset } = useForm<any>();
 
   const { data: units, isLoading } = useQuery({
     queryKey: ['units', filters],
@@ -52,6 +61,29 @@ export default function Units() {
     },
   });
 
+  const { data: buildings } = useQuery({
+    queryKey: ['buildings'],
+    queryFn: async () => {
+      const response = await api.get('/buildings');
+      return response.data.data;
+    },
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (formDialog.unit) {
+        await api.put(`/units/${formDialog.unit._id}`, data);
+      } else {
+        await api.post('/units', data);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['units'] });
+      setFormDialog({ open: false });
+      reset();
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/units/${id}`);
@@ -61,6 +93,25 @@ export default function Units() {
       setDeleteDialog(null);
     },
   });
+
+  const openForm = (unit?: Unit) => {
+    if (unit) {
+      const buildingId = typeof unit.buildingId === 'object' ? unit.buildingId._id : unit.buildingId;
+      reset({
+        ...unit,
+        buildingId,
+      });
+    } else {
+      reset({
+        buildingId: '',
+        unitNumber: '',
+        furnishingStatus: 'furnished',
+        defaultRentMonthly: 0,
+        defaultRentDaily: 0,
+      });
+    }
+    setFormDialog({ open: true, unit });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -83,6 +134,9 @@ export default function Units() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">{t('units.title')}</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => openForm()}>
+          {t('units.addUnit')}
+        </Button>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3 }}>
@@ -136,7 +190,9 @@ export default function Units() {
               {units?.map((unit: Unit) => (
                 <TableRow key={unit._id}>
                   <TableCell>{unit.unitNumber}</TableCell>
-                  <TableCell>{unit.buildingId?.name || '-'}</TableCell>
+                  <TableCell>
+                    {typeof unit.buildingId === 'object' ? unit.buildingId.name : '-'}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={t(`units.${unit.furnishingStatus}`)}
@@ -154,7 +210,7 @@ export default function Units() {
                   <TableCell>{unit.defaultRentMonthly}</TableCell>
                   <TableCell>{unit.defaultRentDaily || '-'}</TableCell>
                   <TableCell align="right">
-                    <IconButton size="small" color="primary">
+                    <IconButton size="small" color="primary" onClick={() => openForm(unit)}>
                       <EditIcon />
                     </IconButton>
                     <IconButton
@@ -171,6 +227,89 @@ export default function Units() {
           </Table>
         </TableContainer>
       )}
+
+      <Dialog open={formDialog.open} onClose={() => setFormDialog({ open: false })} maxWidth="md" fullWidth>
+        <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))}>
+          <DialogTitle>
+            {formDialog.unit ? t('units.editUnit') : t('units.addUnit')}
+          </DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="buildingId"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField {...field} select label={t('units.building')} fullWidth required>
+                      {buildings?.map((building: Building) => (
+                        <MenuItem key={building._id} value={building._id}>
+                          {building.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="unitNumber"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField {...field} label={t('units.unitNumber')} fullWidth required />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="furnishingStatus"
+                  control={control}
+                  defaultValue="furnished"
+                  render={({ field }) => (
+                    <TextField {...field} select label={t('units.furnishing')} fullWidth required>
+                      <MenuItem value="furnished">{t('units.furnished')}</MenuItem>
+                      <MenuItem value="unfurnished">{t('units.unfurnished')}</MenuItem>
+                    </TextField>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="defaultRentMonthly"
+                  control={control}
+                  defaultValue={0}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="number"
+                      label={t('units.monthlyRent')}
+                      fullWidth
+                      required
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="defaultRentDaily"
+                  control={control}
+                  defaultValue={0}
+                  render={({ field }) => (
+                    <TextField {...field} type="number" label={t('units.dailyRent')} fullWidth />
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setFormDialog({ open: false })}>{t('common.cancel')}</Button>
+            <Button type="submit" variant="contained">
+              {t('common.save')}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
       <Dialog open={!!deleteDialog} onClose={() => setDeleteDialog(null)}>
         <DialogTitle>{t('units.deleteConfirm')}</DialogTitle>
