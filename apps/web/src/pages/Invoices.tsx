@@ -81,13 +81,11 @@ export default function Invoices() {
 
   const handlePrint = async (invoiceId: string) => {
     try {
-      const response = await api.get(`/invoices/${invoiceId}/pdf`, {
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      window.open(url, '_blank');
+      // Open print view in new window
+      const printUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/invoices/${invoiceId}/print`;
+      window.open(printUrl, '_blank');
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('Error opening print view:', error);
     }
   };
 

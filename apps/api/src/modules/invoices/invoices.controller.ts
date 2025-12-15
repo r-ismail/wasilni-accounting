@@ -115,4 +115,11 @@ export class InvoicesController {
     const pdfBuffer = await this.invoicesService.generatePdf(id);
     return pdfBuffer;
   }
+
+  @Get(':id/print')
+  @ApiOperation({ summary: 'Get invoice print HTML' })
+  async getPrintHtml(@Param('id') id: string) {
+    const html = await this.invoicesService.generatePrintHtml(id);
+    return html;
+  }
 }
