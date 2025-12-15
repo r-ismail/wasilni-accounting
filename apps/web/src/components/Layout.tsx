@@ -50,6 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [companyName, setCompanyName] = useState<string>('');
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanyInfo = async () => {
@@ -57,6 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         const response = await api.get('/companies/my-company');
         if (response.data.success && response.data.data) {
           setCompanyName(response.data.data.name);
+          setCompanyLogo(response.data.data.logo || null);
         }
       } catch (error) {
         console.error('Failed to fetch company info:', error);
@@ -99,9 +101,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Logo and Company Name */}
       <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ bgcolor: 'white', color: 'primary.main', width: 48, height: 48, mr: 2 }}>
-            <BusinessIcon />
-          </Avatar>
+          {companyLogo ? (
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                mr: 2,
+                bgcolor: 'white',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                p: 0.5,
+              }}
+            >
+              <img
+                src={companyLogo}
+                alt="Company Logo"
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+              />
+            </Box>
+          ) : (
+            <Avatar sx={{ bgcolor: 'white', color: 'primary.main', width: 48, height: 48, mr: 2 }}>
+              <BusinessIcon />
+            </Avatar>
+          )}
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
               {t('app.title')}
@@ -211,8 +235,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {menuItems.find(item => item.path === location.pathname)?.text || t('app.title')}
           </Typography>
 
-          {/* Company Name Badge */}
-          {companyName && (
+          {/* Company Logo/Name Badge */}
+          {companyLogo ? (
+            <Box
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+                height: 40,
+                px: 1.5,
+                bgcolor: 'white',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+              }}
+            >
+              <img
+                src={companyLogo}
+                alt="Company Logo"
+                style={{ maxHeight: 36, maxWidth: 150, objectFit: 'contain' }}
+              />
+            </Box>
+          ) : companyName ? (
             <Chip
               icon={<BusinessIcon />}
               label={companyName}
@@ -224,7 +268,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 fontWeight: 600,
               }}
             />
-          )}
+          ) : null}
 
           {/* Language Toggle */}
           <IconButton 
