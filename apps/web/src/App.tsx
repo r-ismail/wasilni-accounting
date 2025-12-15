@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
 import { getTheme } from './theme/theme';
 import ProtectedRoute from './components/ProtectedRoute';
+import SetupCheck from './components/SetupCheck';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -16,6 +17,7 @@ import Invoices from './pages/Invoices';
 import Payments from './pages/Payments';
 import Customers from './pages/Customers';
 import Settings from './pages/Settings';
+import SetupWizard from './pages/Setup/SetupWizard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,21 +45,33 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
+                path="/setup"
+                element={
+                  <ProtectedRoute>
+                    <SetupCheck>
+                      <SetupWizard />
+                    </SetupCheck>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/*"
                 element={
                   <ProtectedRoute>
-                    <Layout>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/units" element={<Units />} />
-                        <Route path="/contracts" element={<Contracts />} />
-                        <Route path="/invoices" element={<Invoices />} />
-                        <Route path="/payments" element={<Payments />} />
-                        <Route path="/customers" element={<Customers />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                      </Routes>
-                    </Layout>
+                    <SetupCheck>
+                      <Layout>
+                        <Routes>
+                          <Route path="/" element={<Dashboard />} />
+                          <Route path="/units" element={<Units />} />
+                          <Route path="/contracts" element={<Contracts />} />
+                          <Route path="/invoices" element={<Invoices />} />
+                          <Route path="/payments" element={<Payments />} />
+                          <Route path="/customers" element={<Customers />} />
+                          <Route path="/settings" element={<Settings />} />
+                          <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                      </Layout>
+                    </SetupCheck>
                   </ProtectedRoute>
                 }
               />
