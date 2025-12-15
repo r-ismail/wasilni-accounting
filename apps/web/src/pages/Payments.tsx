@@ -115,7 +115,7 @@ export default function Payments() {
 
   const handleSubmit = () => {
     if (!selectedInvoiceId || !amount) {
-      toast.error(t('common.fillRequired'));
+      showSnackbar(t('common.fillRequired'), 'error');
       return;
     }
 
