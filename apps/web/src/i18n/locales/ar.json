@@ -12,6 +12,37 @@
     "loginError": "اسم المستخدم أو كلمة المرور غير صحيحة",
     "welcome": "مرحباً بعودتك!"
   },
+  "meters": {
+    "title": "العدادات",
+    "addMeter": "إضافة عداد",
+    "editMeter": "تعديل عداد",
+    "meterNumber": "رقم العداد",
+    "type": "النوع",
+    "service": "الخدمة",
+    "location": "الموقع",
+    "status": "الحالة",
+    "building": "مبنى",
+    "unit": "وحدة",
+    "created": "تم إنشاء العداد بنجاح",
+    "updated": "تم تحديث العداد بنجاح",
+    "deleted": "تم حذف العداد بنجاح",
+    "confirmDelete": "هل أنت متأكد من حذف هذا العداد؟"
+  },
+  "readings": {
+    "title": "قراءات العدادات",
+    "addReading": "إضافة قراءة",
+    "selectMeter": "اختر العداد",
+    "date": "التاريخ",
+    "meter": "العداد",
+    "previous": "السابق",
+    "current": "الحالي",
+    "currentReading": "القراءة الحالية",
+    "consumption": "الاستهلاك",
+    "notes": "ملاحظات",
+    "created": "تم إضافة القراءة بنجاح",
+    "error": "خطأ في إضافة القراءة",
+    "fillRequired": "يرجى ملء جميع الحقول المطلوبة"
+  },
   "invoices": {
     "title": "الفواتير",
     "generate": "إنشاء فاتورة",
@@ -75,6 +106,8 @@
     "invoices": "الفواتير",
     "payments": "المدفوعات",
     "customers": "العملاء",
+    "meters": "العدادات",
+    "readings": "القراءات",
     "settings": "الإعدادات"
   },
   "setup": {

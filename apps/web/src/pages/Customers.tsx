@@ -32,7 +32,7 @@ export default function Customers() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
-      const response = await api.get(\`/customers?\${params.toString()}\`);
+      const response = await api.get(`/customers?${params.toString()}`);
       return response.data.data;
     },
   });

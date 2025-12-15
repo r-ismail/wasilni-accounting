@@ -16,6 +16,8 @@ import Contracts from './pages/Contracts';
 import Invoices from './pages/Invoices';
 import Payments from './pages/Payments';
 import Customers from './pages/Customers';
+import Meters from './pages/Meters';
+import MeterReadings from './pages/MeterReadings';
 import Settings from './pages/Settings';
 import SetupWizard from './pages/Setup/SetupWizard';
 
@@ -67,6 +69,8 @@ const App: React.FC = () => {
                           <Route path="/invoices" element={<Invoices />} />
                           <Route path="/payments" element={<Payments />} />
                           <Route path="/customers" element={<Customers />} />
+                          <Route path="/meters" element={<Meters />} />
+                          <Route path="/readings" element={<MeterReadings />} />
                           <Route path="/settings" element={<Settings />} />
                           <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>

@@ -12,6 +12,37 @@
     "loginError": "Invalid username or password",
     "welcome": "Welcome back!"
   },
+  "meters": {
+    "title": "Meters",
+    "addMeter": "Add Meter",
+    "editMeter": "Edit Meter",
+    "meterNumber": "Meter Number",
+    "type": "Type",
+    "service": "Service",
+    "location": "Location",
+    "status": "Status",
+    "building": "Building",
+    "unit": "Unit",
+    "created": "Meter created successfully",
+    "updated": "Meter updated successfully",
+    "deleted": "Meter deleted successfully",
+    "confirmDelete": "Are you sure you want to delete this meter?"
+  },
+  "readings": {
+    "title": "Meter Readings",
+    "addReading": "Add Reading",
+    "selectMeter": "Select Meter",
+    "date": "Date",
+    "meter": "Meter",
+    "previous": "Previous",
+    "current": "Current",
+    "currentReading": "Current Reading",
+    "consumption": "Consumption",
+    "notes": "Notes",
+    "created": "Reading added successfully",
+    "error": "Error adding reading",
+    "fillRequired": "Please fill all required fields"
+  },
   "invoices": {
     "title": "Invoices",
     "generate": "Generate Invoice",
@@ -74,6 +105,8 @@
     "invoices": "Invoices",
     "payments": "Payments",
     "customers": "Customers",
+    "meters": "Meters",
+    "readings": "Readings",
     "settings": "Settings"
   },
   "setup": {
