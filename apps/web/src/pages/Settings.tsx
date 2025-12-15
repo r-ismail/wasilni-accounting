@@ -150,6 +150,46 @@ const Settings: React.FC = () => {
     invoiceFooterText: '',
   });
 
+  // Invoice Settings form state
+  const [invoiceForm, setInvoiceForm] = useState({
+    // Display Options
+    showInvoiceHeader: true,
+    showInvoiceFooter: true,
+    showCustomerDetails: true,
+    showUnitDetails: true,
+    showContractDetails: false,
+    showPaymentTerms: false,
+    showTaxBreakdown: true,
+    // Tax & Discount
+    defaultTaxRate: 0,
+    enableDiscount: false,
+    defaultDiscountPercent: 0,
+    // Custom Text
+    invoiceHeaderText: '',
+    invoiceNotes: '',
+    paymentInstructions: '',
+    // Page Settings
+    invoicePageSize: 'A4',
+    invoiceOrientation: 'portrait',
+  });
+
+  // Services & Meters Settings form state
+  const [servicesForm, setServicesForm] = useState({
+    // Meter Pricing
+    electricityPricePerUnit: 0,
+    waterPricePerUnit: 0,
+    enableTieredPricing: false,
+    electricityTiers: [] as Array<{min: number, max: number, price: number}>,
+    waterTiers: [] as Array<{min: number, max: number, price: number}>,
+    electricityFixedCharge: 0,
+    waterFixedCharge: 0,
+    // Meter Settings
+    meterReadingUnit: 'unit',
+    requireApprovalForServices: false,
+    allowNegativeReadings: false,
+    maxConsumptionLimit: 0,
+  });
+
   // Advanced Settings form state
   const [advancedForm, setAdvancedForm] = useState({
     // Invoice Customization
@@ -196,6 +236,42 @@ const Settings: React.FC = () => {
         showInvoiceColors: company.showInvoiceColors ?? true,
         invoiceLogoPosition: company.invoiceLogoPosition || 'right',
         invoiceFooterText: company.invoiceFooterText || '',
+      });
+      setInvoiceForm({
+        // Display Options
+        showInvoiceHeader: company.showInvoiceHeader ?? true,
+        showInvoiceFooter: company.showInvoiceFooter ?? true,
+        showCustomerDetails: company.showCustomerDetails ?? true,
+        showUnitDetails: company.showUnitDetails ?? true,
+        showContractDetails: company.showContractDetails ?? false,
+        showPaymentTerms: company.showPaymentTerms ?? false,
+        showTaxBreakdown: company.showTaxBreakdown ?? true,
+        // Tax & Discount
+        defaultTaxRate: company.defaultTaxRate ?? 0,
+        enableDiscount: company.enableDiscount ?? false,
+        defaultDiscountPercent: company.defaultDiscountPercent ?? 0,
+        // Custom Text
+        invoiceHeaderText: company.invoiceHeaderText || '',
+        invoiceNotes: company.invoiceNotes || '',
+        paymentInstructions: company.paymentInstructions || '',
+        // Page Settings
+        invoicePageSize: company.invoicePageSize || 'A4',
+        invoiceOrientation: company.invoiceOrientation || 'portrait',
+      });
+      setServicesForm({
+        // Meter Pricing
+        electricityPricePerUnit: company.electricityPricePerUnit ?? 0,
+        waterPricePerUnit: company.waterPricePerUnit ?? 0,
+        enableTieredPricing: company.enableTieredPricing ?? false,
+        electricityTiers: company.electricityTiers || [],
+        waterTiers: company.waterTiers || [],
+        electricityFixedCharge: company.electricityFixedCharge ?? 0,
+        waterFixedCharge: company.waterFixedCharge ?? 0,
+        // Meter Settings
+        meterReadingUnit: company.meterReadingUnit || 'unit',
+        requireApprovalForServices: company.requireApprovalForServices ?? false,
+        allowNegativeReadings: company.allowNegativeReadings ?? false,
+        maxConsumptionLimit: company.maxConsumptionLimit ?? 0,
       });
       setAdvancedForm({
         // Invoice Customization
@@ -1622,37 +1698,67 @@ const Settings: React.FC = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showInvoiceHeader} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showInvoiceHeader: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showHeader')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showInvoiceFooter} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showInvoiceFooter: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showFooter')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showCustomerDetails} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showCustomerDetails: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showCustomerDetails')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showUnitDetails} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showUnitDetails: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showUnitDetails')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showContractDetails} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showContractDetails: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showContractDetails')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showPaymentTerms} 
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showPaymentTerms: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showPaymentTerms')}
                     />
                   </Grid>
@@ -1674,13 +1780,19 @@ const Settings: React.FC = () => {
                       fullWidth
                       label={t('settings.invoice.defaultTaxRate')}
                       type="number"
-                      defaultValue={0}
+                      value={invoiceForm.defaultTaxRate}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, defaultTaxRate: parseFloat(e.target.value) || 0})}
                       InputProps={{ endAdornment: '%' }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.enableDiscount}
+                          onChange={(e) => setInvoiceForm({...invoiceForm, enableDiscount: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.enableDiscount')}
                     />
                   </Grid>
@@ -1689,13 +1801,20 @@ const Settings: React.FC = () => {
                       fullWidth
                       label={t('settings.invoice.defaultDiscountPercent')}
                       type="number"
-                      defaultValue={0}
+                      value={invoiceForm.defaultDiscountPercent}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, defaultDiscountPercent: parseFloat(e.target.value) || 0})}
                       InputProps={{ endAdornment: '%' }}
+                      disabled={!invoiceForm.enableDiscount}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControlLabel
-                      control={<Switch checked={true} />}
+                      control={
+                        <Switch 
+                          checked={invoiceForm.showTaxBreakdown}
+                          onChange={(e) => setInvoiceForm({...invoiceForm, showTaxBreakdown: e.target.checked})}
+                        />
+                      }
                       label={t('settings.invoice.showTaxBreakdown')}
                     />
                   </Grid>
@@ -1718,6 +1837,8 @@ const Settings: React.FC = () => {
                       label={t('settings.invoice.headerText')}
                       multiline
                       rows={2}
+                      value={invoiceForm.invoiceHeaderText}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, invoiceHeaderText: e.target.value})}
                       placeholder={t('settings.invoice.headerTextPlaceholder')}
                     />
                   </Grid>
@@ -1727,7 +1848,8 @@ const Settings: React.FC = () => {
                       label={t('settings.invoice.footerText')}
                       multiline
                       rows={2}
-                      defaultValue={company?.invoiceFooterText || ''}
+                      value={customizationForm.invoiceFooterText}
+                      onChange={(e) => setCustomizationForm({...customizationForm, invoiceFooterText: e.target.value})}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -1736,6 +1858,8 @@ const Settings: React.FC = () => {
                       label={t('settings.invoice.notes')}
                       multiline
                       rows={3}
+                      value={invoiceForm.invoiceNotes}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, invoiceNotes: e.target.value})}
                       placeholder={t('settings.invoice.notesPlaceholder')}
                     />
                   </Grid>
@@ -1745,6 +1869,8 @@ const Settings: React.FC = () => {
                       label={t('settings.invoice.paymentInstructions')}
                       multiline
                       rows={3}
+                      value={invoiceForm.paymentInstructions}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, paymentInstructions: e.target.value})}
                       placeholder={t('settings.invoice.paymentInstructionsPlaceholder')}
                     />
                   </Grid>
@@ -1766,7 +1892,8 @@ const Settings: React.FC = () => {
                       fullWidth
                       select
                       label={t('settings.invoice.pageSize')}
-                      defaultValue="A4"
+                      value={invoiceForm.invoicePageSize}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, invoicePageSize: e.target.value})}
                     >
                       <MenuItem value="A4">A4</MenuItem>
                       <MenuItem value="Letter">Letter</MenuItem>
@@ -1778,7 +1905,8 @@ const Settings: React.FC = () => {
                       fullWidth
                       select
                       label={t('settings.invoice.orientation')}
-                      defaultValue="portrait"
+                      value={invoiceForm.invoiceOrientation}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, invoiceOrientation: e.target.value})}
                     >
                       <MenuItem value="portrait">{t('settings.invoice.portrait')}</MenuItem>
                       <MenuItem value="landscape">{t('settings.invoice.landscape')}</MenuItem>
@@ -1789,10 +1917,40 @@ const Settings: React.FC = () => {
             </Card>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button variant="outlined" size="large">
+              <Button 
+                variant="outlined" 
+                size="large"
+                onClick={() => {
+                  if (company) {
+                    setInvoiceForm({
+                      showInvoiceHeader: company.showInvoiceHeader ?? true,
+                      showInvoiceFooter: company.showInvoiceFooter ?? true,
+                      showCustomerDetails: company.showCustomerDetails ?? true,
+                      showUnitDetails: company.showUnitDetails ?? true,
+                      showContractDetails: company.showContractDetails ?? false,
+                      showPaymentTerms: company.showPaymentTerms ?? false,
+                      showTaxBreakdown: company.showTaxBreakdown ?? true,
+                      defaultTaxRate: company.defaultTaxRate ?? 0,
+                      enableDiscount: company.enableDiscount ?? false,
+                      defaultDiscountPercent: company.defaultDiscountPercent ?? 0,
+                      invoiceHeaderText: company.invoiceHeaderText || '',
+                      invoiceNotes: company.invoiceNotes || '',
+                      paymentInstructions: company.paymentInstructions || '',
+                      invoicePageSize: company.invoicePageSize || 'A4',
+                      invoiceOrientation: company.invoiceOrientation || 'portrait',
+                    });
+                  }
+                }}
+              >
                 {t('common.reset')}
               </Button>
-              <Button variant="contained" startIcon={<SaveIcon />} size="large">
+              <Button 
+                variant="contained" 
+                startIcon={<SaveIcon />} 
+                size="large"
+                onClick={() => updateCompanyMutation.mutate(invoiceForm)}
+                disabled={updateCompanyMutation.isPending}
+              >
                 {t('common.save')}
               </Button>
             </Box>
@@ -1827,10 +1985,11 @@ const Settings: React.FC = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label={t('settings.services.pricePerKwh')}
+                      label={t('settings.services.electricityPricePerUnit')}
                       type="number"
-                      defaultValue={0}
-                      InputProps={{ endAdornment: t('settings.services.perKwh') }}
+                      value={servicesForm.electricityPricePerUnit}
+                      onChange={(e) => setServicesForm({...servicesForm, electricityPricePerUnit: parseFloat(e.target.value) || 0})}
+                      InputProps={{ endAdornment: t('settings.services.perUnit') }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1838,7 +1997,8 @@ const Settings: React.FC = () => {
                       fullWidth
                       label={t('settings.services.fixedCharge')}
                       type="number"
-                      defaultValue={0}
+                      value={servicesForm.electricityFixedCharge}
+                      onChange={(e) => setServicesForm({...servicesForm, electricityFixedCharge: parseFloat(e.target.value) || 0})}
                       InputProps={{ endAdornment: t('common.currency') }}
                     />
                   </Grid>
@@ -1855,10 +2015,11 @@ const Settings: React.FC = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label={t('settings.services.pricePerCubicMeter')}
+                      label={t('settings.services.waterPricePerUnit')}
                       type="number"
-                      defaultValue={0}
-                      InputProps={{ endAdornment: t('settings.services.perM3') }}
+                      value={servicesForm.waterPricePerUnit}
+                      onChange={(e) => setServicesForm({...servicesForm, waterPricePerUnit: parseFloat(e.target.value) || 0})}
+                      InputProps={{ endAdornment: t('settings.services.perUnit') }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1866,14 +2027,20 @@ const Settings: React.FC = () => {
                       fullWidth
                       label={t('settings.services.fixedCharge')}
                       type="number"
-                      defaultValue={0}
+                      value={servicesForm.waterFixedCharge}
+                      onChange={(e) => setServicesForm({...servicesForm, waterFixedCharge: parseFloat(e.target.value) || 0})}
                       InputProps={{ endAdornment: t('common.currency') }}
                     />
                   </Grid>
                   
                   <Grid item xs={12}>
                     <FormControlLabel
-                      control={<Switch />}
+                      control={
+                        <Switch 
+                          checked={servicesForm.enableTieredPricing}
+                          onChange={(e) => setServicesForm({...servicesForm, enableTieredPricing: e.target.checked})}
+                        />
+                      }
                       label={t('settings.services.enableTieredPricing')}
                     />
                   </Grid>
@@ -1906,10 +2073,36 @@ const Settings: React.FC = () => {
             </Card>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button variant="outlined" size="large">
+              <Button 
+                variant="outlined" 
+                size="large"
+                onClick={() => {
+                  if (company) {
+                    setServicesForm({
+                      electricityPricePerUnit: company.electricityPricePerUnit ?? 0,
+                      waterPricePerUnit: company.waterPricePerUnit ?? 0,
+                      enableTieredPricing: company.enableTieredPricing ?? false,
+                      electricityTiers: company.electricityTiers || [],
+                      waterTiers: company.waterTiers || [],
+                      electricityFixedCharge: company.electricityFixedCharge ?? 0,
+                      waterFixedCharge: company.waterFixedCharge ?? 0,
+                      meterReadingUnit: company.meterReadingUnit || 'unit',
+                      requireApprovalForServices: company.requireApprovalForServices ?? false,
+                      allowNegativeReadings: company.allowNegativeReadings ?? false,
+                      maxConsumptionLimit: company.maxConsumptionLimit ?? 0,
+                    });
+                  }
+                }}
+              >
                 {t('common.reset')}
               </Button>
-              <Button variant="contained" startIcon={<SaveIcon />} size="large">
+              <Button 
+                variant="contained" 
+                startIcon={<SaveIcon />} 
+                size="large"
+                onClick={() => updateCompanyMutation.mutate(servicesForm)}
+                disabled={updateCompanyMutation.isPending}
+              >
                 {t('common.save')}
               </Button>
             </Box>

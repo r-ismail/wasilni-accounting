@@ -217,10 +217,10 @@ export class Company {
 
   // Meter Pricing Configuration
   @Prop({ default: 0 })
-  electricityPricePerKwh?: number; // Price per kWh
+  electricityPricePerUnit?: number; // Price per unit (instead of kWh)
 
   @Prop({ default: 0 })
-  waterPricePerCubicMeter?: number; // Price per m³
+  waterPricePerUnit?: number; // Price per unit (instead of m³)
 
   @Prop({ default: false })
   enableTieredPricing?: boolean; // Enable tiered/progressive pricing
