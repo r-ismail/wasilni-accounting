@@ -50,12 +50,12 @@ const Dashboard: React.FC = () => {
         api.get('/payments').then(res => res.data),
       ]);
 
-      // Ensure arrays
-      const units = Array.isArray(unitsRes) ? unitsRes : [];
-      const customers = Array.isArray(customersRes) ? customersRes : [];
-      const contracts = Array.isArray(contractsRes) ? contractsRes : [];
-      const invoices = Array.isArray(invoicesRes) ? invoicesRes : [];
-      const payments = Array.isArray(paymentsRes) ? paymentsRes : [];
+      // Extract data arrays from API response format {success: true, data: [...]}
+      const units = Array.isArray(unitsRes?.data) ? unitsRes.data : (Array.isArray(unitsRes) ? unitsRes : []);
+      const customers = Array.isArray(customersRes?.data) ? customersRes.data : (Array.isArray(customersRes) ? customersRes : []);
+      const contracts = Array.isArray(contractsRes?.data) ? contractsRes.data : (Array.isArray(contractsRes) ? contractsRes : []);
+      const invoices = Array.isArray(invoicesRes?.data) ? invoicesRes.data : (Array.isArray(invoicesRes) ? invoicesRes : []);
+      const payments = Array.isArray(paymentsRes?.data) ? paymentsRes.data : (Array.isArray(paymentsRes) ? paymentsRes : []);
 
       // Calculate statistics
       const totalUnits = units.length;
