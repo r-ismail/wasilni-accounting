@@ -15,6 +15,7 @@ export interface InvoicePdfData {
     name: string;
     currency: string;
     defaultLanguage: string;
+    logo?: string;
   };
   customer: {
     name: string;
