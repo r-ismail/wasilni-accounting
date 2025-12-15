@@ -17,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Paper,
   Typography,
   IconButton,
@@ -31,10 +32,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { api } from '../lib/api';
 import toast from 'react-hot-toast';
+import { usePagination } from '../hooks/usePagination';
 
 export default function Payments() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState('');
   const [paymentDate, setPaymentDate] = useState<Date>(new Date());
@@ -205,7 +208,7 @@ export default function Payments() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {payments.map((payment: any) => (
+            {paginateData(payments).map((payment: any) => (
               <TableRow key={payment._id}>
                 <TableCell>{getInvoiceInfo(payment.invoiceId)}</TableCell>
                 <TableCell>{payment.amount.toFixed(2)}</TableCell>
@@ -227,6 +230,16 @@ export default function Payments() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={payments?.length || 0}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+        />
       </TableContainer>
 
       {/* Record Payment Dialog */}

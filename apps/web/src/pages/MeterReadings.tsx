@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Dialog, DialogTitle,
+  TableContainer, TableHead, TableRow, TablePagination, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, FormControl,
   InputLabel, Select, Chip
 } from '@mui/material';
@@ -10,10 +10,12 @@ import { Add } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { toast } from 'react-hot-toast';
+import { usePagination } from '../hooks/usePagination';
 
 export default function MeterReadings() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     meterId: '',
@@ -100,7 +102,7 @@ export default function MeterReadings() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {readings.map((reading: any) => (
+            {paginateData(readings).map((reading: any) => (
               <TableRow key={reading._id}>
                 <TableCell>{formatDate(reading.readingDate)}</TableCell>
                 <TableCell>{reading.meterId?.meterNumber}</TableCell>
@@ -126,6 +128,16 @@ export default function MeterReadings() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={readings?.length || 0}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+        />
       </TableContainer>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>

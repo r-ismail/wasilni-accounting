@@ -17,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Paper,
   Typography,
   IconButton,
@@ -31,6 +32,7 @@ import {
 import { Add, Delete, Refresh, Send } from '@mui/icons-material';
 import { api } from '../lib/api';
 import toast from 'react-hot-toast';
+import { usePagination } from '../hooks/usePagination';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,6 +52,7 @@ function TabPanel(props: TabPanelProps) {
 export default function Notifications() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [tabValue, setTabValue] = useState(0);
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
@@ -277,7 +280,7 @@ export default function Notifications() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {notifications.map((notification: any) => (
+              {paginateData(notifications).map((notification: any) => (
                 <TableRow key={notification._id}>
                   <TableCell>
                     {getTypeIcon(notification.type)} {notification.type.toUpperCase()}
@@ -313,6 +316,16 @@ export default function Notifications() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={notifications?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       </TabPanel>
 
@@ -340,7 +353,7 @@ export default function Notifications() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {templates.map((template: any) => (
+              {paginateData(templates).map((template: any) => (
                 <TableRow key={template._id}>
                   <TableCell>{template.name}</TableCell>
                   <TableCell>
@@ -376,6 +389,16 @@ export default function Notifications() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={templates?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       </TabPanel>
 

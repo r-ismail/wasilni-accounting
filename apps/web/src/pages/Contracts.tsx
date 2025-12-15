@@ -11,6 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   IconButton,
   Chip,
   Typography,
@@ -31,6 +32,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
+import { usePagination } from '../hooks/usePagination';
 
 interface Contract {
   _id: string;
@@ -59,6 +61,7 @@ interface Customer {
 export default function Contracts() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [formDialog, setFormDialog] = useState<{ open: boolean; contract?: Contract }>({
     open: false,
   });
@@ -202,7 +205,7 @@ export default function Contracts() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {contracts?.map((contract: Contract) => (
+              {paginateData(contracts).map((contract: Contract) => (
                 <TableRow key={contract._id}>
                   <TableCell>{contract.unitId.unitNumber}</TableCell>
                   <TableCell>{contract.customerId.name}</TableCell>
@@ -248,6 +251,16 @@ export default function Contracts() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={contracts?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       )}
 
