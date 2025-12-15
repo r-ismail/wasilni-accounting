@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UnitsService } from './units.service';
-import { CreateUnitDto } from './dto/create-unit.dto';
+import { CreateUnitDto, UpdateUnitDto } from './dto/create-unit.dto';
 import { BulkCreateUnitsDto } from './dto/bulk-create-units.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -74,7 +74,7 @@ export class UnitsController {
   async update(
     @Request() req: any,
     @Param('id') id: string,
-    @Body() updateUnitDto: Partial<CreateUnitDto>,
+    @Body() updateUnitDto: UpdateUnitDto,
   ) {
     const unit = await this.unitsService.update(
       req.user.companyId,

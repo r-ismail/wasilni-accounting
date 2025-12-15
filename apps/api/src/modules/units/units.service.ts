@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Unit, UsageType } from './schemas/unit.schema';
-import { CreateUnitDto } from './dto/create-unit.dto';
+import { CreateUnitDto, UpdateUnitDto } from './dto/create-unit.dto';
 import { BulkCreateUnitsDto } from './dto/bulk-create-units.dto';
 
 @Injectable()
@@ -82,7 +82,7 @@ export class UnitsService {
   async update(
     companyId: string,
     id: string,
-    updateUnitDto: Partial<CreateUnitDto>,
+    updateUnitDto: UpdateUnitDto,
   ): Promise<Unit> {
     const unit = await this.unitModel
       .findOneAndUpdate(

@@ -51,3 +51,46 @@ export class CreateUnitDto {
   @IsOptional()
   defaultRentDaily?: number;
 }
+
+export class UpdateUnitDto {
+  @ApiPropertyOptional({ description: 'Unit number', example: '101' })
+  @IsString()
+  @IsOptional()
+  unitNumber?: string;
+
+  @ApiPropertyOptional({
+    description: 'Furnishing status',
+    enum: FurnishingStatus,
+  })
+  @IsEnum(FurnishingStatus)
+  @IsOptional()
+  furnishingStatus?: FurnishingStatus;
+
+  @ApiPropertyOptional({
+    description: 'Usage type',
+    enum: UsageType,
+  })
+  @IsEnum(UsageType)
+  @IsOptional()
+  usageType?: UsageType;
+
+  @ApiPropertyOptional({ description: 'Default monthly rent' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  defaultRentMonthly?: number;
+
+  @ApiPropertyOptional({ description: 'Default daily rent' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  defaultRentDaily?: number;
+
+  @ApiPropertyOptional({
+    description: 'Unit status',
+    enum: ['available', 'occupied', 'maintenance'],
+  })
+  @IsEnum(['available', 'occupied', 'maintenance'])
+  @IsOptional()
+  status?: 'available' | 'occupied' | 'maintenance';
+}
