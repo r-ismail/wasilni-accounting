@@ -55,29 +55,43 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     const fetchCompanyInfo = async () => {
       try {
+        console.log('[Layout] Fetching company info...');
         const response = await api.get('/companies/my-company');
+        console.log('[Layout] Company response:', response.data);
+        
         if (response.data.success && response.data.data) {
           const name = response.data.data.name;
+          const logo = response.data.data.logo;
+          
+          console.log('[Layout] Company name:', name);
+          console.log('[Layout] Company logo:', logo);
+          
           setCompanyName(name);
-          setCompanyLogo(response.data.data.logo || null);
-          // Update page title to company name only
-          document.title = name;
+          setCompanyLogo(logo || null);
+          
+          // Update page title to company name
+          document.title = name || 'Wasilni Accounting';
           
           // Update favicon if logo exists
-          if (response.data.data.logo) {
+          if (logo) {
             const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
             if (favicon) {
-              favicon.href = response.data.data.logo;
+              favicon.href = logo;
             }
           }
+        } else {
+          console.warn('[Layout] No company data received');
+          document.title = 'Wasilni Accounting';
         }
       } catch (error) {
-        console.error('Failed to fetch company info:', error);
+        console.error('[Layout] Failed to fetch company info:', error);
+        // Fallback on error
+        document.title = 'Wasilni Accounting';
       }
     };
 
     fetchCompanyInfo();
-  }, [t]);
+  }, []); // Run only once on mount
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
