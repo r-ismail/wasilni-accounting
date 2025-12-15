@@ -38,7 +38,7 @@ COPY packages/ ./packages/
 RUN pnpm install --prod --frozen-lockfile
 
 # Copy built application
-COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
 # Set working directory to api app
 WORKDIR /app/apps/api
