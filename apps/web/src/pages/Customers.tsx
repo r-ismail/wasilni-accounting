@@ -40,7 +40,7 @@ export default function Customers() {
   const createMutation = useMutation({
     mutationFn: async (data: Partial<Customer>) => {
       if (formDialog.customer) {
-        await api.put(\`/customers/\${formDialog.customer._id}\`, data);
+        await api.put(`/customers/${formDialog.customer._id}`, data);
       } else {
         await api.post('/customers', data);
       }
@@ -53,7 +53,7 @@ export default function Customers() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => await api.delete(\`/customers/\${id}\`),
+    mutationFn: async (id: string) => await api.delete(`/customers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       setDeleteDialog(null);
@@ -94,7 +94,7 @@ export default function Customers() {
               {customers?.map((customer: Customer) => (
                 <TableRow key={customer._id}>
                   <TableCell>{customer.name}</TableCell>
-                  <TableCell><Chip label={t(\`customers.\${customer.type}\`)} size="small" /></TableCell>
+                  <TableCell><Chip label={t(`customers.${customer.type}`)} size="small" /></TableCell>
                   <TableCell>{customer.phone}</TableCell>
                   <TableCell>{customer.email || '-'}</TableCell>
                   <TableCell align="right">
