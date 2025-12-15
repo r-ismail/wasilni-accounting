@@ -14,6 +14,23 @@ export interface InvoicePrintData {
     currency: string;
     defaultLanguage: string;
     logo?: string;
+    // Display settings
+    showInvoiceHeader?: boolean;
+    showInvoiceFooter?: boolean;
+    showCustomerDetails?: boolean;
+    showUnitDetails?: boolean;
+    showContractDetails?: boolean;
+    showPaymentTerms?: boolean;
+    showTaxBreakdown?: boolean;
+    // Tax & Discount
+    defaultTaxRate?: number;
+    enableDiscount?: boolean;
+    defaultDiscountPercent?: number;
+    // Custom text
+    invoiceHeaderText?: string;
+    invoiceFooterText?: string;
+    invoiceNotes?: string;
+    paymentInstructions?: string;
   };
   customer: {
     name: string;
@@ -24,6 +41,16 @@ export interface InvoicePrintData {
     unitNumber: string;
     buildingName?: string;
   };
+  contract?: {
+    startDate: Date;
+    endDate: Date;
+    rentType: string;
+  };
+  subtotal?: number;
+  discount?: number;
+  discountPercent?: number;
+  taxAmount?: number;
+  taxRate?: number;
   lines: Array<{
     description: string;
     quantity: number;
@@ -242,10 +269,12 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
   </button>
   
   <div class="invoice-container">
+    ${data.company.showInvoiceHeader !== false ? `
     <div class="header">
       ${data.company.logo ? `<img src="${data.company.logo}" alt="Logo" style="max-height: 80px; max-width: 200px; object-fit: contain;">` : `<div class="company-name">${data.company.name}</div>`}
       <div class="invoice-title">${isRTL ? 'فاتورة' : 'INVOICE'}</div>
-    </div>
+      ${data.company.invoiceHeaderText ? `<div style="margin-top: 10px; font-size: 14px; color: #666;">${data.company.invoiceHeaderText}</div>` : ''}
+    </div>` : `<div class="invoice-title" style="text-align: center; margin-bottom: 30px;">${isRTL ? 'فاتورة' : 'INVOICE'}</div>`}
 
     <div class="info-section">
       <div class="info-box">
@@ -255,13 +284,14 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
         <div class="info-item"><strong>${isRTL ? 'تاريخ الاستحقاق' : 'Due Date'}:</strong> ${formatDate(data.invoice.dueDate)}</div>
         <div class="info-item"><strong>${isRTL ? 'الفترة' : 'Period'}:</strong> ${formatDate(data.invoice.periodStart)} - ${formatDate(data.invoice.periodEnd)}</div>
       </div>
-      <div class="info-box">
+      ${data.company.showCustomerDetails !== false ? `<div class="info-box">
         <div class="info-header">${isRTL ? 'معلومات العميل' : 'Customer Information'}</div>
         <div class="info-item"><strong>${isRTL ? 'الاسم' : 'Name'}:</strong> ${data.customer.name}</div>
         ${data.customer.phone ? `<div class="info-item"><strong>${isRTL ? 'الهاتف' : 'Phone'}:</strong> ${data.customer.phone}</div>` : ''}
         ${data.customer.email ? `<div class="info-item"><strong>${isRTL ? 'البريد' : 'Email'}:</strong> ${data.customer.email}</div>` : ''}
-        <div class="info-item"><strong>${isRTL ? 'الوحدة' : 'Unit'}:</strong> ${data.unit.unitNumber}${data.unit.buildingName ? ` - ${data.unit.buildingName}` : ''}</div>
-      </div>
+        ${data.company.showUnitDetails !== false ? `<div class="info-item"><strong>${isRTL ? 'الوحدة' : 'Unit'}:</strong> ${data.unit.unitNumber}${data.unit.buildingName ? ` - ${data.unit.buildingName}` : ''}</div>` : ''}
+        ${data.company.showContractDetails && data.contract ? `<div class="info-item"><strong>${isRTL ? 'العقد' : 'Contract'}:</strong> ${formatDate(data.contract.startDate)} - ${formatDate(data.contract.endDate)}</div>` : ''}
+      </div>` : ''}
     </div>
 
     <table>
@@ -286,6 +316,18 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
     </table>
 
     <div class="totals">
+      ${data.subtotal ? `<div class="total-row">
+        <span>${isRTL ? 'المجموع الفرعي' : 'Subtotal'}:</span>
+        <span>${formatNumber(data.subtotal)} ${currencySymbol}</span>
+      </div>` : ''}
+      ${data.discount && data.discount > 0 ? `<div class="total-row" style="color: #4caf50;">
+        <span>${isRTL ? 'الخصم' : 'Discount'} ${data.discountPercent ? `(${data.discountPercent}%)` : ''}:</span>
+        <span>-${formatNumber(data.discount)} ${currencySymbol}</span>
+      </div>` : ''}
+      ${data.taxAmount && data.taxAmount > 0 && data.company.showTaxBreakdown !== false ? `<div class="total-row">
+        <span>${isRTL ? 'الضريبة' : 'Tax'} ${data.taxRate ? `(${data.taxRate}%)` : ''}:</span>
+        <span>+${formatNumber(data.taxAmount)} ${currencySymbol}</span>
+      </div>` : ''}
       <div class="total-row main">
         <span>${isRTL ? 'الإجمالي' : 'Total'}:</span>
         <span>${formatNumber(data.invoice.totalAmount)} ${currencySymbol}</span>
@@ -300,9 +342,15 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
       </div>
     </div>
 
-    <div class="footer">
-      ${isRTL ? 'شكراً لتعاملكم معنا' : 'Thank you for your business'}
-    </div>
+    ${data.company.invoiceNotes || data.company.paymentInstructions ? `
+    <div style="margin-top: 30px; padding: 15px; background: #f5f5f5; border-${isRTL ? 'right' : 'left'}: 4px solid #1976d2;">
+      ${data.company.invoiceNotes ? `<div style="margin-bottom: ${data.company.paymentInstructions ? '10px' : '0'};"><strong>${isRTL ? 'ملاحظات' : 'Notes'}:</strong> ${data.company.invoiceNotes}</div>` : ''}
+      ${data.company.paymentInstructions ? `<div><strong>${isRTL ? 'تعليمات الدفع' : 'Payment Instructions'}:</strong> ${data.company.paymentInstructions}</div>` : ''}
+    </div>` : ''}
+
+    ${data.company.showInvoiceFooter !== false ? `<div class="footer">
+      ${data.company.invoiceFooterText || (isRTL ? 'شكراً لتعاملكم معنا' : 'Thank you for your business')}
+    </div>` : ''}
   </div>
 </body>
 </html>

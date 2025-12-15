@@ -418,6 +418,15 @@ export class InvoicesService {
     const unit: any = contract.unitId;
     const building: any = unit?.buildingId;
 
+    // Calculate subtotal, discount, and tax
+    const linesTotal = lines.reduce((sum, line) => sum + line.amount, 0);
+    const discountPercent = company.enableDiscount ? (company.defaultDiscountPercent || 0) : 0;
+    const discount = discountPercent > 0 ? (linesTotal * discountPercent / 100) : 0;
+    const afterDiscount = linesTotal - discount;
+    const taxRate = company.defaultTaxRate || 0;
+    const taxAmount = taxRate > 0 ? (afterDiscount * taxRate / 100) : 0;
+    const calculatedTotal = afterDiscount + taxAmount;
+
     const printData: InvoicePrintData = {
       invoice: {
         invoiceNumber: invoice.invoiceNumber,
@@ -434,6 +443,23 @@ export class InvoicesService {
         currency: company.currency,
         defaultLanguage: company.defaultLanguage,
         logo: company.logo,
+        // Display settings
+        showInvoiceHeader: company.showInvoiceHeader,
+        showInvoiceFooter: company.showInvoiceFooter,
+        showCustomerDetails: company.showCustomerDetails,
+        showUnitDetails: company.showUnitDetails,
+        showContractDetails: company.showContractDetails,
+        showPaymentTerms: company.showPaymentTerms,
+        showTaxBreakdown: company.showTaxBreakdown,
+        // Tax & Discount
+        defaultTaxRate: company.defaultTaxRate,
+        enableDiscount: company.enableDiscount,
+        defaultDiscountPercent: company.defaultDiscountPercent,
+        // Custom text
+        invoiceHeaderText: company.invoiceHeaderText,
+        invoiceFooterText: company.invoiceFooterText,
+        invoiceNotes: company.invoiceNotes,
+        paymentInstructions: company.paymentInstructions,
       },
       customer: {
         name: customer.name,
@@ -444,12 +470,22 @@ export class InvoicesService {
         unitNumber: unit.unitNumber,
         buildingName: building?.name,
       },
+      contract: {
+        startDate: contract.startDate,
+        endDate: contract.endDate,
+        rentType: contract.rentType,
+      },
       lines: lines.map((line) => ({
         description: line.description,
         quantity: line.quantity,
         unitPrice: line.unitPrice,
         amount: line.amount,
       })),
+      subtotal: linesTotal,
+      discount: discount > 0 ? discount : undefined,
+      discountPercent: discountPercent > 0 ? discountPercent : undefined,
+      taxAmount: taxAmount > 0 ? taxAmount : undefined,
+      taxRate: taxRate > 0 ? taxRate : undefined,
     };
 
     return generateInvoiceHtml(printData);
