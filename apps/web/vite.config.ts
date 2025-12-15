@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@wasilni/shared': path.resolve(__dirname, '../../packages/shared/src'),
+      '@aqarat/shared': path.resolve(__dirname, '../../packages/shared/src'),
     },
   },
   server: {
