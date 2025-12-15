@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Payment, PaymentDocument } from './schemas/payment.schema';
 import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
 import { CreatePaymentDto } from './dto/payment.dto';
@@ -18,10 +18,25 @@ export class PaymentsService {
     userId: string,
   ): Promise<PaymentDocument> {
     // Get invoice
+    // Convert string to ObjectId if needed
+    const invoiceId = typeof createPaymentDto.invoiceId === 'string' 
+      ? new Types.ObjectId(createPaymentDto.invoiceId)
+      : createPaymentDto.invoiceId;
+    
+    // Convert companyId to ObjectId if needed
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
+    
     const invoice = await this.invoiceModel
-      .findOne({ _id: createPaymentDto.invoiceId, companyId })
-      .populate('contractId');
-
+      .findOne({ _id: invoiceId, companyId: companyObjectId })
+      .populate({
+        path: 'contractId',
+        populate: {
+          path: 'customerId',
+        },
+      });
+    
     if (!invoice) {
       throw new NotFoundException('Invoice not found');
     }
@@ -35,13 +50,18 @@ export class PaymentsService {
     }
 
     // Create payment
+    // Convert userId to ObjectId if needed
+    const userObjectId = typeof userId === 'string'
+      ? new Types.ObjectId(userId)
+      : userId;
+    
     const payment = new this.paymentModel({
       ...createPaymentDto,
-      companyId,
+      companyId: companyObjectId,
       contractId: (invoice.contractId as any)._id,
       customerId: (invoice.contractId as any).customerId,
       paymentMethod: 'cash',
-      recordedBy: userId,
+      recordedBy: userObjectId,
     });
 
     await payment.save();
@@ -62,7 +82,12 @@ export class PaymentsService {
   }
 
   async findAll(companyId: string, filters?: any): Promise<PaymentDocument[]> {
-    const query: any = { companyId };
+    // Convert companyId to ObjectId if needed
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
+    
+    const query: any = { companyId: companyObjectId };
 
     if (filters?.invoiceId) {
       query.invoiceId = filters.invoiceId;
@@ -87,8 +112,13 @@ export class PaymentsService {
   }
 
   async findOne(id: string, companyId: string): Promise<PaymentDocument> {
+    // Convert companyId to ObjectId if needed
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
+    
     const payment = await this.paymentModel
-      .findOne({ _id: id, companyId })
+      .findOne({ _id: id, companyId: companyObjectId })
       .populate('invoiceId')
       .populate('contractId')
       .populate('customerId')

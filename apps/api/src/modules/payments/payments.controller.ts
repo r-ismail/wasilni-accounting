@@ -27,7 +27,7 @@ export class PaymentsController {
     const payment = await this.paymentsService.create(
       createPaymentDto,
       req.user.companyId,
-      req.user.sub,
+      req.user.userId,
     );
     return {
       success: true,
