@@ -3,12 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  IconButton, Chip, TextField, MenuItem, Typography, Dialog, DialogTitle, DialogContent,
+  TablePagination, IconButton, Chip, TextField, MenuItem, Typography, Dialog, DialogTitle, DialogContent,
   DialogActions, Alert, Grid,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
+import { usePagination } from '../hooks/usePagination';
 
 interface Customer {
   _id: string;
@@ -22,6 +23,7 @@ interface Customer {
 export default function Customers() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [search, setSearch] = useState('');
   const [formDialog, setFormDialog] = useState<{ open: boolean; customer?: Customer }>({ open: false });
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
@@ -91,7 +93,7 @@ export default function Customers() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers?.map((customer: Customer) => (
+              {paginateData(customers).map((customer: Customer) => (
                 <TableRow key={customer._id}>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell><Chip label={t(`customers.${customer.type}`)} size="small" /></TableCell>
@@ -105,6 +107,16 @@ export default function Customers() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={customers?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       )}
       <Dialog open={formDialog.open} onClose={() => setFormDialog({ open: false })} maxWidth="md" fullWidth>

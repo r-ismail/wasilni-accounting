@@ -9,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Typography,
   Chip,
   IconButton,
@@ -29,10 +30,12 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
+import { usePagination } from '../hooks/usePagination';
 
 export default function Invoices() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [generateOpen, setGenerateOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
@@ -157,7 +160,7 @@ export default function Invoices() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {invoices.map((invoice: any) => (
+              {paginateData(invoices).map((invoice: any) => (
                 <TableRow key={invoice._id}>
                   <TableCell>{invoice.invoiceNumber}</TableCell>
                   <TableCell>{invoice.contractId?.customerId?.name}</TableCell>
@@ -205,6 +208,16 @@ export default function Invoices() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={invoices?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       )}
 

@@ -11,6 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   IconButton,
   Chip,
   TextField,
@@ -26,6 +27,7 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
+import { usePagination } from '../hooks/usePagination';
 
 interface Unit {
   _id: string;
@@ -45,6 +47,7 @@ interface Building {
 export default function Units() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [filters, setFilters] = useState({ status: '', furnishing: '' });
   const [formDialog, setFormDialog] = useState<{ open: boolean; unit?: Unit }>({ open: false });
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
@@ -209,7 +212,7 @@ export default function Units() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {units?.map((unit: Unit) => (
+              {paginateData(units).map((unit: Unit) => (
                 <TableRow key={unit._id}>
                   <TableCell sx={{  }}>{unit.unitNumber}</TableCell>
                   <TableCell sx={{  }}>
@@ -247,6 +250,16 @@ export default function Units() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={units?.length || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage={t('settings.advanced.rowsPerPage')}
+          />
         </TableContainer>
       )}
 
