@@ -18,7 +18,7 @@ export default defineConfig({
     allowedHosts: ['.manusvm.computer'],
     proxy: {
       '/api': {
-        target: 'https://3001-i38ky9reaf15140rnrl0z-807a6cb4.manusvm.computer',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
       },
