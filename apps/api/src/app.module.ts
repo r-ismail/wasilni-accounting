@@ -12,6 +12,7 @@ import { ServicesModule } from './modules/services/services.module';
 import { SetupModule } from './modules/setup/setup.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { ContractsModule } from './modules/contracts/contracts.module';
+import { InvoicesModule } from './modules/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { ContractsModule } from './modules/contracts/contracts.module';
     SetupModule,
     CustomersModule,
     ContractsModule,
+    InvoicesModule,
   ],
 })
 export class AppModule {}

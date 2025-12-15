@@ -6,8 +6,10 @@ export enum ServiceType {
   FIXED_FEE = 'fixed_fee',
 }
 
+export type ServiceDocument = Service & Document;
+
 @Schema({ timestamps: true })
-export class Service extends Document {
+export class Service {
   @Prop({ type: Types.ObjectId, ref: 'Company', required: true, index: true })
   companyId: Types.ObjectId;
 
