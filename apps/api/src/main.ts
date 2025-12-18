@@ -11,7 +11,7 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Enable CORS
-  const allowedCorsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  const allowedCorsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173', 'https://wasilni-accounting-web.vercel.app')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
