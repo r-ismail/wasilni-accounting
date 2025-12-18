@@ -46,7 +46,7 @@ COPY --from=builder /app/packages/shared/dist /app/packages/shared/dist
 COPY --from=builder /app/packages/shared/package.json /app/packages/shared/
 
 # Copy built application to dist folder
-COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/dist /app/apps/api/dist
 
 # Set working directory to api app
 WORKDIR /app/apps/api
