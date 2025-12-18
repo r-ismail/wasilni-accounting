@@ -11,8 +11,19 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Enable CORS
+  const allowedCorsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (incomingOrigin, callback) => {
+      if (!incomingOrigin || allowedCorsOrigins.includes(incomingOrigin)) {
+        return callback(null, true);
+      }
+      return callback(
+        new Error('CORS policy does not allow access from the specified Origin'),
+      );
+    },
     credentials: true,
   });
 
