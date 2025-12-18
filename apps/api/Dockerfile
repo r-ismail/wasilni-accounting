@@ -54,5 +54,5 @@ WORKDIR /app/apps/api
 # Expose port
 EXPOSE 3001
 
-# Start the application
-CMD ["node", "dist/apps/api/src/main.js"]
+# Seed and start the application
+CMD ["sh", "-c", "node dist/apps/api/src/seed.js && node dist/apps/api/src/main.js"]

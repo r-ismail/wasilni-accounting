@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nest build",
     "seed": "ts-node src/seed.ts",
+    "seed:prod": "node dist/apps/api/src/seed.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/apps/api/src/main",
     "dev": "nest start --watch",
