@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserRole = exports.Language = exports.ServiceType = exports.InvoiceLineType = exports.InvoiceStatus = exports.RentType = exports.UnitStatus = exports.UsageType = exports.FurnishingStatus = void 0;
+exports.UserRole = exports.Currency = exports.Language = exports.ServiceType = exports.InvoiceLineType = exports.InvoiceStatus = exports.RentType = exports.UnitStatus = exports.UsageType = exports.FurnishingStatus = void 0;
 var FurnishingStatus;
 (function (FurnishingStatus) {
     FurnishingStatus["FURNISHED"] = "furnished";
@@ -43,6 +43,13 @@ var Language;
     Language["AR"] = "ar";
     Language["EN"] = "en";
 })(Language || (exports.Language = Language = {}));
+var Currency;
+(function (Currency) {
+    Currency["SAR"] = "SAR";
+    Currency["YER"] = "YER";
+    Currency["USD"] = "USD";
+    Currency["EUR"] = "EUR";
+})(Currency || (exports.Currency = Currency = {}));
 var UserRole;
 (function (UserRole) {
     UserRole["SUPER_ADMIN"] = "super_admin";

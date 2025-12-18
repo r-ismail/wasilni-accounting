@@ -32,6 +32,12 @@ export declare enum Language {
     AR = "ar",
     EN = "en"
 }
+export declare enum Currency {
+    SAR = "SAR",
+    YER = "YER",
+    USD = "USD",
+    EUR = "EUR"
+}
 export declare enum UserRole {
     SUPER_ADMIN = "super_admin",
     ADMIN = "admin",
@@ -64,7 +70,7 @@ export interface RefreshTokenDto {
 }
 export interface CreateCompanyDto {
     name: string;
-    currency: string;
+    currency: Currency;
     defaultLanguage: Language;
     mergeServicesWithRent: boolean;
 }
