@@ -78,7 +78,10 @@ export default function Units() {
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       if (formDialog.unit) {
-        await api.put(`/units/${formDialog.unit._id}`, data);
+        // Filter out fields that should not be sent in update
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, companyId, buildingId, features, createdAt, updatedAt, __v, ...updateData } = data;
+        await api.put(`/units/${formDialog.unit._id}`, updateData);
       } else {
         await api.post('/units', data);
       }
