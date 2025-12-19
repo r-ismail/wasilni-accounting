@@ -4,7 +4,7 @@ import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TablePagination, IconButton, Chip, Dialog,
   DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
-  FormControl, InputLabel, Select
+  FormControl, InputLabel, Select, CircularProgress
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -30,13 +30,15 @@ export default function Meters() {
     isActive: true,
   });
 
-  const { data: meters = [] } = useQuery({
+  const { data: meters = [], isLoading } = useQuery({
     queryKey: ['meters'],
     queryFn: async () => {
       const res = await api.get('/meters');
       return res.data.data || res.data || [];
     },
   });
+
+  // ... (rest of the hooks) ...
 
   const { data: services = [] } = useQuery({
     queryKey: ['services'],
@@ -61,6 +63,8 @@ export default function Meters() {
       return res.data.data || res.data || [];
     },
   });
+
+  // ... (mutations and handlers) ...
 
   const createMutation = useMutation({
     mutationFn: (data: any) => api.post('/meters', data),
@@ -161,7 +165,12 @@ export default function Meters() {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
@@ -216,6 +225,7 @@ export default function Meters() {
           labelRowsPerPage={t('settings.advanced.rowsPerPage')}
         />
       </TableContainer>
+      )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
