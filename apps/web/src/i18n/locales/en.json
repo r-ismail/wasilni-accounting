@@ -337,6 +337,10 @@
   },
   "settings": {
     "description": "Manage system and company settings",
+    "buildings": {
+      "title": "Building Management",
+      "description": "Manage your buildings and their types"
+    },
     "company": {
       "title": "Company Settings",
       "info": "Update your company information and basic settings",
@@ -586,6 +590,28 @@
       "maintenance": "Maintenance",
       "amenities": "Amenities",
       "other": "Other"
+    }
+  },
+  "buildings": {
+    "addBuilding": "Add Building",
+    "editBuilding": "Edit Building",
+    "title": "Buildings",
+    "description": "Manage your buildings and properties",
+    "name": "Building Name",
+    "address": "Address",
+    "type": "Building Type",
+    "created": "Building created successfully",
+    "updated": "Building updated successfully",
+    "deleted": "Building deleted successfully",
+    "deleteConfirmTitle": "Confirm Delete",
+    "deleteConfirmMessage": "Are you sure you want to delete this building? This cannot be undone.",
+    "noBuildings": "No buildings found. Click 'Add Building' to create one.",
+    "types": {
+      "apartment": "Apartment Building",
+      "villa": "Villa",
+      "office": "Office Building",
+      "commercial": "Commercial Complex",
+      "warehouse": "Warehouse"
     }
   }
 }

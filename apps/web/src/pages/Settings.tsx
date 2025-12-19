@@ -66,10 +66,12 @@ import {
 
   Edit as EditIcon,
   Delete as DeleteIcon,
+  LocationCity as LocationCityIcon,
 } from '@mui/icons-material';
 import api from '../lib/api';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ServiceFormDialog from '../components/ServiceFormDialog';
+import BuildingSettings from '../components/BuildingSettings';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -520,6 +522,12 @@ const Settings: React.FC = () => {
             sx={{ textTransform: 'none', fontWeight: 600 }}
           />
           <Tab
+            icon={<LocationCityIcon />}
+            iconPosition="start"
+            label={t('settings.buildings.title')}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+          <Tab
             icon={<LanguageIcon />}
             iconPosition="start"
             label={t('settings.language.title')}
@@ -707,8 +715,13 @@ const Settings: React.FC = () => {
           </Box>
         </TabPanel>
 
-        {/* Language Settings Tab */}
+        {/* Buildings Management Tab */}
         <TabPanel value={tabValue} index={1}>
+          <BuildingSettings />
+        </TabPanel>
+
+        {/* Language Settings Tab */}
+        <TabPanel value={tabValue} index={2}>
           <Box sx={{ px: 3 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -793,7 +806,7 @@ const Settings: React.FC = () => {
         </TabPanel>
 
         {/* Notifications Settings Tab */}
-        <TabPanel value={tabValue} index={2}>
+        <TabPanel value={tabValue} index={3}>
           <Box sx={{ px: 3 }}>
             <form onSubmit={handleNotificationsSubmit}>
               <Grid container spacing={3}>
@@ -1259,7 +1272,7 @@ const Settings: React.FC = () => {
         </TabPanel>
 
         {/* Security Settings Tab */}
-        <TabPanel value={tabValue} index={3}>
+        <TabPanel value={tabValue} index={4}>
           <Box sx={{ px: 3 }}>
             <form onSubmit={handlePasswordSubmit}>
               <Grid container spacing={3}>
@@ -1403,7 +1416,7 @@ const Settings: React.FC = () => {
         </TabPanel>
 
         {/* Advanced Customization Tab */}
-        <TabPanel value={tabValue} index={4}>
+        <TabPanel value={tabValue} index={5}>
           <Box sx={{ px: 3 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               {t('settings.advanced.title')}
@@ -1773,7 +1786,7 @@ const Settings: React.FC = () => {
         </TabPanel>
 
         {/* Invoice Customization Tab */}
-        <TabPanel value={tabValue} index={5}>
+        <TabPanel value={tabValue} index={6}>
           <Box sx={{ px: 3 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               {t('settings.invoice.title')}
@@ -2054,7 +2067,7 @@ const Settings: React.FC = () => {
         </TabPanel>
 
         {/* Services Management Tab */}
-        <TabPanel value={tabValue} index={6}>
+        <TabPanel value={tabValue} index={7}>
           <Box sx={{ px: 3 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
               {t('settings.services.title')}
