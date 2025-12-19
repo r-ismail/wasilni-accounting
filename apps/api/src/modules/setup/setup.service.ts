@@ -82,6 +82,7 @@ export class SetupService {
         const building = await this.buildingsService.create(companyId, {
           name: buildingDto.name,
           address: buildingDto.address,
+          ...(buildingDto.buildingType ? { buildingType: buildingDto.buildingType } : {}),
         });
 
         // Create furnished units

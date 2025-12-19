@@ -14,6 +14,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Language } from '@aqarat/shared';
 import { FurnishingStatus, UsageType } from '../../units/schemas/unit.schema';
+import { BuildingType } from '../../buildings/schemas/building.schema';
 import { ServiceType } from '../../services/schemas/service.schema';
 
 // Company Info DTO
@@ -81,6 +82,15 @@ export class BuildingSetupDto {
   @IsString()
   @IsOptional()
   address?: string;
+
+  @ApiPropertyOptional({
+    description: 'Building type',
+    enum: BuildingType,
+    example: BuildingType.APARTMENT,
+  })
+  @IsEnum(BuildingType)
+  @IsOptional()
+  buildingType?: BuildingType;
 
   @ApiProperty({ description: 'Furnished units configuration' })
   @ValidateNested()

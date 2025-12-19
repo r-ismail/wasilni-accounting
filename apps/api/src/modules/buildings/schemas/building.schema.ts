@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export enum BuildingType {
+  APARTMENT = 'apartment',
+  HOTEL = 'hotel',
+}
+
 @Schema({ timestamps: true })
 export class Building extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Company', required: true, index: true })
@@ -12,8 +17,8 @@ export class Building extends Document {
   @Prop({ trim: true })
   address?: string;
 
-  @Prop({ enum: ['apartment', 'hotel'], default: 'apartment' })
-  buildingType: string;
+  @Prop({ enum: Object.values(BuildingType), default: BuildingType.APARTMENT })
+  buildingType: BuildingType;
 
   @Prop({ default: Date.now })
   createdAt: Date;
