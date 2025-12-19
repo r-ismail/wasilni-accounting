@@ -98,7 +98,8 @@ export default function Invoices() {
   const handlePrint = async (invoiceId: string) => {
     try {
       // Open print view in new window
-      const printUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/invoices/${invoiceId}/print`;
+      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
+      const printUrl = `${baseUrl}/invoices/${invoiceId}/print`;
       window.open(printUrl, '_blank');
     } catch (error) {
       console.error('Error opening print view:', error);
