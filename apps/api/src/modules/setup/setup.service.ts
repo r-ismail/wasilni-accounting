@@ -21,16 +21,16 @@ export class SetupService {
     private servicesService: ServicesService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   async getSetupStatus(userId: string): Promise<{ setupCompleted: boolean; companyId?: string }> {
     // Check if user is super admin (no company)
     const user = await this.usersService.findById(userId);
-    
+
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    
+
     if (user.role === 'super_admin' && !user.companyId) {
       return { setupCompleted: false };
     }
@@ -50,11 +50,11 @@ export class SetupService {
   async runSetup(userId: string, setupDto: RunSetupDto): Promise<{ companyId: string }> {
     // Verify user is super admin
     const user = await this.usersService.findById(userId);
-    
+
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    
+
     if (user.role !== 'super_admin') {
       throw new BadRequestException('Only super admin can run initial setup');
     }
@@ -113,6 +113,7 @@ export class SetupService {
       // Create services
       for (const serviceDto of setupDto.services) {
         await this.servicesService.create(companyId, {
+          name: serviceDto.name,
           nameAr: serviceDto.name,
           nameEn: serviceDto.name,
           type: serviceDto.type,

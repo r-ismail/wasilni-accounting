@@ -11,10 +11,14 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Enable CORS
-  const allowedCorsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173', 'https://wasilni-accounting-web.vercel.app')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  /* 
+   * Fix for CORS: correctly create array of origins. 
+   */
+  
+  const defaultOrigins = ['http://localhost:5173', 'https://wasilni-accounting-web.vercel.app'];
+  const allowedCorsOrigins = process.env.CORS_ORIGIN
+    ? [...defaultOrigins, ...process.env.CORS_ORIGIN.split(',').map(o => o.trim())]
+    : defaultOrigins;
   app.enableCors({
     origin: (incomingOrigin, callback) => {
       if (!incomingOrigin || allowedCorsOrigins.includes(incomingOrigin)) {
