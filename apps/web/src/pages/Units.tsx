@@ -78,10 +78,22 @@ export default function Units() {
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       if (formDialog.unit) {
-        // Filter out fields that should not be sent in update
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, companyId, buildingId, features, createdAt, updatedAt, __v, ...updateData } = data;
-        await api.put(`/units/${formDialog.unit._id}`, updateData);
+        // Use whitelist approach to ensure only allowed fields are sent
+        const updatePayload = {
+          buildingId: data.buildingId,
+          unitNumber: data.unitNumber,
+          furnishingStatus: data.furnishingStatus,
+          usageType: data.usageType,
+          defaultRentMonthly: Number(data.defaultRentMonthly),
+          defaultRentDaily: data.defaultRentDaily ? Number(data.defaultRentDaily) : undefined,
+          status: data.status,
+          area: data.area ? Number(data.area) : undefined,
+          bedrooms: data.bedrooms ? Number(data.bedrooms) : undefined,
+          bathrooms: data.bathrooms ? Number(data.bathrooms) : undefined,
+          floor: data.floor,
+          description: data.description,
+        };
+        await api.put(`/units/${formDialog.unit._id}`, updatePayload);
       } else {
         await api.post('/units', data);
       }

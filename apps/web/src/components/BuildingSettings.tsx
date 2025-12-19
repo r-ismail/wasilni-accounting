@@ -71,7 +71,13 @@ const BuildingSettings: React.FC = () => {
   // Update mutation
   const updateBuildingMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await api.put(`/buildings/${id}`, data);
+      // Use whitelist approach to ensure only allowed fields are sent
+      const updatePayload = {
+        name: data.name,
+        address: data.address,
+        buildingType: data.buildingType,
+      };
+      const res = await api.put(`/buildings/${id}`, updatePayload);
       return res.data;
     },
     onSuccess: () => {

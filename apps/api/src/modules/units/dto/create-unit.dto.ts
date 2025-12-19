@@ -81,6 +81,11 @@ export class CreateUnitDto {
 }
 
 export class UpdateUnitDto {
+  @ApiPropertyOptional({ description: 'Building ID' })
+  @IsMongoId()
+  @IsOptional()
+  buildingId?: string;
+
   @ApiPropertyOptional({ description: 'Unit number', example: '101' })
   @IsString()
   @IsOptional()
