@@ -57,6 +57,15 @@ export class InvoicesService {
       );
     }
 
+    const company = await this.companyModel
+      .findById(companyId)
+      .select('defaultLanguage')
+      .exec();
+
+    if (!company) {
+      throw new NotFoundException('Company not found');
+    }
+
     // Get contract with populated data
     const contract = await this.contractModel
       .findById(contractId)
@@ -109,7 +118,7 @@ export class InvoicesService {
     const rentLine = new this.invoiceLineModel({
       invoiceId: invoice._id,
       type: 'rent',
-      description: `${contract.rentType === 'monthly' ? 'Monthly' : 'Daily'} Rent`,
+      description: this.getRentDescription(contract.rentType, company.defaultLanguage),
       quantity: contract.rentType === 'monthly' ? 1 : Math.ceil(
         (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
       ),
@@ -325,6 +334,14 @@ export class InvoicesService {
     }
 
     return `${prefix}-${String(sequence).padStart(4, '0')}`;
+  }
+
+  private getRentDescription(rentType: string, language: string): string {
+    const isArabic = language === 'ar';
+    if (rentType === 'monthly') {
+      return isArabic ? 'الإيجار الشهري' : 'Monthly Rent';
+    }
+    return isArabic ? 'الإيجار اليومي' : 'Daily Rent';
   }
 
   private async addMeterLines(
