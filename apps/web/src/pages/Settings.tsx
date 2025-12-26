@@ -480,14 +480,6 @@ const Settings: React.FC = () => {
     });
   };
 
-  const handleServiceSubmit = (data: any) => {
-    if (editingService) {
-      updateServiceMutation.mutate({ id: editingService._id, data });
-    } else {
-      createServiceMutation.mutate(data);
-    }
-  };
-
   const handleDeleteService = (id: string) => {
     setDeletingServiceId(id);
     setDeleteConfirmOpen(true);
