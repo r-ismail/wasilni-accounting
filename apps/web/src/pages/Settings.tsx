@@ -168,7 +168,7 @@ const Settings: React.FC = () => {
   });
 
   // Customization form state
-  const [customizationForm, setCustomizationForm] = useState({
+  const [, setCustomizationForm] = useState({
     primaryColor: '#19d238ff',
     secondaryColor: '#0b00dcff',
     accentColor: '#c77913ff',
