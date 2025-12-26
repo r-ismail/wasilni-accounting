@@ -28,6 +28,8 @@ async function bootstrap() {
         new Error('CORS policy does not allow access from the specified Origin'),
       );
     },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
   });
 
