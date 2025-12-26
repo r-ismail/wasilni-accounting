@@ -20,6 +20,9 @@ export class Building extends Document {
   @Prop({ enum: Object.values(BuildingType), default: BuildingType.APARTMENT })
   buildingType: BuildingType;
 
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Service' }], default: [] })
+  services?: Types.ObjectId[];
+
   @Prop({ default: Date.now })
   createdAt: Date;
 

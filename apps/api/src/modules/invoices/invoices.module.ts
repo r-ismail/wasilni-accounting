@@ -10,6 +10,7 @@ import { Company, CompanySchema } from '../companies/schemas/company.schema';
 import { Service, ServiceSchema } from '../services/schemas/service.schema';
 import { Meter, MeterSchema } from '../meters/schemas/meter.schema';
 import { MeterReading, MeterReadingSchema } from '../meters/schemas/meter-reading.schema';
+import { Building, BuildingSchema } from '../buildings/schemas/building.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MeterReading, MeterReadingSchema } from '../meters/schemas/meter-readin
       { name: Service.name, schema: ServiceSchema },
       { name: Meter.name, schema: MeterSchema },
       { name: MeterReading.name, schema: MeterReadingSchema },
+      { name: Building.name, schema: BuildingSchema },
     ]),
   ],
   controllers: [InvoicesController],

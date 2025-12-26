@@ -1,22 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Building } from './schemas/building.schema';
 import { CreateBuildingDto } from './dto/create-building.dto';
+import { Service, ServiceDocument } from '../services/schemas/service.schema';
 
 @Injectable()
 export class BuildingsService {
   constructor(
     @InjectModel(Building.name) private buildingModel: Model<Building>,
+    @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
   ) {}
 
   async create(
     companyId: string,
     createBuildingDto: CreateBuildingDto,
   ): Promise<Building> {
+    const services = await this.validateServices(companyId, createBuildingDto.services);
+
     const building = new this.buildingModel({
       ...createBuildingDto,
       companyId: new Types.ObjectId(companyId),
+      services,
     });
     return building.save();
   }
@@ -24,6 +29,7 @@ export class BuildingsService {
   async findAll(companyId: string): Promise<Building[]> {
     return this.buildingModel
       .find({ companyId: new Types.ObjectId(companyId) })
+      .populate('services', 'name type')
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -34,6 +40,7 @@ export class BuildingsService {
         _id: new Types.ObjectId(id),
         companyId: new Types.ObjectId(companyId),
       })
+      .populate('services', 'name type')
       .exec();
 
     if (!building) {
@@ -48,15 +55,21 @@ export class BuildingsService {
     id: string,
     updateBuildingDto: Partial<CreateBuildingDto>,
   ): Promise<Building> {
+    const services =
+      updateBuildingDto.services !== undefined
+        ? await this.validateServices(companyId, updateBuildingDto.services)
+        : undefined;
+
     const building = await this.buildingModel
       .findOneAndUpdate(
         {
           _id: new Types.ObjectId(id),
           companyId: new Types.ObjectId(companyId),
         },
-        { ...updateBuildingDto, updatedAt: new Date() },
+        { ...updateBuildingDto, ...(services ? { services } : {}), updatedAt: new Date() },
         { new: true },
       )
+      .populate('services', 'name type')
       .exec();
 
     if (!building) {
@@ -77,5 +90,25 @@ export class BuildingsService {
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Building with ID ${id} not found`);
     }
+  }
+
+  private async validateServices(
+    companyId: string,
+    serviceIds?: string[] | Types.ObjectId[],
+  ): Promise<Types.ObjectId[] | undefined> {
+    if (!serviceIds) return undefined;
+    const ids = serviceIds.map((id) => new Types.ObjectId(id));
+    const count = await this.serviceModel
+      .countDocuments({
+        _id: { $in: ids },
+        companyId: new Types.ObjectId(companyId),
+      })
+      .exec();
+
+    if (count !== ids.length) {
+      throw new BadRequestException('One or more services are invalid for this company');
+    }
+
+    return ids;
   }
 }

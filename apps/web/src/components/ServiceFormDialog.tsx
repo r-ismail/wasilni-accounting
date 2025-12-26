@@ -32,6 +32,9 @@ interface ServiceFormDialogProps {
   onSubmit: (data: ServiceFormData) => void;
   initialData?: ServiceFormData | null;
   isLoading?: boolean;
+  buildings?: any;
+  selectedBuildingIds?: string[];
+  onChangeBuildings?: (ids: string[]) => void;
 }
 
 const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
@@ -40,8 +43,12 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
   onSubmit,
   initialData,
   isLoading = false,
+  buildings = [],
+  selectedBuildingIds = [],
+  onChangeBuildings,
 }) => {
   const { t } = useTranslation();
+  const safeBuildings = Array.isArray(buildings) ? buildings : [];
   const [formData, setFormData] = useState<ServiceFormData>({
     name: '',
     description: '',
@@ -183,6 +190,29 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
               }
               label={t('services.requiresApproval')}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              select
+              SelectProps={{ multiple: true }}
+              label={t('services.buildings')}
+              value={selectedBuildingIds}
+              onChange={(e) =>
+                onChangeBuildings?.(
+                  typeof e.target.value === 'string'
+                    ? e.target.value.split(',')
+                    : (e.target.value as string[]),
+                )
+              }
+              helperText={t('services.buildingsHelp')}
+            >
+              {safeBuildings.map((building: any) => (
+                <MenuItem key={building._id} value={building._id}>
+                  {building.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
         {!formData.name ? (

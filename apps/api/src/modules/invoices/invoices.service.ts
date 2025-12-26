@@ -13,6 +13,7 @@ import { Company, CompanyDocument } from '../companies/schemas/company.schema';
 import { Service, ServiceDocument } from '../services/schemas/service.schema';
 import { Meter, MeterDocument } from '../meters/schemas/meter.schema';
 import { MeterReading, MeterReadingDocument } from '../meters/schemas/meter-reading.schema';
+import { Building } from '../buildings/schemas/building.schema';
 import { GenerateInvoiceDto, UpdateInvoiceDto, UpdateInvoiceStatusDto } from './dto/generate-invoice.dto';
 import { generateInvoicePdf, InvoicePdfData } from './pdf.helper';
 import { generateInvoiceHtml, InvoicePrintData } from './invoice-print.helper';
@@ -27,6 +28,7 @@ export class InvoicesService {
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
     @InjectModel(Meter.name) private meterModel: Model<MeterDocument>,
     @InjectModel(MeterReading.name) private meterReadingModel: Model<MeterReadingDocument>,
+    @InjectModel(Building.name) private buildingModel: Model<Building>,
   ) { }
 
   async generateInvoice(
@@ -128,7 +130,11 @@ export class InvoicesService {
 
     await rentLine.save();
 
-    await this.addServiceLines(invoice._id.toString(), companyId);
+    const buildingId =
+      (contract.unitId as any)?.buildingId?._id?.toString?.() ||
+      (contract.unitId as any)?.buildingId?.toString?.();
+
+    await this.addServiceLines(invoice._id.toString(), companyId, buildingId);
 
     const unitId = (contract.unitId as any)?._id || contract.unitId;
     await this.addMeterLines(
@@ -287,15 +293,33 @@ export class InvoicesService {
   private async addServiceLines(
     invoiceId: string,
     companyId: string,
+    buildingId?: string,
   ): Promise<void> {
-    // Get active fixed/variable services for the company
-    const services = await this.serviceModel
-      .find({
-        companyId: new Types.ObjectId(companyId),
-        isActive: true,
-        type: { $in: ['fixed_fee', 'variable'] },
-      })
-      .exec();
+    const filter: any = {
+      companyId: new Types.ObjectId(companyId),
+      isActive: true,
+      type: { $in: ['fixed_fee', 'variable'] },
+    };
+
+    if (buildingId) {
+      const building = await this.buildingModel
+        .findOne({
+          _id: new Types.ObjectId(buildingId),
+          companyId: new Types.ObjectId(companyId),
+        })
+        .select('services')
+        .exec();
+
+      if (building?.services?.length) {
+        filter._id = { $in: building.services };
+      } else {
+        // No linked services for this building; skip adding service lines
+        return;
+      }
+    }
+
+    // Get active fixed/variable services for the company (or building-filtered)
+    const services = await this.serviceModel.find(filter).exec();
 
     // Create invoice lines for each service
     for (const service of services) {

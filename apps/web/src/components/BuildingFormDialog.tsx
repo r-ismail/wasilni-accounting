@@ -42,7 +42,11 @@ const BuildingFormDialog: React.FC<BuildingFormDialogProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name || '',
+        address: initialData.address || '',
+        buildingType: initialData.buildingType || 'apartment',
+      });
     } else {
       setFormData({
         name: '',

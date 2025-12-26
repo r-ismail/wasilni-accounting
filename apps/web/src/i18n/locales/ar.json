@@ -670,7 +670,9 @@
       "amenities": "خدمات إضافية",
       "other": "أخرى"
     },
-    "name": "اسم الخدمة"
+    "name": "اسم الخدمة",
+    "buildings": "المباني",
+    "buildingsHelp": "قم بتحديد المباني التي تخص هذه الخدمة"
   },
   "buildings": {
     "addBuilding": "إضافة مبنى",

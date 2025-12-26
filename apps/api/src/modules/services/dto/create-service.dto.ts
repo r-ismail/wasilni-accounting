@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsNumber, IsNotEmpty, Min, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsEnum, IsNumber, IsNotEmpty, Min, IsOptional, IsBoolean, IsMongoId, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ServiceType } from '../schemas/service.schema';
 
@@ -74,4 +74,10 @@ export class CreateServiceDto {
   @IsNumber()
   @IsOptional()
   displayOrder?: number;
+
+  @ApiPropertyOptional({ description: 'Buildings this service applies to', type: [String] })
+  @IsArray()
+  @IsMongoId({ each: true })
+  @IsOptional()
+  buildingIds?: string[];
 }

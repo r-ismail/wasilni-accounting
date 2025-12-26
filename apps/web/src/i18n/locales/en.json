@@ -633,6 +633,8 @@
     "taxRate": "Tax Rate",
     "isActive": "Active",
     "requiresApproval": "Requires Approval",
+    "buildings": "Buildings",
+    "buildingsHelp": "Select which buildings use this service",
     "status": "Status",
     "addService": "Add Service",
     "editService": "Edit Service",

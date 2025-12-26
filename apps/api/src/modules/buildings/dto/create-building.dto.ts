@@ -1,6 +1,7 @@
 import { IsString, IsOptional, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BuildingType } from '../schemas/building.schema';
+import { IsMongoId, IsArray } from 'class-validator';
 
 export class CreateBuildingDto {
   @ApiProperty({ description: 'Building name', example: 'Building A' })
@@ -21,4 +22,13 @@ export class CreateBuildingDto {
   @IsEnum(BuildingType)
   @IsOptional()
   buildingType?: BuildingType;
+
+  @ApiPropertyOptional({
+    description: 'Services linked to this building',
+    type: [String],
+  })
+  @IsArray()
+  @IsMongoId({ each: true })
+  @IsOptional()
+  services?: string[];
 }

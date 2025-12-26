@@ -120,6 +120,20 @@ const Settings: React.FC = () => {
       return res.data;
     },
   });
+  const { data: buildings } = useQuery({
+    queryKey: ['buildings'],
+    queryFn: async () => {
+      const res = await api.get('/buildings');
+      return res.data.data || res.data || [];
+    },
+  });
+  const buildingOptions = React.useMemo(() => {
+    const raw = buildings as any;
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw?.data?.data)) return raw.data.data;
+    return [];
+  }, [buildings]);
 
   // Company form state
   const [companyForm, setCompanyForm] = useState({
@@ -217,6 +231,7 @@ const Settings: React.FC = () => {
     requireApprovalForServices: false,
     allowNegativeReadings: false,
     maxConsumptionLimit: 0,
+    serviceBuildingIds: [] as string[],
   });
 
   // Advanced Settings form state
@@ -308,6 +323,7 @@ const Settings: React.FC = () => {
         requireApprovalForServices: company.requireApprovalForServices ?? false,
         allowNegativeReadings: company.allowNegativeReadings ?? false,
         maxConsumptionLimit: company.maxConsumptionLimit ?? 0,
+        serviceBuildingIds: [],
       });
       setAdvancedForm({
         // Invoice Customization
@@ -394,6 +410,7 @@ const Settings: React.FC = () => {
     onSuccess: () => {
       showSnackbar(t('services.created'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
       setServiceDialogOpen(false);
     },
     onError: (error: any) => {
@@ -409,6 +426,7 @@ const Settings: React.FC = () => {
     onSuccess: () => {
       showSnackbar(t('services.updated'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
       setServiceDialogOpen(false);
     },
     onError: (error: any) => {
@@ -424,6 +442,7 @@ const Settings: React.FC = () => {
     onSuccess: () => {
       showSnackbar(t('services.deleted'), 'success');
       queryClient.invalidateQueries({ queryKey: ['services'] });
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
       setDeleteConfirmOpen(false);
       setDeletingServiceId(null);
     },
@@ -2194,6 +2213,7 @@ const Settings: React.FC = () => {
                     onClick={() => {
                       setServiceDialogOpen(true);
                       setEditingService(null);
+                      setServicesForm((prev) => ({ ...prev, serviceBuildingIds: [] }));
                     }}
                   >
                     {t('settings.services.addService')}
@@ -2250,6 +2270,19 @@ const Settings: React.FC = () => {
                                 size="small" 
                                 onClick={() => {
                                   setEditingService(service);
+                                  const fromService = (service as any).buildingIds || [];
+                                  const derived =
+                                    fromService.length > 0
+                                      ? fromService
+                                      : buildingOptions
+                                          .filter((b: any) =>
+                                            (b?.services || []).some((s: any) => (s?._id ?? s) === service._id),
+                                          )
+                                          .map((b: any) => b._id);
+                                  setServicesForm((prev) => ({
+                                    ...prev,
+                                    serviceBuildingIds: derived,
+                                  }));
                                   setServiceDialogOpen(true);
                                 }}
                               >
@@ -2290,6 +2323,7 @@ const Settings: React.FC = () => {
                       requireApprovalForServices: company.requireApprovalForServices ?? false,
                       allowNegativeReadings: company.allowNegativeReadings ?? false,
                       maxConsumptionLimit: company.maxConsumptionLimit ?? 0,
+                      serviceBuildingIds: [],
                     });
                   }
                 }}
@@ -2337,8 +2371,21 @@ const Settings: React.FC = () => {
         onClose={() => {
           setServiceDialogOpen(false);
           setEditingService(null);
+          setServicesForm((prev) => ({ ...prev, serviceBuildingIds: [] }));
         }}
-        onSubmit={handleServiceSubmit}
+        onSubmit={(data) => {
+          if (editingService) {
+            updateServiceMutation.mutate({
+              id: editingService._id,
+              data: { ...data, buildingIds: servicesForm.serviceBuildingIds },
+            });
+          } else {
+            createServiceMutation.mutate({
+              ...data,
+              buildingIds: servicesForm.serviceBuildingIds,
+            });
+          }
+        }}
         initialData={editingService ? {
           name: editingService.name || '',
           description: editingService.description || '',
@@ -2351,6 +2398,11 @@ const Settings: React.FC = () => {
           requiresApproval: editingService.requiresApproval ?? false,
         } : null}
         isLoading={createServiceMutation.isPending || updateServiceMutation.isPending}
+        buildings={buildingOptions}
+        selectedBuildingIds={servicesForm.serviceBuildingIds}
+        onChangeBuildings={(ids) =>
+          setServicesForm((prev) => ({ ...prev, serviceBuildingIds: ids || [] }))
+        }
       />
 
       {/* Delete Confirmation Dialog */}
