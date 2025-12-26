@@ -28,5 +28,4 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 // Index for performance
-UserSchema.index({ username: 1 });
 UserSchema.index({ companyId: 1 });

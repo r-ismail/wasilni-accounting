@@ -72,7 +72,7 @@ export default function SetupWizard() {
     },
     onSuccess: () => {
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/login');
       }, 2000);
     },
   });
