@@ -16,6 +16,10 @@ export interface InvoicePdfData {
     currency: string;
     defaultLanguage: string;
     logo?: string;
+    phone?: string;
+    address?: string;
+    invoiceHeaderText?: string;
+    invoiceFooterText?: string;
   };
   customer: {
     name: string;
@@ -67,6 +71,17 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       font-size: 24px;
       font-weight: bold;
       color: #1976d2;
+    }
+    .company-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 260px;
+    }
+    .company-contact {
+      font-size: 12px;
+      color: #616161;
+      line-height: 1.4;
     }
     .invoice-title {
       font-size: 28px;
@@ -144,7 +159,12 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 </head>
 <body>
   <div class="header">
-    <div class="company-name">${data.company.name}</div>
+    <div class="company-block">
+      <div class="company-name">${data.company.name}</div>
+      ${data.company.phone ? `<div class="company-contact">${isRTL ? 'الهاتف' : 'Phone'}: ${data.company.phone}</div>` : ''}
+      ${data.company.address ? `<div class="company-contact">${isRTL ? 'العنوان' : 'Address'}: ${data.company.address}</div>` : ''}
+      ${data.company.invoiceHeaderText ? `<div class="company-contact">${data.company.invoiceHeaderText}</div>` : ''}
+    </div>
     <div class="invoice-title">${isRTL ? 'فاتورة' : 'INVOICE'}</div>
   </div>
 
@@ -202,7 +222,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
   </div>
 
   <div class="footer">
-    ${isRTL ? 'شكراً لتعاملكم معنا' : 'Thank you for your business'}
+    ${data.company.invoiceFooterText || (isRTL ? 'شكراً لتعاملكم معنا' : 'Thank you for your business')}
   </div>
 </body>
 </html>

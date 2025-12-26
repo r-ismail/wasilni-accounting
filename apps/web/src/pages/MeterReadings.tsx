@@ -4,13 +4,14 @@ import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TablePagination, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, FormControl,
-  InputLabel, Select, Chip
+  InputLabel, Select, Chip, IconButton
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
 import { useSnackbar } from '../hooks/useSnackbar';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function MeterReadings() {
   const { t } = useTranslation();
@@ -18,6 +19,11 @@ export default function MeterReadings() {
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingReading, setEditingReading] = useState<any | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({
+    open: false,
+    id: null,
+  });
   const [formData, setFormData] = useState({
     meterId: '',
     readingDate: new Date().toISOString().split('T')[0],
@@ -53,7 +59,34 @@ export default function MeterReadings() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => api.patch(`/meters/readings/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meter-readings'] });
+      showSnackbar(t('readings.updated'), 'success');
+      handleCloseDialog();
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('readings.error'), 'error');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/meters/readings/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meter-readings'] });
+      setConfirmDelete({ open: false, id: null });
+      showSnackbar(t('readings.deleted'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('readings.error'), 'error');
+    },
+  });
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
   const handleOpenDialog = () => {
+    setEditingReading(null);
     setFormData({
       meterId: '',
       readingDate: new Date().toISOString().split('T')[0],
@@ -63,8 +96,20 @@ export default function MeterReadings() {
     setOpenDialog(true);
   };
 
+  const handleOpenEdit = (reading: any) => {
+    setEditingReading(reading);
+    setFormData({
+      meterId: reading.meterId?._id || reading.meterId || '',
+      readingDate: new Date(reading.readingDate).toISOString().split('T')[0],
+      currentReading: reading.currentReading?.toString() || '',
+      notes: reading.notes || '',
+    });
+    setOpenDialog(true);
+  };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setEditingReading(null);
   };
 
   const handleSubmit = () => {
@@ -72,7 +117,18 @@ export default function MeterReadings() {
       showSnackbar(t('readings.fillRequired'), 'error');
       return;
     }
-    createMutation.mutate(formData);
+
+    const payload = {
+      readingDate: formData.readingDate,
+      currentReading: formData.currentReading,
+      notes: formData.notes,
+    };
+
+    if (editingReading) {
+      updateMutation.mutate({ id: editingReading._id, data: payload });
+    } else {
+      createMutation.mutate({ ...payload, meterId: formData.meterId });
+    }
   };
 
   const formatDate = (date: string) => {
@@ -100,6 +156,7 @@ export default function MeterReadings() {
               <TableCell align="right">{t('readings.current')}</TableCell>
               <TableCell align="right">{t('readings.consumption')}</TableCell>
               <TableCell>{t('readings.notes')}</TableCell>
+              <TableCell align="right">{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -125,6 +182,18 @@ export default function MeterReadings() {
                   />
                 </TableCell>
                 <TableCell>{reading.notes || '-'}</TableCell>
+                <TableCell align="right">
+                  <IconButton size="small" color="primary" onClick={() => handleOpenEdit(reading)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => setConfirmDelete({ open: true, id: reading._id })}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -142,7 +211,7 @@ export default function MeterReadings() {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('readings.addReading')}</DialogTitle>
+        <DialogTitle>{editingReading ? t('readings.editReading') : t('readings.addReading')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
             <FormControl fullWidth>
@@ -151,6 +220,7 @@ export default function MeterReadings() {
                 value={formData.meterId}
                 label={t('readings.selectMeter')}
                 onChange={(e) => setFormData({ ...formData, meterId: e.target.value })}
+                disabled={!!editingReading}
               >
                 {meters.map((meter: any) => (
                   <MenuItem key={meter._id} value={meter._id}>
@@ -193,14 +263,23 @@ export default function MeterReadings() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} disabled={createMutation.isPending}>
+          <Button onClick={handleCloseDialog} disabled={isSaving}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={createMutation.isPending}>
-            {createMutation.isPending ? t('common.saving') : t('common.create')}
+          <Button onClick={handleSubmit} variant="contained" disabled={isSaving}>
+            {isSaving ? t('common.saving') : editingReading ? t('common.save') : t('common.create')}
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmDelete.open}
+        title={t('readings.deleteConfirm')}
+        message={t('readings.deleteWarning')}
+        onConfirm={() => confirmDelete.id && deleteMutation.mutate(confirmDelete.id)}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        loading={deleteMutation.isPending}
+      />
 
       {SnackbarComponent}
     </Box>

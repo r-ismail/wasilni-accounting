@@ -70,6 +70,48 @@ export default function CompanyInfoStep({ data, onNext }: CompanyInfoStepProps) 
       />
 
       <Controller
+        name="phone"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label={t('setup.companyPhone')}
+            placeholder={t('setup.companyPhonePlaceholder')}
+            fullWidth
+            margin="normal"
+          />
+        )}
+      />
+
+      <Controller
+        name="address"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label={t('setup.companyAddress')}
+            placeholder={t('setup.companyAddressPlaceholder')}
+            fullWidth
+            margin="normal"
+          />
+        )}
+      />
+
+      <Controller
+        name="taxNumber"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label={t('setup.taxNumber')}
+            placeholder={t('setup.taxNumberPlaceholder')}
+            fullWidth
+            margin="normal"
+          />
+        )}
+      />
+
+      <Controller
         name="currency"
         control={control}
         render={({ field }) => (

@@ -9,6 +9,15 @@ export class Company {
   @Prop({ required: true })
   name: string;
 
+  @Prop()
+  phone?: string;
+
+  @Prop()
+  address?: string;
+
+  @Prop()
+  taxNumber?: string;
+
   @Prop({ required: true, enum: Object.values(Currency) })
   currency: Currency;
 

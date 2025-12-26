@@ -78,6 +78,13 @@ export class ContractsController {
     return { success: true, data: contract, message: 'Contract terminated successfully' };
   }
 
+  @Patch(':id/reactivate')
+  @ApiOperation({ summary: 'Reactivate contract' })
+  async reactivate(@Request() req: any, @Param('id') id: string) {
+    const contract = await this.contractsService.reactivate(req.user.companyId, id);
+    return { success: true, data: contract, message: 'Contract reactivated successfully' };
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete contract' })
   async remove(@Request() req: any, @Param('id') id: string) {

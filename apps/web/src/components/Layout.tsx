@@ -28,11 +28,14 @@ import {
   People as PeopleIcon,
   Speed as SpeedIcon,
   TrendingUp as TrendingUpIcon,
+  Assessment as AssessmentIcon,
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   Language as LanguageIcon,
   Business as BusinessIcon,
   Logout as LogoutIcon,
+  Engineering as EngineeringIcon,
+  AccountBalanceWallet as AccountBalanceWalletIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
@@ -114,7 +117,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: t('nav.contracts'), icon: <DescriptionIcon />, path: '/contracts' },
     { text: t('nav.invoices'), icon: <ReceiptIcon />, path: '/invoices' },
     { text: t('nav.payments'), icon: <PaymentIcon />, path: '/payments' },
+    { text: t('nav.reports'), icon: <AssessmentIcon />, path: '/reports' },
     { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
+    { text: t('vendors.title'), icon: <EngineeringIcon />, path: '/vendors' },
+    { text: t('expenses.title'), icon: <AccountBalanceWalletIcon />, path: '/expenses' },
     { text: t('nav.meters'), icon: <SpeedIcon />, path: '/meters' },
     { text: t('nav.readings'), icon: <TrendingUpIcon />, path: '/readings' },
     { text: t('nav.notifications'), icon: <NotificationsIcon />, path: '/notifications' },

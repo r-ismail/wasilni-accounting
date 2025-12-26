@@ -88,6 +88,8 @@ export interface RefreshTokenDto {
 
 export interface CreateCompanyDto {
   name: string;
+  phone?: string;
+  address?: string;
   currency: Currency;
   defaultLanguage: Language;
   mergeServicesWithRent: boolean;

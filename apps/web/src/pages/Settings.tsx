@@ -124,6 +124,8 @@ const Settings: React.FC = () => {
   // Company form state
   const [companyForm, setCompanyForm] = useState({
     name: '',
+    phone: '',
+    address: '',
     currency: 'YER',
     defaultLanguage: 'ar',
     mergeServicesWithRent: true,
@@ -167,14 +169,13 @@ const Settings: React.FC = () => {
 
   // Customization form state
   const [customizationForm, setCustomizationForm] = useState({
-    primaryColor: '#1976d2',
-    secondaryColor: '#dc004e',
-    accentColor: '#2e7d32',
+    primaryColor: '#19d238ff',
+    secondaryColor: '#0b00dcff',
+    accentColor: '#c77913ff',
     invoiceTemplate: 'modern',
     showInvoiceLogo: true,
     showInvoiceColors: true,
     invoiceLogoPosition: 'right',
-    invoiceFooterText: '',
   });
 
   // Invoice Settings form state
@@ -193,6 +194,7 @@ const Settings: React.FC = () => {
     defaultDiscountPercent: 0,
     // Custom Text
     invoiceHeaderText: '',
+    invoiceFooterText: '',
     invoiceNotes: '',
     paymentInstructions: '',
     // Page Settings
@@ -254,6 +256,8 @@ const Settings: React.FC = () => {
     if (company) {
       setCompanyForm({
         name: company.name || '',
+        phone: company.phone || '',
+        address: company.address || '',
         currency: company.currency || 'YER',
         defaultLanguage: company.defaultLanguage || 'ar',
         mergeServicesWithRent: company.mergeServicesWithRent ?? true,
@@ -267,7 +271,6 @@ const Settings: React.FC = () => {
         showInvoiceLogo: company.showInvoiceLogo ?? true,
         showInvoiceColors: company.showInvoiceColors ?? true,
         invoiceLogoPosition: company.invoiceLogoPosition || 'right',
-        invoiceFooterText: company.invoiceFooterText || '',
       });
       setInvoiceForm({
         // Display Options
@@ -284,6 +287,7 @@ const Settings: React.FC = () => {
         defaultDiscountPercent: company.defaultDiscountPercent ?? 0,
         // Custom Text
         invoiceHeaderText: company.invoiceHeaderText || '',
+        invoiceFooterText: company.invoiceFooterText || '',
         invoiceNotes: company.invoiceNotes || '',
         paymentInstructions: company.paymentInstructions || '',
         // Page Settings
@@ -586,6 +590,24 @@ const Settings: React.FC = () => {
                     InputProps={{
                       startAdornment: <BusinessIcon sx={{ mr: 1, color: 'action.active' }} />,
                     }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label={t('settings.company.phone')}
+                    value={companyForm.phone}
+                    onChange={(e) => setCompanyForm({ ...companyForm, phone: e.target.value })}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label={t('settings.company.address')}
+                    value={companyForm.address}
+                    onChange={(e) => setCompanyForm({ ...companyForm, address: e.target.value })}
                   />
                 </Grid>
 
@@ -1957,8 +1979,8 @@ const Settings: React.FC = () => {
                       label={t('settings.invoice.footerText')}
                       multiline
                       rows={2}
-                      value={customizationForm.invoiceFooterText}
-                      onChange={(e) => setCustomizationForm({...customizationForm, invoiceFooterText: e.target.value})}
+                      value={invoiceForm.invoiceFooterText}
+                      onChange={(e) => setInvoiceForm({...invoiceForm, invoiceFooterText: e.target.value})}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -2043,6 +2065,7 @@ const Settings: React.FC = () => {
                       enableDiscount: company.enableDiscount ?? false,
                       defaultDiscountPercent: company.defaultDiscountPercent ?? 0,
                       invoiceHeaderText: company.invoiceHeaderText || '',
+                      invoiceFooterText: company.invoiceFooterText || '',
                       invoiceNotes: company.invoiceNotes || '',
                       paymentInstructions: company.paymentInstructions || '',
                       invoicePageSize: company.invoicePageSize || 'A4',
@@ -2077,7 +2100,7 @@ const Settings: React.FC = () => {
               {t('settings.services.description')}
             </Alert>
 
-            {/* Meter Pricing */}
+            {/* Meter Pricing
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -2155,7 +2178,7 @@ const Settings: React.FC = () => {
                   </Grid>
                 </Grid>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Custom Services CRUD */}
             <Card sx={{ mb: 3 }}>
@@ -2195,8 +2218,7 @@ const Settings: React.FC = () => {
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>{t('services.nameAr')}</TableCell>
-                          <TableCell>{t('services.nameEn')}</TableCell>
+                          <TableCell>{t('services.name')}</TableCell>
                           <TableCell>{t('services.type')}</TableCell>
                           <TableCell>{t('services.defaultPrice')}</TableCell>
                           <TableCell>{t('services.status')}</TableCell>
@@ -2206,8 +2228,7 @@ const Settings: React.FC = () => {
                       <TableBody>
                         {servicesQuery.data?.data?.map((service: any) => (
                           <TableRow key={service._id}>
-                            <TableCell>{service.nameAr}</TableCell>
-                            <TableCell>{service.nameEn}</TableCell>
+                            <TableCell>{service.name}</TableCell>
                             <TableCell>
                               <Chip 
                                 label={t(`services.types.${service.type}`)} 
@@ -2319,8 +2340,7 @@ const Settings: React.FC = () => {
         }}
         onSubmit={handleServiceSubmit}
         initialData={editingService ? {
-          nameAr: editingService.nameAr || '',
-          nameEn: editingService.nameEn || '',
+          name: editingService.name || '',
           description: editingService.description || '',
           type: editingService.type || 'fixed_fee',
           defaultPrice: editingService.defaultPrice || 0,

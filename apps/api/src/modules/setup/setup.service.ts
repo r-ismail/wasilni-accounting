@@ -66,6 +66,8 @@ export class SetupService {
     // Create company
     const company = new this.companyModel({
       name: setupDto.company.name,
+      phone: setupDto.company.phone,
+      address: setupDto.company.address,
       currency: setupDto.company.currency,
       defaultLanguage: setupDto.company.defaultLanguage,
       mergeServicesWithRent: setupDto.company.mergeServicesWithRent,
@@ -114,8 +116,6 @@ export class SetupService {
       for (const serviceDto of setupDto.services) {
         await this.servicesService.create(companyId, {
           name: serviceDto.name,
-          nameAr: serviceDto.name,
-          nameEn: serviceDto.name,
           type: serviceDto.type,
           defaultPrice: serviceDto.defaultPrice,
         });

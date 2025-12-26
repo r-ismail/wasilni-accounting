@@ -11,6 +11,8 @@ import { InvoiceLine, InvoiceLineDocument } from './schemas/invoice-line.schema'
 import { Contract, ContractDocument } from '../contracts/schemas/contract.schema';
 import { Company, CompanyDocument } from '../companies/schemas/company.schema';
 import { Service, ServiceDocument } from '../services/schemas/service.schema';
+import { Meter, MeterDocument } from '../meters/schemas/meter.schema';
+import { MeterReading, MeterReadingDocument } from '../meters/schemas/meter-reading.schema';
 import { GenerateInvoiceDto, UpdateInvoiceDto, UpdateInvoiceStatusDto } from './dto/generate-invoice.dto';
 import { generateInvoicePdf, InvoicePdfData } from './pdf.helper';
 import { generateInvoiceHtml, InvoicePrintData } from './invoice-print.helper';
@@ -23,7 +25,9 @@ export class InvoicesService {
     @InjectModel(Contract.name) private contractModel: Model<ContractDocument>,
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
-  ) {}
+    @InjectModel(Meter.name) private meterModel: Model<MeterDocument>,
+    @InjectModel(MeterReading.name) private meterReadingModel: Model<MeterReadingDocument>,
+  ) { }
 
   async generateInvoice(
     companyId: string,
@@ -115,18 +119,24 @@ export class InvoicesService {
 
     await rentLine.save();
 
-    // Check if company wants to merge services with rent
-    const company = await this.companyModel.findById(companyId).exec();
-    if (company && company.mergeServicesWithRent) {
-      await this.addServiceLines(invoice._id.toString(), companyId);
-      // Recalculate total
-      const lines = await this.invoiceLineModel
-        .find({ invoiceId: invoice._id })
-        .exec();
-      const total = lines.reduce((sum, line) => sum + line.amount, 0);
-      invoice.totalAmount = total;
-      await invoice.save();
-    }
+    await this.addServiceLines(invoice._id.toString(), companyId);
+
+    const unitId = (contract.unitId as any)?._id || contract.unitId;
+    await this.addMeterLines(
+      invoice._id.toString(),
+      companyId,
+      unitId,
+      startDate,
+      endDate,
+    );
+
+    // Recalculate total after adding optional lines
+    const lines = await this.invoiceLineModel
+      .find({ invoiceId: invoice._id })
+      .exec();
+    const total = lines.reduce((sum, line) => sum + line.amount, 0);
+    invoice.totalAmount = total;
+    await invoice.save();
 
     return invoice;
   }
@@ -269,12 +279,12 @@ export class InvoicesService {
     invoiceId: string,
     companyId: string,
   ): Promise<void> {
-    // Get active fixed-fee services for the company
+    // Get active fixed/variable services for the company
     const services = await this.serviceModel
       .find({
         companyId: new Types.ObjectId(companyId),
         isActive: true,
-        serviceType: 'fixed_fee',
+        type: { $in: ['fixed_fee', 'variable'] },
       })
       .exec();
 
@@ -315,6 +325,63 @@ export class InvoicesService {
     }
 
     return `${prefix}-${String(sequence).padStart(4, '0')}`;
+  }
+
+  private async addMeterLines(
+    invoiceId: string,
+    companyId: string,
+    unitId: Types.ObjectId,
+    periodStart: Date,
+    periodEnd: Date,
+  ): Promise<void> {
+    const meters = await this.meterModel
+      .find({
+        companyId: new Types.ObjectId(companyId),
+        unitId: new Types.ObjectId(unitId),
+        type: 'unit',
+        isActive: true,
+      })
+      .populate('serviceId')
+      .exec();
+
+    for (const meter of meters) {
+      const readings = await this.meterReadingModel
+        .find({
+          meterId: meter._id,
+          readingDate: { $gte: periodStart, $lte: periodEnd },
+        })
+        .exec();
+
+      const totalConsumption = readings.reduce((sum, reading) => {
+        const consumption = reading.consumption || 0;
+        return sum + (consumption > 0 ? consumption : 0);
+      }, 0);
+
+      if (totalConsumption <= 0) {
+        continue;
+      }
+
+      const service: any = meter.serviceId;
+      const unitPrice = service?.defaultPrice || 0;
+      const amount = totalConsumption * unitPrice;
+      const descriptionParts = [service?.name || 'Metered Service'];
+      if (meter.meterNumber) {
+        descriptionParts.push(`#${meter.meterNumber}`);
+      }
+
+      const meterLine = new this.invoiceLineModel({
+        invoiceId: new Types.ObjectId(invoiceId),
+        type: 'meter',
+        description: descriptionParts.join(' '),
+        quantity: totalConsumption,
+        unitPrice,
+        amount,
+        serviceId: service?._id,
+        meterId: meter._id,
+      });
+
+      await meterLine.save();
+    }
   }
 
   async generatePdf(id: string): Promise<Buffer> {
@@ -366,6 +433,10 @@ export class InvoicesService {
         currency: company.currency,
         defaultLanguage: company.defaultLanguage,
         logo: company.logo,
+        phone: company.phone,
+        address: company.address,
+        invoiceHeaderText: company.invoiceHeaderText,
+        invoiceFooterText: company.invoiceFooterText,
       },
       customer: {
         name: customer.name,
@@ -443,6 +514,9 @@ export class InvoicesService {
         currency: company.currency,
         defaultLanguage: company.defaultLanguage,
         logo: company.logo,
+        phone: company.phone,
+        address: company.address,
+        taxNumber: company.taxNumber,
         // Display settings
         showInvoiceHeader: company.showInvoiceHeader,
         showInvoiceFooter: company.showInvoiceFooter,

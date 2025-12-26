@@ -3,6 +3,9 @@ import { z } from 'zod';
 // Step 1: Company Information
 export const companyInfoSchema = z.object({
   name: z.string().min(1, 'Company name is required'),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  taxNumber: z.string().optional(),
   currency: z.string().min(1, 'Currency is required'),
   defaultLanguage: z.enum(['ar', 'en'], {
     required_error: 'Default language is required',

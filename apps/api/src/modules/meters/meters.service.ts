@@ -1,18 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Meter, MeterDocument } from './schemas/meter.schema';
 import { MeterReading, MeterReadingDocument } from './schemas/meter-reading.schema';
-import { CreateMeterDto, UpdateMeterDto, CreateMeterReadingDto } from './dto/create-meter.dto';
+import { CreateMeterDto, UpdateMeterDto, CreateMeterReadingDto, UpdateMeterReadingDto } from './dto/create-meter.dto';
+import { Service, ServiceDocument } from '../services/schemas/service.schema';
 
 @Injectable()
 export class MetersService {
   constructor(
     @InjectModel(Meter.name) private meterModel: Model<MeterDocument>,
     @InjectModel(MeterReading.name) private meterReadingModel: Model<MeterReadingDocument>,
+    @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
   ) {}
 
   async create(companyId: string, createMeterDto: CreateMeterDto) {
+    const service = await this.serviceModel
+      .findOne({
+        _id: new Types.ObjectId(createMeterDto.serviceId),
+        companyId: new Types.ObjectId(companyId),
+      })
+      .exec();
+
+    if (!service || service.type !== 'metered') {
+      throw new BadRequestException('Meters can only be linked to metered services');
+    }
+
     const meter = new this.meterModel({
       ...createMeterDto,
       companyId: new Types.ObjectId(companyId),
@@ -93,7 +106,10 @@ export class MetersService {
       notes: createReadingDto.notes,
     });
 
-    return reading.save();
+    const savedReading = await reading.save();
+
+    await this.recalculateMeterReadings(companyId, meter._id);
+    return savedReading;
   }
 
   async findReadings(companyId: string, meterId?: string) {
@@ -105,6 +121,63 @@ export class MetersService {
       .populate('meterId')
       .sort({ readingDate: -1 })
       .exec();
+  }
+
+  async updateReading(companyId: string, id: string, updateReadingDto: UpdateMeterReadingDto) {
+    const reading = await this.meterReadingModel
+      .findOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .exec();
+
+    if (!reading) throw new NotFoundException('Reading not found');
+
+    if (updateReadingDto.readingDate) {
+      const readingDate = new Date(updateReadingDto.readingDate);
+      if (Number.isNaN(readingDate.getTime())) {
+        throw new BadRequestException('Invalid reading date');
+      }
+      const duplicate = await this.meterReadingModel
+        .findOne({
+          companyId: new Types.ObjectId(companyId),
+          meterId: reading.meterId,
+          readingDate,
+          _id: { $ne: reading._id },
+        })
+        .exec();
+      if (duplicate) {
+        throw new BadRequestException('Reading already exists for this meter and date');
+      }
+      reading.readingDate = readingDate;
+    }
+
+    if (updateReadingDto.currentReading !== undefined) {
+      const currentReading = parseFloat(updateReadingDto.currentReading);
+      if (Number.isNaN(currentReading)) {
+        throw new BadRequestException('Invalid current reading');
+      }
+      reading.currentReading = currentReading;
+    }
+
+    if (updateReadingDto.notes !== undefined) {
+      reading.notes = updateReadingDto.notes;
+    }
+
+    await reading.save();
+    await this.recalculateMeterReadings(companyId, reading.meterId);
+    return reading;
+  }
+
+  async removeReading(companyId: string, id: string) {
+    const reading = await this.meterReadingModel
+      .findOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .exec();
+
+    if (!reading) throw new NotFoundException('Reading not found');
+
+    const meterId = reading.meterId;
+    await this.meterReadingModel.deleteOne({ _id: reading._id }).exec();
+    await this.recalculateMeterReadings(companyId, meterId);
+
+    return { message: 'Reading deleted successfully' };
   }
 
   async distributeBuildingMeterConsumption(companyId: string, buildingId: string, readingDate: Date) {
@@ -180,4 +253,26 @@ export class MetersService {
 
     return distributions;
   }
+  private async recalculateMeterReadings(companyId: string, meterId: Types.ObjectId | string) {
+    const meterObjectId = typeof meterId === 'string' ? new Types.ObjectId(meterId) : meterId;
+    const readings = await this.meterReadingModel
+      .find({
+        companyId: new Types.ObjectId(companyId),
+        meterId: meterObjectId,
+      })
+      .sort({ readingDate: 1 })
+      .exec();
+
+    let previous = 0;
+    for (const reading of readings) {
+      const consumption = reading.currentReading - previous;
+      if (reading.previousReading !== previous || reading.consumption !== consumption) {
+        reading.previousReading = previous;
+        reading.consumption = consumption;
+        await reading.save();
+      }
+      previous = reading.currentReading;
+    }
+  }
+
 }

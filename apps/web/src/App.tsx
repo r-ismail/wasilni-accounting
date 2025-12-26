@@ -16,12 +16,15 @@ import Units from './pages/Units';
 import Contracts from './pages/Contracts';
 import Invoices from './pages/Invoices';
 import Payments from './pages/Payments';
+import Reports from './pages/Reports';
 import Customers from './pages/Customers';
 import Meters from './pages/Meters';
 import MeterReadings from './pages/MeterReadings';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 import SetupWizard from './pages/Setup/SetupWizard';
+import Vendors from './pages/Vendors';
+import Expenses from './pages/Expenses';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,7 +74,10 @@ const App: React.FC = () => {
                           <Route path="/contracts" element={<Contracts />} />
                           <Route path="/invoices" element={<Invoices />} />
                           <Route path="/payments" element={<Payments />} />
+                          <Route path="/reports" element={<Reports />} />
                           <Route path="/customers" element={<Customers />} />
+                          <Route path="/vendors" element={<Vendors />} />
+                          <Route path="/expenses" element={<Expenses />} />
                           <Route path="/meters" element={<Meters />} />
                           <Route path="/readings" element={<MeterReadings />} />
                           <Route path="/notifications" element={<Notifications />} />

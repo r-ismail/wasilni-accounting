@@ -39,7 +39,9 @@ export default function SetupWizard() {
   }>({
     company: {
       name: '',
-      currency: 'SAR',
+      phone: '',
+      address: '',
+      currency: 'YER',
       defaultLanguage: 'ar',
       mergeServicesWithRent: true,
     },

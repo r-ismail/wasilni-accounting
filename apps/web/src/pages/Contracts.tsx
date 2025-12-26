@@ -29,6 +29,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Block as BlockIcon,
+  Replay as ReplayIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
@@ -38,7 +39,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 
 interface Contract {
   _id: string;
-  unitId: { _id: string; unitNumber: string };
+  unitId: { _id: string; unitNumber: string; buildingId: { name: string } };
   customerId: { _id: string; name: string };
   rentType: 'monthly' | 'daily';
   baseRentAmount: number;
@@ -70,6 +71,7 @@ export default function Contracts() {
   });
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const [confirmTerminate, setConfirmTerminate] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [confirmReactivate, setConfirmReactivate] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const { control, handleSubmit, reset, watch, setValue } = useForm<any>();
 
   const selectedUnitId = watch('unitId');
@@ -99,10 +101,19 @@ export default function Contracts() {
     },
   });
 
+  const updatePayload = () => {
+    const payload = {
+      baseRentAmount: watch('baseRentAmount'),
+      startDate: watch('startDate'),
+      endDate: watch('endDate'),
+    };
+    return payload;
+  };
+
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       if (formDialog.contract) {
-        await api.put(`/contracts/${formDialog.contract._id}`, data);
+        await api.put(`/contracts/${formDialog.contract._id}`, updatePayload());
       } else {
         await api.post('/contracts', data);
       }
@@ -146,6 +157,21 @@ export default function Contracts() {
       queryClient.invalidateQueries({ queryKey: ['units'] });
       setConfirmTerminate({ open: false, id: null });
       showSnackbar(t('contracts.contractTerminated'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
+    },
+  });
+
+  const reactivateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.patch(`/contracts/${id}/reactivate`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
+      setConfirmReactivate({ open: false, id: null });
+      showSnackbar(t('contracts.contractReactivated'), 'success');
     },
     onError: (error: any) => {
       showSnackbar(error.response?.data?.message || t('common.error'), 'error');
@@ -213,6 +239,7 @@ export default function Contracts() {
             <TableHead>
               <TableRow>
                 <TableCell>{t('contracts.unit')}</TableCell>
+                <TableCell>{t('contracts.building')}</TableCell>
                 <TableCell>{t('contracts.customer')}</TableCell>
                 <TableCell>{t('contracts.rentType')}</TableCell>
                 <TableCell>{t('contracts.amount')}</TableCell>
@@ -226,6 +253,7 @@ export default function Contracts() {
               {paginateData(contracts).map((contract: any) => (
                 <TableRow key={contract._id}>
                   <TableCell>{contract.unitId.unitNumber}</TableCell>
+                  <TableCell>{contract.unitId.buildingId?.name}</TableCell>
                   <TableCell>{contract.customerId.name}</TableCell>
                   <TableCell>
                     <Chip
@@ -255,6 +283,15 @@ export default function Contracts() {
                       onClick={() => setConfirmTerminate({ open: true, id: contract._id })}
                     >
                       <BlockIcon />
+                      </IconButton>
+                    )}
+                    {!contract.isActive && (
+                      <IconButton
+                        size="small"
+                        color="success"
+                        onClick={() => setConfirmReactivate({ open: true, id: contract._id })}
+                      >
+                        <ReplayIcon />
                       </IconButton>
                     )}
                     <IconButton
@@ -438,6 +475,16 @@ export default function Contracts() {
         onCancel={() => setConfirmTerminate({ open: false, id: null })}
         loading={terminateMutation.isPending}
         confirmColor="warning"
+      />
+
+      <ConfirmDialog
+        open={confirmReactivate.open}
+        title={t('contracts.reactivateConfirm')}
+        message={t('contracts.reactivateWarning')}
+        onConfirm={() => confirmReactivate.id && reactivateMutation.mutate(confirmReactivate.id)}
+        onCancel={() => setConfirmReactivate({ open: false, id: null })}
+        loading={reactivateMutation.isPending}
+        confirmColor="success"
       />
 
       <ConfirmDialog

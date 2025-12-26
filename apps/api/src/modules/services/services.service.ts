@@ -27,7 +27,7 @@ export class ServicesService {
     if (activeOnly) {
       query.isActive = true;
     }
-    return this.serviceModel.find(query).sort({ nameAr: 1, nameEn: 1 }).exec();
+    return this.serviceModel.find(query).sort({ name: 1 }).exec();
   }
 
   async findOne(companyId: string, id: string): Promise<Service> {

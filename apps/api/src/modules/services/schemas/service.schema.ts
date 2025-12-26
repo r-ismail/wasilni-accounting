@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 export enum ServiceType {
   METERED = 'metered',
   FIXED_FEE = 'fixed_fee',
+  VARIABLE = 'variable',
 }
 
 export type ServiceDocument = Service & Document;
@@ -30,12 +31,6 @@ export class Service {
   isActive: boolean;
 
   // Additional customization fields
-  @Prop()
-  nameAr?: string; // Arabic name
-
-  @Prop()
-  nameEn?: string; // English name
-
   @Prop()
   description?: string; // Service description
 

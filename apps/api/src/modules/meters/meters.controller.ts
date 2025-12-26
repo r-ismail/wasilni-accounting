@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { MetersService } from './meters.service';
-import { CreateMeterDto, UpdateMeterDto, CreateMeterReadingDto } from './dto/create-meter.dto';
+import { CreateMeterDto, UpdateMeterDto, CreateMeterReadingDto, UpdateMeterReadingDto } from './dto/create-meter.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('meters')
@@ -42,6 +42,16 @@ export class MetersController {
   @Get('readings/list')
   findReadings(@Req() req: any, @Query('meterId') meterId?: string) {
     return this.metersService.findReadings(req.user.companyId, meterId);
+  }
+
+  @Patch('readings/:id')
+  updateReading(@Req() req: any, @Param('id') id: string, @Body() updateReadingDto: UpdateMeterReadingDto) {
+    return this.metersService.updateReading(req.user.companyId, id, updateReadingDto);
+  }
+
+  @Delete('readings/:id')
+  removeReading(@Req() req: any, @Param('id') id: string) {
+    return this.metersService.removeReading(req.user.companyId, id);
   }
 
   @Post('distribute/:buildingId')

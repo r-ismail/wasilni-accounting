@@ -3,20 +3,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ServiceType } from '../schemas/service.schema';
 
 export class CreateServiceDto {
-  @ApiProperty({ description: 'Service name (Internal/Canonical)', example: 'Maintenance' })
+  @ApiProperty({ description: 'Service name', example: 'Maintenance' })
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty({ description: 'Service name (Arabic)', example: 'صيانة' })
-  @IsString()
-  @IsNotEmpty()
-  nameAr: string;
-
-  @ApiProperty({ description: 'Service name (English)', example: 'Maintenance' })
-  @IsString()
-  @IsNotEmpty()
-  nameEn: string;
 
   @ApiPropertyOptional({ description: 'Service description', example: 'Monthly maintenance service' })
   @IsString()

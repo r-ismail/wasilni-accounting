@@ -14,6 +14,9 @@ export interface InvoicePrintData {
     currency: string;
     defaultLanguage: string;
     logo?: string;
+    phone?: string;
+    address?: string;
+    taxNumber?: string;
     // Display settings
     showInvoiceHeader?: boolean;
     showInvoiceFooter?: boolean;
@@ -72,8 +75,17 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
   <title>${isRTL ? 'فاتورة' : 'Invoice'} ${data.invoice.invoiceNumber}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #2c3e50;
+      --accent-color: #3498db;
+      --text-color: #333333;
+      --text-light: #666666;
+      --border-color: #e0e0e0;
+      --bg-color: #f8f9fa;
+    }
+
     * { 
       margin: 0; 
       padding: 0; 
@@ -81,274 +93,423 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
     }
     
     body {
-      font-family: ${isRTL ? "'Cairo', 'Noto Sans Arabic', 'Amiri', Arial, sans-serif" : 'Arial, sans-serif'};
-      padding: 40px;
-      color: #212121;
+      font-family: ${isRTL ? "'Cairo', sans-serif" : "'Inter', 'Helvetica Neue', Arial, sans-serif"};
+      background-color: #525659; /* Dark background for viewer context */
+      color: var(--text-color);
       font-size: 14px;
-      line-height: 1.6;
-      background: #f5f5f5;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     
     .invoice-container {
-      max-width: 900px;
-      margin: 0 auto;
+      max-width: 210mm; /* A4 width */
+      min-height: 297mm; /* A4 height */
+      margin: 40px auto;
       background: white;
-      padding: 40px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 40px 50px;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.15);
     }
     
+    /* Header Section */
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
+      align-items: flex-start;
+      margin-bottom: 50px;
+      border-bottom: 2px solid var(--primary-color);
       padding-bottom: 20px;
-      border-bottom: 3px solid #1976d2;
     }
-    
-    .company-name {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1976d2;
-    }
-    
-    .invoice-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: #1976d2;
-    }
-    
-    .info-section {
+
+    .brand-section {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 30px;
-      gap: 20px;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 50%;
     }
-    
-    .info-box {
-      flex: 1;
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
+
+    .company-logo-img {
+      max-height: 80px;
+      max-width: 200px;
+      object-fit: contain;
     }
-    
-    .info-header {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1976d2;
+
+    .company-name-text {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary-color);
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+
+    .invoice-meta {
+      text-align: ${isRTL ? 'left' : 'right'};
+    }
+
+    .invoice-title {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--border-color);
+      text-transform: uppercase;
+      line-height: 1;
       margin-bottom: 15px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #e0e0e0;
+      letter-spacing: 2px;
     }
-    
-    .info-item {
-      margin: 10px 0;
-      line-height: 1.8;
+
+    .meta-grid {
+      display: grid;
+      gap: 8px;
     }
-    
-    .info-item strong {
+
+    .meta-item {
+      display: flex;
+      justify-content: ${isRTL ? 'flex-start' : 'flex-end'};
+      gap: 15px;
+    }
+
+    .meta-label {
       font-weight: 600;
-      color: #424242;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
     }
-    
+
+    .meta-value {
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    /* Info Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 50px;
+    }
+
+    .info-box h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .info-content {
+      font-size: 14px;
+    }
+
+    .info-row {
+      margin-bottom: 5px;
+    }
+
+    .info-row strong {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* Table Section */
+    .table-container {
+      margin-bottom: 40px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
-      background: white;
     }
     
-    thead {
-      background: #1976d2;
+    thead th {
+      background-color: var(--primary-color);
       color: white;
-    }
-    
-    th {
-      padding: 15px 12px;
+      padding: 12px 15px;
       text-align: ${isRTL ? 'right' : 'left'};
       font-weight: 600;
-      font-size: 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #e0e0e0;
+    tbody td {
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #fafafa;
     }
     
-    tbody tr:hover {
-      background: #f8f9fa;
-    }
+    .text-center { text-align: center; }
+    .text-right { text-align: ${isRTL ? 'left' : 'right'}; }
     
-    .text-right { 
-      text-align: right; 
+    /* Totals Section */
+    .totals-container {
+      display: flex;
+      justify-content: ${isRTL ? 'flex-start' : 'flex-end'};
+      margin-bottom: 40px;
     }
-    
-    .text-center { 
-      text-align: center; 
+
+    .totals-box {
+      width: 300px;
     }
-    
-    .totals {
-      margin-${isRTL ? 'right' : 'left'}: auto;
-      width: 350px;
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    
+
     .total-row {
       display: flex;
       justify-content: space-between;
-      padding: 10px 0;
-      font-size: 15px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
     }
-    
-    .total-row.main {
-      font-weight: 700;
-      font-size: 18px;
-      border-top: 2px solid #424242;
-      padding-top: 15px;
+
+    .total-row:last-child {
+      border-bottom: none;
+    }
+
+    .total-row.main-total {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 15px;
       margin-top: 10px;
-      color: #1976d2;
-    }
-    
-    .total-row.balance {
-      color: #d32f2f;
+      border-radius: 4px;
       font-weight: 700;
       font-size: 16px;
     }
-    
+
+    /* Footer Section */
     .footer {
+      position: absolute;
+      bottom: 40px;
+      left: 50px;
+      right: 50px;
       text-align: center;
-      margin-top: 50px;
+      color: var(--text-light);
+      font-size: 12px;
+      border-top: 1px solid var(--border-color);
       padding-top: 20px;
-      border-top: 2px solid #e0e0e0;
-      color: #757575;
-      font-size: 14px;
     }
-    
-    .print-button {
+
+    .notes-section {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 4px;
+      border-${isRTL ? 'right' : 'left'}: 4px solid var(--accent-color);
+      margin-top: 20px;
+      margin-bottom: 60px; /* Space for footer */
+      font-size: 13px;
+    }
+
+    .print-btn {
       position: fixed;
-      top: 20px;
-      ${isRTL ? 'left' : 'right'}: 20px;
-      background: #1976d2;
+      top: 30px;
+      ${isRTL ? 'left' : 'right'}: 30px;
+      background: var(--primary-color);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
+      padding: 12px 25px;
+      border-radius: 50px;
       font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      font-family: inherit;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     }
     
-    .print-button:hover {
-      background: #1565c0;
+    @page {
+      size: A4;
+      margin: 0;
     }
-    
+
     @media print {
       body {
         background: white;
+        margin: 0;
         padding: 0;
+        width: 210mm;
+        height: 297mm;
       }
-      
       .invoice-container {
         box-shadow: none;
-        padding: 20px;
+        margin: 0;
+        padding: 20px 40px !important;
+        max-width: 210mm;
+        min-height: 0;
+        width: 100%;
+        height: auto;
       }
-      
-      .print-button {
+      .print-btn {
         display: none;
       }
+      
+      /* Scale content down slightly if needed to prevent spillover */
+      .header { margin-bottom: 30px; }
+      .info-grid { margin-bottom: 30px; }
+      .table-container { margin-bottom: 20px; }
+      .notes-section { margin-bottom: 30px; padding: 15px; }
+      .footer { position: static; margin-top: 30px; }
     }
   </style>
 </head>
 <body>
-  <button class="print-button" onclick="window.print()">
-    ${isRTL ? '🖨️ طباعة' : '🖨️ Print'}
+  <button class="print-btn" onclick="window.print()">
+    ${isRTL ? 'طباعة الفاتورة' : 'Print Invoice'}
   </button>
   
   <div class="invoice-container">
-    ${data.company.showInvoiceHeader !== false ? `
     <div class="header">
-      ${data.company.logo ? `<img src="${data.company.logo}" alt="Logo" style="max-height: 80px; max-width: 200px; object-fit: contain;">` : `<div class="company-name">${data.company.name}</div>`}
-      <div class="invoice-title">${isRTL ? 'فاتورة' : 'INVOICE'}</div>
-      ${data.company.invoiceHeaderText ? `<div style="margin-top: 10px; font-size: 14px; color: #666;">${data.company.invoiceHeaderText}</div>` : ''}
-    </div>` : `<div class="invoice-title" style="text-align: center; margin-bottom: 30px;">${isRTL ? 'فاتورة' : 'INVOICE'}</div>`}
-
-    <div class="info-section">
-      <div class="info-box">
-        <div class="info-header">${isRTL ? 'معلومات الفاتورة' : 'Invoice Information'}</div>
-        <div class="info-item"><strong>${isRTL ? 'رقم الفاتورة' : 'Invoice Number'}:</strong> ${data.invoice.invoiceNumber}</div>
-        <div class="info-item"><strong>${isRTL ? 'تاريخ الإصدار' : 'Issue Date'}:</strong> ${formatDate(data.invoice.issueDate)}</div>
-        <div class="info-item"><strong>${isRTL ? 'تاريخ الاستحقاق' : 'Due Date'}:</strong> ${formatDate(data.invoice.dueDate)}</div>
-        <div class="info-item"><strong>${isRTL ? 'الفترة' : 'Period'}:</strong> ${formatDate(data.invoice.periodStart)} - ${formatDate(data.invoice.periodEnd)}</div>
+      <div class="brand-section">
+        ${data.company.logo ? `<img src="${data.company.logo}" class="company-logo-img" alt="Logo">` : ''}
+        <div class="company-name-text" style="${data.company.logo ? 'font-size: 18px; margin-top: 5px;' : ''}">${data.company.name}</div>
+        
+        <div style="margin-top: 10px; font-size: 12px; color: var(--text-light); line-height: 1.6;">
+          ${data.company.taxNumber ? `<div style="margin-bottom: 4px;"><strong>${isRTL ? 'الرقم الضريبي' : 'Tax ID'}:</strong> ${data.company.taxNumber}</div>` : ''}
+          ${data.company.address ? `<div style="margin-bottom: 2px;">${data.company.address}</div>` : ''}
+          ${data.company.phone ? `<div>${data.company.phone}</div>` : ''}
+          ${data.company.invoiceHeaderText ? `<div style="margin-top: 8px;">${data.company.invoiceHeaderText}</div>` : ''}
+        </div>
       </div>
-      ${data.company.showCustomerDetails !== false ? `<div class="info-box">
-        <div class="info-header">${isRTL ? 'معلومات العميل' : 'Customer Information'}</div>
-        <div class="info-item"><strong>${isRTL ? 'الاسم' : 'Name'}:</strong> ${data.customer.name}</div>
-        ${data.customer.phone ? `<div class="info-item"><strong>${isRTL ? 'الهاتف' : 'Phone'}:</strong> ${data.customer.phone}</div>` : ''}
-        ${data.customer.email ? `<div class="info-item"><strong>${isRTL ? 'البريد' : 'Email'}:</strong> ${data.customer.email}</div>` : ''}
-        ${data.company.showUnitDetails !== false ? `<div class="info-item"><strong>${isRTL ? 'الوحدة' : 'Unit'}:</strong> ${data.unit.unitNumber}${data.unit.buildingName ? ` - ${data.unit.buildingName}` : ''}</div>` : ''}
-        ${data.company.showContractDetails && data.contract ? `<div class="info-item"><strong>${isRTL ? 'العقد' : 'Contract'}:</strong> ${formatDate(data.contract.startDate)} - ${formatDate(data.contract.endDate)}</div>` : ''}
-      </div>` : ''}
+
+      <div class="invoice-meta">
+        <div class="invoice-title" style="color: var(--primary-color);">${isRTL ? 'فاتورة إيجار' : 'RENTAL INVOICE'}</div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label"># ${isRTL ? 'رقم الفاتورة' : 'Invoice No'}</span>
+            <span class="meta-value">${data.invoice.invoiceNumber}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">📅 ${isRTL ? 'تاريخ الإصدار' : 'Issue Date'}</span>
+            <span class="meta-value">${formatDate(data.invoice.issueDate)}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">⚠️ ${isRTL ? 'تاريخ الاستحقاق' : 'Due Date'}</span>
+            <span class="meta-value">${formatDate(data.invoice.dueDate)}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">📊 ${isRTL ? 'الحالة' : 'Status'}</span>
+            <span class="meta-value" style="text-transform: capitalize;">${data.invoice.status}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>${isRTL ? 'الوصف' : 'Description'}</th>
-          <th class="text-center">${isRTL ? 'الكمية' : 'Quantity'}</th>
-          <th class="text-right">${isRTL ? 'السعر' : 'Unit Price'}</th>
-          <th class="text-right">${isRTL ? 'المبلغ' : 'Amount'}</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.lines.map(line => `
-          <tr>
-            <td>${line.description}</td>
-            <td class="text-center">${line.quantity}</td>
-            <td class="text-right">${formatNumber(line.unitPrice)} ${currencySymbol}</td>
-            <td class="text-right">${formatNumber(line.amount)} ${currencySymbol}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="info-grid">
+      ${data.company.showCustomerDetails !== false ? `
+      <div class="info-box">
+        <h3>${isRTL ? 'معلومات العميل ' : 'Bill To'}</h3>
+        <div class="info-content">
+          <div class="info-row"><strong style="font-size: 18px; color: var(--primary-color);">${data.customer.name}</strong></div>
+          ${data.customer.phone ? `<div class="info-row">${data.customer.phone}</div>` : ''}
+          ${data.customer.email ? `<div class="info-row">${data.customer.email}</div>` : ''}
+        </div>
+      </div>` : '<div></div>'}
 
-    <div class="totals">
-      ${data.subtotal ? `<div class="total-row">
-        <span>${isRTL ? 'المجموع الفرعي' : 'Subtotal'}:</span>
-        <span>${formatNumber(data.subtotal)} ${currencySymbol}</span>
-      </div>` : ''}
-      ${data.discount && data.discount > 0 ? `<div class="total-row" style="color: #4caf50;">
-        <span>${isRTL ? 'الخصم' : 'Discount'} ${data.discountPercent ? `(${data.discountPercent}%)` : ''}:</span>
-        <span>-${formatNumber(data.discount)} ${currencySymbol}</span>
-      </div>` : ''}
-      ${data.taxAmount && data.taxAmount > 0 && data.company.showTaxBreakdown !== false ? `<div class="total-row">
-        <span>${isRTL ? 'الضريبة' : 'Tax'} ${data.taxRate ? `(${data.taxRate}%)` : ''}:</span>
-        <span>+${formatNumber(data.taxAmount)} ${currencySymbol}</span>
-      </div>` : ''}
-      <div class="total-row main">
-        <span>${isRTL ? 'الإجمالي' : 'Total'}:</span>
-        <span>${formatNumber(data.invoice.totalAmount)} ${currencySymbol}</span>
+      <div class="info-box">
+        <h3>${isRTL ? 'تفاصيل المرفق' : 'Property Details'}</h3>
+        <div class="info-content">
+          ${data.company.showUnitDetails !== false ? `
+            <div class="info-row">
+              <span style="color: var(--text-light);">${isRTL ? 'الوحدة' : 'Unit'}:</span>
+              <strong>${data.unit.unitNumber}</strong>
+            </div>
+            ${data.unit.buildingName ? `
+            <div class="info-row">
+              <span style="color: var(--text-light);">${isRTL ? 'المبنى' : 'Building'}:</span>
+              <strong>${data.unit.buildingName}</strong>
+            </div>` : ''}
+          ` : ''}
+          <div class="info-row" style="margin-top: 8px;">
+            <span style="color: var(--text-light);">${isRTL ? 'الفترة' : 'Period'}:</span><br>
+            <span>${formatDate(data.invoice.periodStart)} — ${formatDate(data.invoice.periodEnd)}</span>
+          </div>
+        </div>
       </div>
-      <div class="total-row">
-        <span>${isRTL ? 'المدفوع' : 'Paid'}:</span>
-        <span>${formatNumber(data.invoice.paidAmount)} ${currencySymbol}</span>
-      </div>
-      <div class="total-row balance">
-        <span>${isRTL ? 'المتبقي' : 'Balance'}:</span>
-        <span>${formatNumber(data.invoice.totalAmount - data.invoice.paidAmount)} ${currencySymbol}</span>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>${isRTL ? 'الوصف' : 'Description'}</th>
+            <th class="text-center" width="100">${isRTL ? 'الكمية' : 'Qty'}</th>
+            <th class="text-right" width="150">${isRTL ? 'السعر' : 'Price'}</th>
+            <th class="text-right" width="150">${isRTL ? 'المبلغ' : 'Amount'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.lines.map(line => `
+            <tr>
+              <td><strong>${line.description}</strong></td>
+              <td class="text-center">${line.quantity}</td>
+              <td class="text-right">${formatNumber(line.unitPrice)}</td>
+              <td class="text-right">${formatNumber(line.amount)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="totals-container">
+      <div class="totals-box">
+        ${data.subtotal ? `
+        <div class="total-row">
+          <span>${isRTL ? 'المجموع الفرعي' : 'Subtotal'}</span>
+          <span>${formatNumber(data.subtotal)} ${currencySymbol}</span>
+        </div>` : ''}
+        
+        ${data.discount && data.discount > 0 ? `
+        <div class="total-row" style="color: #27ae60;">
+          <span>${isRTL ? 'خصم' : 'Discount'} ${data.discountPercent ? `(${data.discountPercent}%)` : ''}</span>
+          <span>- ${formatNumber(data.discount)} ${currencySymbol}</span>
+        </div>` : ''}
+        
+        ${data.taxAmount && data.taxAmount > 0 && data.company.showTaxBreakdown !== false ? `
+        <div class="total-row">
+          <span>${isRTL ? 'الضريبة' : 'Tax'} ${data.taxRate ? `(${data.taxRate}%)` : ''}</span>
+          <span>+ ${formatNumber(data.taxAmount)} ${currencySymbol}</span>
+        </div>` : ''}
+        
+        <div class="total-row main-total">
+          <span>${isRTL ? 'الإجمالي' : 'Total'}</span>
+          <span>${formatNumber(data.invoice.totalAmount)} ${currencySymbol}</span>
+        </div>
+
+        <div class="total-row" style="margin-top: 10px; border: none; font-size: 13px;">
+          <span>${isRTL ? 'المدفوع' : 'Amount Paid'}</span>
+          <span>${formatNumber(data.invoice.paidAmount)} ${currencySymbol}</span>
+        </div>
+        
+        <div class="total-row" style="border-top: 1px solid #ddd; padding-top: 8px; font-weight: 700; color: #c0392b;">
+          <span>${isRTL ? 'المتبقي' : 'Balance Due'}</span>
+          <span>${formatNumber(data.invoice.totalAmount - data.invoice.paidAmount)} ${currencySymbol}</span>
+        </div>
       </div>
     </div>
 
     ${data.company.invoiceNotes || data.company.paymentInstructions ? `
-    <div style="margin-top: 30px; padding: 15px; background: #f5f5f5; border-${isRTL ? 'right' : 'left'}: 4px solid #1976d2;">
-      ${data.company.invoiceNotes ? `<div style="margin-bottom: ${data.company.paymentInstructions ? '10px' : '0'};"><strong>${isRTL ? 'ملاحظات' : 'Notes'}:</strong> ${data.company.invoiceNotes}</div>` : ''}
-      ${data.company.paymentInstructions ? `<div><strong>${isRTL ? 'تعليمات الدفع' : 'Payment Instructions'}:</strong> ${data.company.paymentInstructions}</div>` : ''}
+    <div class="notes-section">
+      ${data.company.invoiceNotes ? `
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--primary-color); display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 11px;">${isRTL ? 'ملاحظات' : 'Notes'}</strong>
+          <div style="color: var(--text-light);">${data.company.invoiceNotes}</div>
+        </div>` : ''}
+      
+      ${data.company.paymentInstructions ? `
+        <div>
+          <strong style="color: var(--primary-color); display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 11px;">${isRTL ? 'تعليمات الدفع' : 'Payment Instructions'}</strong>
+          <div style="color: var(--text-light); white-space: pre-line;">${data.company.paymentInstructions}</div>
+        </div>` : ''}
     </div>` : ''}
 
-    ${data.company.showInvoiceFooter !== false ? `<div class="footer">
+    ${data.company.showInvoiceFooter !== false ? `
+    <div class="footer">
       ${data.company.invoiceFooterText || (isRTL ? 'شكراً لتعاملكم معنا' : 'Thank you for your business')}
     </div>` : ''}
   </div>

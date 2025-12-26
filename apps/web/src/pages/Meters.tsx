@@ -30,12 +30,14 @@ export default function Meters() {
     isActive: true,
   });
 
-  const { data: meters = [], isLoading } = useQuery({
+  const { data: meters = [], isLoading, refetch: refetchMeters } = useQuery({
     queryKey: ['meters'],
     queryFn: async () => {
       const res = await api.get('/meters');
       return res.data.data || res.data || [];
     },
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   // ... (rest of the hooks) ...
@@ -47,6 +49,8 @@ export default function Meters() {
       return res.data.data || res.data || [];
     },
   });
+
+  const meteredServices = services.filter((service: any) => service.type === 'metered');
 
   const { data: buildings = [] } = useQuery({
     queryKey: ['buildings'],
@@ -70,6 +74,7 @@ export default function Meters() {
     mutationFn: (data: any) => api.post('/meters', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
+      refetchMeters();
       showSnackbar(t('meters.created'), 'success');
       handleCloseDialog();
     },
@@ -78,10 +83,17 @@ export default function Meters() {
     },
   });
 
+ const buildMeterPayload = (data: Partial<typeof formData>) => {
+    const payload: Partial<typeof formData> = {};
+    if (data.meterNumber !== undefined) payload.meterNumber = data.meterNumber;
+    if (data.isActive !== undefined) payload.isActive = data.isActive;
+    return payload;
+  };
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: any) => api.patch(`/meters/${id}`, data),
+    mutationFn: ({ id, data }: any) => api.patch(`/meters/${id}`, buildMeterPayload(data)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
+      refetchMeters();
       showSnackbar(t('meters.updated'), 'success');
       handleCloseDialog();
     },
@@ -94,6 +106,7 @@ export default function Meters() {
     mutationFn: (id: string) => api.delete(`/meters/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meters'] });
+      refetchMeters();
       showSnackbar(t('meters.deleted'), 'success');
     },
     onError: (error: any) => {
@@ -259,7 +272,7 @@ export default function Meters() {
                 label={t('meters.service')}
                 onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
               >
-                {services.map((service: any) => (
+                {meteredServices.map((service: any) => (
                   <MenuItem key={service._id} value={service._id}>
                     {service.name}
                   </MenuItem>

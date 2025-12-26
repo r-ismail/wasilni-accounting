@@ -16,6 +16,9 @@ import { InvoicesModule } from './modules/invoices/invoices.module';
 import { MetersModule } from './modules/meters/meters.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { VendorsModule } from './modules/vendors/vendors.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
 
 @Module({
   imports: [
@@ -78,6 +81,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     MetersModule,
     PaymentsModule,
     NotificationsModule,
+    ReportsModule,
+    VendorsModule,
+    ExpensesModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

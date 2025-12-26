@@ -20,6 +20,9 @@ interface Customer {
   phone: string;
   email?: string;
   isActive: boolean;
+  idNumber?: string;
+  taxNumber?: string;
+  address?: string;
 }
 
 export default function Customers() {
@@ -45,7 +48,17 @@ export default function Customers() {
   const createMutation = useMutation({
     mutationFn: async (data: Partial<Customer>) => {
       if (formDialog.customer) {
-        await api.put(`/customers/${formDialog.customer._id}`, data);
+        const updatePayload = {
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          isActive: data.isActive,
+          type: data.type,
+          idNumber: data.idNumber,
+          taxNumber: data.taxNumber,
+          address: data.address,
+        };
+        await api.put(`/customers/${formDialog.customer._id}`, updatePayload);
       } else {
         await api.post('/customers', data);
       }
@@ -159,6 +172,21 @@ export default function Customers() {
               <Grid item xs={12} sm={6}>
                 <Controller name="email" control={control} defaultValue="" render={({ field }) => (
                   <TextField {...field} label={t('customers.email')} type="email" fullWidth />
+                )} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller name="idNumber" control={control} defaultValue="" render={({ field }) => (
+                  <TextField {...field} label={t('customers.idNumber')} fullWidth />
+                )} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller name="taxNumber" control={control} defaultValue="" render={({ field }) => (
+                  <TextField {...field} label={t('customers.taxNumber')} fullWidth />
+                )} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller name="address" control={control} defaultValue="" render={({ field }) => (
+                  <TextField {...field} label={t('customers.address')} fullWidth />
                 )} />
               </Grid>
             </Grid>

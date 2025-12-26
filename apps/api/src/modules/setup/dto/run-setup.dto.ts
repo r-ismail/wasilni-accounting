@@ -24,6 +24,16 @@ export class CompanyInfoDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiPropertyOptional({ description: 'Company phone number', example: '+967777123456' })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiPropertyOptional({ description: 'Company address', example: 'Sana’a, Yemen' })
+  @IsString()
+  @IsOptional()
+  address?: string;
+
   @ApiProperty({ description: 'Currency code', example: 'SAR' })
   @IsString()
   @IsNotEmpty()

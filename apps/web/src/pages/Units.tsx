@@ -245,7 +245,7 @@ export default function Units() {
                 <TableRow key={unit._id}>
                   <TableCell sx={{  }}>{unit.unitNumber}</TableCell>
                   <TableCell sx={{  }}>
-                    {typeof unit.buildingId === 'object' ? unit.buildingId.name : '-'}
+                    {buildings?.find((building: any) => building._id === unit.buildingId)?.name}
                   </TableCell>
                   <TableCell sx={{  }}>
                     <Chip

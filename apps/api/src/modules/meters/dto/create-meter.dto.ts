@@ -47,3 +47,17 @@ export class CreateMeterReadingDto {
   @IsOptional()
   notes?: string;
 }
+
+export class UpdateMeterReadingDto {
+  @IsString()
+  @IsOptional()
+  readingDate?: string;
+
+  @IsString()
+  @IsOptional()
+  currentReading?: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}

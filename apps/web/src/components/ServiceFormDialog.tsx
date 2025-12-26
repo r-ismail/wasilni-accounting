@@ -15,8 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 interface ServiceFormData {
-  nameAr: string;
-  nameEn: string;
+  name: string;
   description: string;
   type: string;
   defaultPrice: number;
@@ -44,8 +43,7 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<ServiceFormData>({
-    nameAr: '',
-    nameEn: '',
+    name: '',
     description: '',
     type: 'fixed_fee',
     defaultPrice: 0,
@@ -61,8 +59,7 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
       setFormData(initialData);
     } else {
       setFormData({
-        nameAr: '',
-        nameEn: '',
+        name: '',
         description: '',
         type: 'fixed_fee',
         defaultPrice: 0,
@@ -93,18 +90,9 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label={t('services.nameAr')}
-              value={formData.nameAr}
-              onChange={(e) => handleChange('nameAr', e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label={t('services.nameEn')}
-              value={formData.nameEn}
-              onChange={(e) => handleChange('nameEn', e.target.value)}
+              label={t('services.name')}
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
               required
             />
           </Grid>
@@ -197,7 +185,7 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
             />
           </Grid>
         </Grid>
-        {!formData.nameAr || !formData.nameEn ? (
+        {!formData.name ? (
           <Alert severity="warning" sx={{ mt: 2 }}>
             {t('services.requiredFields')}
           </Alert>
@@ -210,7 +198,7 @@ const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={isLoading || !formData.nameAr || !formData.nameEn}
+          disabled={isLoading || !formData.name}
         >
           {isLoading ? t('common.saving') : t('common.save')}
         </Button>
