@@ -2233,6 +2233,7 @@ const Settings: React.FC = () => {
                           <TableCell>{t('services.name')}</TableCell>
                           <TableCell>{t('services.type')}</TableCell>
                           <TableCell>{t('services.defaultPrice')}</TableCell>
+                          <TableCell>{t('services.buildings')}</TableCell>
                           <TableCell>{t('services.status')}</TableCell>
                           <TableCell align="right">{t('common.actions')}</TableCell>
                         </TableRow>
@@ -2250,6 +2251,23 @@ const Settings: React.FC = () => {
                               />
                             </TableCell>
                             <TableCell>{service.defaultPrice}</TableCell>
+                            <TableCell>
+                              {(() => {
+                                const fromService = (service as any).buildingIds || [];
+                                const ids =
+                                  fromService.length > 0
+                                    ? fromService
+                                    : buildingOptions
+                                        .filter((b: any) =>
+                                          (b?.services || []).some((s: any) => (s?._id ?? s) === service._id),
+                                        )
+                                        .map((b: any) => b._id);
+                                const names = buildingOptions
+                                  .filter((b: any) => ids.includes(b._id))
+                                  .map((b: any) => b.name);
+                                return names.length ? names.join(', ') : '-';
+                              })()}
+                            </TableCell>
                             <TableCell>
                               <Chip 
                                 label={service.isActive ? t('common.active') : t('common.inactive')} 

@@ -94,6 +94,14 @@ export const getTheme = (language: string) => {
             padding: '8px 16px',
             fontWeight: 600,
           },
+          startIcon: {
+            marginInlineStart: 0,
+            marginInlineEnd: 8,
+          },
+          endIcon: {
+            marginInlineStart: 8,
+            marginInlineEnd: 0,
+          },
           contained: {
             boxShadow: 'none',
             '&:hover': {
