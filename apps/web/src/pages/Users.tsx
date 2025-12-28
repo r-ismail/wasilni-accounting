@@ -143,7 +143,7 @@ export default function Users() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginateData(users).map((user: User) => (
+              {(paginateData(users as User[])).map((user) => (
                 <TableRow key={user._id}>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>
