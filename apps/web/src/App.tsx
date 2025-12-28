@@ -18,6 +18,8 @@ import Invoices from './pages/Invoices';
 import Payments from './pages/Payments';
 import Reports from './pages/Reports';
 import Customers from './pages/Customers';
+import CustomerProfile from './pages/CustomerProfile';
+import ContractPrint from './pages/ContractPrint';
 import Meters from './pages/Meters';
 import MeterReadings from './pages/MeterReadings';
 import Notifications from './pages/Notifications';
@@ -72,10 +74,12 @@ const App: React.FC = () => {
                           <Route path="/" element={<Dashboard />} />
                           <Route path="/units" element={<Units />} />
                           <Route path="/contracts" element={<Contracts />} />
+                          <Route path="/contracts/:id/print" element={<ContractPrint />} />
                           <Route path="/invoices" element={<Invoices />} />
                           <Route path="/payments" element={<Payments />} />
                           <Route path="/reports" element={<Reports />} />
                           <Route path="/customers" element={<Customers />} />
+                          <Route path="/customers/:id" element={<CustomerProfile />} />
                           <Route path="/vendors" element={<Vendors />} />
                           <Route path="/expenses" element={<Expenses />} />
                           <Route path="/meters" element={<Meters />} />

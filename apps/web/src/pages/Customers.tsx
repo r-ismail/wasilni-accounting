@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -6,7 +7,7 @@ import {
   TablePagination, IconButton, Chip, TextField, MenuItem, Typography, Dialog, DialogTitle, DialogContent,
   DialogActions, Alert, Grid,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
@@ -28,6 +29,7 @@ interface Customer {
 export default function Customers() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [search, setSearch] = useState('');
@@ -127,6 +129,9 @@ export default function Customers() {
                   <TableCell>{customer.phone}</TableCell>
                   <TableCell>{customer.email || '-'}</TableCell>
                   <TableCell align="right">
+                    <IconButton size="small" onClick={() => navigate(`/customers/${customer._id}`)}>
+                      <VisibilityIcon />
+                    </IconButton>
                     <IconButton size="small" onClick={() => openForm(customer)}><EditIcon /></IconButton>
                     <IconButton size="small" color="error" onClick={() => setConfirmDelete({ open: true, id: customer._id })}><DeleteIcon /></IconButton>
                   </TableCell>

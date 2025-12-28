@@ -3,11 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto/create-customer.dto';
+import { Contract, ContractDocument } from '../contracts/schemas/contract.schema';
+import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
+import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
 
 @Injectable()
 export class CustomersService {
   constructor(
     @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
+    @InjectModel(Contract.name) private contractModel: Model<ContractDocument>,
+    @InjectModel(Invoice.name) private invoiceModel: Model<InvoiceDocument>,
+    @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
   ) {}
 
   async create(companyId: string, createCustomerDto: CreateCustomerDto): Promise<CustomerDocument> {
@@ -65,6 +71,104 @@ export class CustomersService {
     }
 
     return customer;
+  }
+
+  async getProfile(companyId: string, id: string): Promise<any> {
+    const customer = await this.findOne(companyId, id);
+    const companyObjectId = new Types.ObjectId(companyId);
+    const customerObjectId = new Types.ObjectId(id);
+
+    const contracts = await this.contractModel
+      .find({
+        companyId: companyObjectId,
+        customerId: customerObjectId,
+      })
+      .populate({
+        path: 'unitId',
+        select: 'unitNumber buildingId',
+        populate: { path: 'buildingId', select: 'name' },
+      })
+      .sort({ startDate: -1 })
+      .exec();
+
+    const contractIds = contracts.map((contract) => contract._id);
+    const invoices = contractIds.length
+      ? await this.invoiceModel
+          .find({
+            companyId: companyObjectId,
+            contractId: { $in: contractIds },
+          })
+          .populate({
+            path: 'contractId',
+            select: 'unitId startDate endDate',
+            populate: {
+              path: 'unitId',
+              select: 'unitNumber buildingId',
+              populate: { path: 'buildingId', select: 'name' },
+            },
+          })
+          .sort({ issueDate: -1 })
+          .exec()
+      : [];
+
+    const payments = await this.paymentModel
+      .find({
+        companyId: companyObjectId,
+        customerId: customerObjectId,
+      })
+      .populate('invoiceId', 'invoiceNumber totalAmount')
+      .sort({ paymentDate: -1 })
+      .exec();
+
+    const totalInvoiced = invoices.reduce(
+      (sum, invoice) => sum + (invoice.totalAmount || 0),
+      0,
+    );
+    const now = new Date();
+    const overdueInvoices = invoices.filter(
+      (invoice) =>
+        !['paid', 'cancelled'].includes(invoice.status) &&
+        invoice.dueDate &&
+        new Date(invoice.dueDate) < now,
+    );
+    const overdueAmount = overdueInvoices.reduce(
+      (sum, invoice) => sum + (invoice.totalAmount || 0) - (invoice.paidAmount || 0),
+      0,
+    );
+    const totalPaid = payments.reduce(
+      (sum, payment) => sum + (payment.amount || 0),
+      0,
+    );
+    const outstanding = totalInvoiced - totalPaid;
+    const openInvoices = invoices.filter(
+      (invoice) => !['paid', 'cancelled'].includes(invoice.status),
+    ).length;
+    const activeContracts = contracts.filter((contract) => contract.isActive).length;
+    const lastPayment = payments.length
+      ? {
+          amount: payments[0].amount,
+          paymentDate: payments[0].paymentDate,
+          paymentMethod: payments[0].paymentMethod,
+          invoiceId: payments[0].invoiceId,
+        }
+      : null;
+
+    return {
+      customer,
+      summary: {
+        totalInvoiced,
+        totalPaid,
+        outstanding,
+        openInvoices,
+        overdueInvoices: overdueInvoices.length,
+        overdueAmount,
+        activeContracts,
+        lastPayment,
+      },
+      contracts,
+      invoices,
+      payments,
+    };
   }
 
   async update(

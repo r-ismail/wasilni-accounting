@@ -48,6 +48,13 @@ export class CustomersController {
     return { success: true, data: customers };
   }
 
+  @Get(':id/profile')
+  @ApiOperation({ summary: 'Get customer profile with contracts and accounting details' })
+  async profile(@Request() req: any, @Param('id') id: string) {
+    const profile = await this.customersService.getProfile(req.user.companyId, id);
+    return { success: true, data: profile };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get customer by ID' })
   async findOne(@Request() req: any, @Param('id') id: string) {

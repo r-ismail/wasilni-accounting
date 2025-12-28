@@ -30,12 +30,14 @@ import {
   Delete as DeleteIcon,
   Block as BlockIcon,
   Replay as ReplayIcon,
+  Print as PrintIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { usePagination } from '../hooks/usePagination';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useNavigate } from 'react-router-dom';
 
 interface Contract {
   _id: string;
@@ -64,6 +66,7 @@ interface Customer {
 export default function Contracts() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [formDialog, setFormDialog] = useState<{ open: boolean; contract?: Contract }>({
@@ -275,6 +278,13 @@ export default function Contracts() {
                   <TableCell align="right">
                     <IconButton size="small" color="primary" onClick={() => openForm(contract)}>
                       <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="info"
+                      onClick={() => navigate(`/contracts/${contract._id}/print`)}
+                    >
+                      <PrintIcon />
                     </IconButton>
                     {contract.isActive && (
                       <IconButton

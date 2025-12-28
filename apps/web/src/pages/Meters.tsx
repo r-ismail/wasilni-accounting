@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
@@ -46,11 +46,9 @@ export default function Meters() {
     queryKey: ['services'],
     queryFn: async () => {
       const res = await api.get('/services');
-      return res.data.data || res.data || [];
+      return res.data.data || res.data?.data || res.data || [];
     },
   });
-
-  const meteredServices = services.filter((service: any) => service.type === 'metered');
 
   const { data: buildings = [] } = useQuery({
     queryKey: ['buildings'],
@@ -67,6 +65,50 @@ export default function Meters() {
       return res.data.data || res.data || [];
     },
   });
+
+  const servicesList = Array.isArray(services) ? services : [];
+  const buildingsList = Array.isArray(buildings) ? buildings : [];
+  const unitsList = Array.isArray(units) ? units : [];
+
+  const serviceById = useMemo(() => {
+    return new Map(servicesList.map((service: any) => [service._id, service]));
+  }, [servicesList]);
+
+  const selectedBuildingId = useMemo(() => {
+    if (formData.type === 'building') {
+      return formData.buildingId;
+    }
+    if (formData.type === 'unit') {
+      const unit = unitsList.find((item: any) => item._id === formData.unitId);
+      return unit?.buildingId?._id || unit?.buildingId || '';
+    }
+    return '';
+  }, [formData.type, formData.buildingId, formData.unitId, unitsList]);
+
+  const meteredServices = useMemo(() => {
+    const building = buildingsList.find((item: any) => item._id === selectedBuildingId);
+    const buildingServices = building?.services || [];
+    const resolvedBuildingServices = building
+      ? buildingServices
+          .map((service: any) => {
+            const id = typeof service === 'string' ? service : service?._id;
+            return serviceById.get(id) || service;
+          })
+          .filter(Boolean)
+      : servicesList;
+
+    return resolvedBuildingServices.filter(
+      (service: any) => service.type === 'metered' && service.isActive !== false,
+    );
+  }, [buildingsList, selectedBuildingId, serviceById, servicesList]);
+
+  const serviceSelectDisabled = !selectedBuildingId;
+
+  useEffect(() => {
+    if (formData.serviceId && !meteredServices.some((service: any) => service._id === formData.serviceId)) {
+      setFormData((prev) => ({ ...prev, serviceId: '' }));
+    }
+  }, [formData.serviceId, meteredServices]);
 
   // ... (mutations and handlers) ...
 
@@ -271,12 +313,21 @@ export default function Meters() {
                 value={formData.serviceId}
                 label={t('meters.service')}
                 onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
+                disabled={serviceSelectDisabled}
               >
-                {meteredServices.map((service: any) => (
-                  <MenuItem key={service._id} value={service._id}>
-                    {service.name}
+                {meteredServices.length === 0 ? (
+                  <MenuItem value="" disabled>
+                    {selectedBuildingId
+                      ? t('meters.noMeteredServicesForBuilding')
+                      : t('meters.noMeteredServices')}
                   </MenuItem>
-                ))}
+                ) : (
+                  meteredServices.map((service: any) => (
+                    <MenuItem key={service._id} value={service._id}>
+                      {service.name}
+                    </MenuItem>
+                  ))
+                )}
               </Select>
             </FormControl>
 
