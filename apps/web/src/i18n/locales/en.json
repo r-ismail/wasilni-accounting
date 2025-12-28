@@ -206,7 +206,30 @@
     "meters": "Meters",
     "readings": "Readings",
     "notifications": "Notifications",
-    "settings": "Settings"
+    "settings": "Settings",
+    "users": "Users"
+  },
+  "users": {
+    "title": "User Management",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "username": "Username",
+    "role": "Role",
+    "password": "Password",
+    "newPassword": "New Password",
+    "isActive": "Active",
+    "status": "Status",
+    "noUsers": "No users found",
+    "deleteConfirm": "Delete User?",
+    "deleteWarning": "This action cannot be undone",
+    "userCreated": "User created successfully",
+    "userUpdated": "User updated successfully",
+    "userDeleted": "User deleted successfully",
+    "roles": {
+      "admin": "Admin",
+      "user": "User",
+      "super_admin": "Super Admin"
+    }
   },
   "reports": {
     "title": "Reports",

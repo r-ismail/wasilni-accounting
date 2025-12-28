@@ -22,7 +22,6 @@ import {
 import { ArrowBack as ArrowBackIcon, Print as PrintIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
-import { formatCurrency } from '../utils/format';
 
 interface CustomerProfileData {
   customer: any;
@@ -50,6 +49,9 @@ export default function CustomerProfile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const formatCurrencyEn = (value?: number) =>
+    new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value || 0);
+  const formatDateEn = (value: string | Date) => new Date(value).toLocaleDateString('en-GB');
 
   const { data, isLoading } = useQuery({
     queryKey: ['customer-profile', id],
@@ -62,13 +64,13 @@ export default function CustomerProfile() {
 
   const summaryCards = useMemo(
     () => [
-      { label: t('customers.totalInvoiced'), value: formatCurrency(data?.summary.totalInvoiced) },
-      { label: t('customers.totalPaid'), value: formatCurrency(data?.summary.totalPaid) },
-      { label: t('customers.outstanding'), value: formatCurrency(data?.summary.outstanding) },
+      { label: t('customers.totalInvoiced'), value: formatCurrencyEn(data?.summary.totalInvoiced) },
+      { label: t('customers.totalPaid'), value: formatCurrencyEn(data?.summary.totalPaid) },
+      { label: t('customers.outstanding'), value: formatCurrencyEn(data?.summary.outstanding) },
       { label: t('customers.activeContracts'), value: data?.summary.activeContracts ?? 0 },
       { label: t('customers.openInvoices'), value: data?.summary.openInvoices ?? 0 },
       { label: t('customers.overdueInvoices'), value: data?.summary.overdueInvoices ?? 0 },
-      { label: t('customers.overdueAmount'), value: formatCurrency(data?.summary.overdueAmount) },
+      { label: t('customers.overdueAmount'), value: formatCurrencyEn(data?.summary.overdueAmount) },
     ],
     [data, t],
   );
@@ -91,9 +93,13 @@ export default function CustomerProfile() {
     <Box>
       <style>
         {`@media print {
+          @page { size: A4; margin: 12mm; }
           .print-hidden { display: none !important; }
           .MuiDrawer-root, .MuiAppBar-root { display: none !important; }
-          body { background: #fff !important; }
+          html, body { width: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+          #root { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          #root > .MuiBox-root { display: block !important; width: 100% !important; margin: 0 !important; }
         }`}
       </style>
 
@@ -179,11 +185,11 @@ export default function CustomerProfile() {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <Typography variant="body2" color="text.secondary">{t('payments.amount')}</Typography>
-              <Typography>{formatCurrency(data.summary.lastPayment.amount)}</Typography>
+              <Typography>{formatCurrencyEn(data.summary.lastPayment.amount)}</Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
               <Typography variant="body2" color="text.secondary">{t('payments.paymentDate')}</Typography>
-              <Typography>{new Date(data.summary.lastPayment.paymentDate).toLocaleDateString()}</Typography>
+              <Typography>{formatDateEn(data.summary.lastPayment.paymentDate)}</Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
               <Typography variant="body2" color="text.secondary">{t('payments.paymentMethod')}</Typography>
@@ -220,9 +226,9 @@ export default function CustomerProfile() {
                     <TableCell>{contract.unitId?.unitNumber || '-'}</TableCell>
                     <TableCell>{contract.unitId?.buildingId?.name || '-'}</TableCell>
                     <TableCell>{t(`contracts.${contract.rentType}`)}</TableCell>
-                    <TableCell>{formatCurrency(contract.baseRentAmount)}</TableCell>
-                    <TableCell>{new Date(contract.startDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(contract.endDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatCurrencyEn(contract.baseRentAmount)}</TableCell>
+                    <TableCell>{formatDateEn(contract.startDate)}</TableCell>
+                    <TableCell>{formatDateEn(contract.endDate)}</TableCell>
                     <TableCell>
                       <Chip
                         label={contract.isActive ? t('common.active') : t('common.inactive')}
@@ -263,11 +269,11 @@ export default function CustomerProfile() {
                 {data.invoices.map((invoice: any) => (
                   <TableRow key={invoice._id}>
                     <TableCell>{invoice.invoiceNumber}</TableCell>
-                    <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
-                    <TableCell>{formatCurrency(invoice.paidAmount)}</TableCell>
-                    <TableCell>{formatCurrency(invoice.remainingAmount)}</TableCell>
+                    <TableCell>{formatDateEn(invoice.issueDate)}</TableCell>
+                    <TableCell>{formatDateEn(invoice.dueDate)}</TableCell>
+                    <TableCell>{formatCurrencyEn(invoice.totalAmount)}</TableCell>
+                    <TableCell>{formatCurrencyEn(invoice.paidAmount)}</TableCell>
+                    <TableCell>{formatCurrencyEn(invoice.remainingAmount)}</TableCell>
                     <TableCell>
                       <Chip
                         label={t(`invoices.status.${invoice.status}`)}
@@ -314,9 +320,9 @@ export default function CustomerProfile() {
                   .map((invoice: any) => (
                     <TableRow key={invoice._id}>
                       <TableCell>{invoice.invoiceNumber}</TableCell>
-                      <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
-                      <TableCell>{formatCurrency(invoice.remainingAmount)}</TableCell>
+                      <TableCell>{formatDateEn(invoice.dueDate)}</TableCell>
+                      <TableCell>{formatCurrencyEn(invoice.totalAmount)}</TableCell>
+                      <TableCell>{formatCurrencyEn(invoice.remainingAmount)}</TableCell>
                       <TableCell>
                         <Chip
                           label={t(`invoices.status.${invoice.status}`)}
@@ -354,8 +360,8 @@ export default function CustomerProfile() {
               <TableBody>
                 {data.payments.map((payment: any) => (
                   <TableRow key={payment._id}>
-                    <TableCell>{new Date(payment.paymentDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                    <TableCell>{formatDateEn(payment.paymentDate)}</TableCell>
+                    <TableCell>{formatCurrencyEn(payment.amount)}</TableCell>
                     <TableCell>{payment.paymentMethod}</TableCell>
                     <TableCell>{payment.invoiceId?.invoiceNumber || '-'}</TableCell>
                     <TableCell>{payment.notes || '-'}</TableCell>

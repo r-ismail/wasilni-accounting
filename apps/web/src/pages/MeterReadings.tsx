@@ -132,7 +132,7 @@ export default function MeterReadings() {
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('ar-EG');
+    return new Date(date).toLocaleDateString('en-GB');
   };
 
   return (

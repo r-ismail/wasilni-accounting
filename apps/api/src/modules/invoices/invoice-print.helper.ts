@@ -519,7 +519,7 @@ export function generateInvoiceHtml(data: InvoicePrintData): string {
 }
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('ar-EG', {
+  return new Date(date).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'

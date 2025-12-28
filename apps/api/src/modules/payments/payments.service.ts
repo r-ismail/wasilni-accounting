@@ -132,7 +132,10 @@ export class PaymentsService {
   }
 
   async delete(id: string, companyId: string): Promise<void> {
-    const payment = await this.paymentModel.findOne({ _id: id, companyId });
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
+    const payment = await this.paymentModel.findOne({ _id: id, companyId: companyObjectId });
 
     if (!payment) {
       throw new NotFoundException('Payment not found');
@@ -142,12 +145,17 @@ export class PaymentsService {
     const invoice = await this.invoiceModel.findById(payment.invoiceId);
     if (invoice) {
       invoice.paidAmount -= payment.amount;
-      
+      if (invoice.paidAmount < 0) {
+        invoice.paidAmount = 0;
+      }
+
       // Update invoice status
       if (invoice.paidAmount === 0) {
-        invoice.status = 'posted';
+        invoice.status = 'draft';
       } else if (invoice.paidAmount < invoice.totalAmount) {
         invoice.status = 'posted';
+      } else if (invoice.paidAmount >= invoice.totalAmount) {
+        invoice.status = 'paid';
       }
 
       await invoice.save();
@@ -160,8 +168,11 @@ export class PaymentsService {
     invoiceId: string,
     companyId: string,
   ): Promise<PaymentDocument[]> {
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
     return this.paymentModel
-      .find({ invoiceId, companyId })
+      .find({ invoiceId, companyId: companyObjectId })
       .populate('recordedBy', 'username')
       .sort({ paymentDate: -1 })
       .exec();
@@ -171,8 +182,11 @@ export class PaymentsService {
     contractId: string,
     companyId: string,
   ): Promise<PaymentDocument[]> {
+    const companyObjectId = typeof companyId === 'string'
+      ? new Types.ObjectId(companyId)
+      : companyId;
     return this.paymentModel
-      .find({ contractId, companyId })
+      .find({ contractId, companyId: companyObjectId })
       .populate('invoiceId')
       .populate('recordedBy', 'username')
       .sort({ paymentDate: -1 })

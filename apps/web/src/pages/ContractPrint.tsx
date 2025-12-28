@@ -4,13 +4,15 @@ import { Box, Typography, Button, Paper, Grid, Divider, Alert } from '@mui/mater
 import { ArrowBack as ArrowBackIcon, Print as PrintIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
-import { formatCurrency } from '../utils/format';
 
 export default function ContractPrint() {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
   const navigate = useNavigate();
   const { id } = useParams();
+  const formatCurrencyEn = (value?: number) =>
+    new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value || 0);
+  const formatDateEn = (value: string | Date) => new Date(value).toLocaleDateString('en-GB');
 
   const { data: company } = useQuery({
     queryKey: ['company-settings'],
@@ -45,9 +47,13 @@ export default function ContractPrint() {
     <Box>
       <style>
         {`@media print {
+          @page { size: A4; margin: 12mm; }
           .print-hidden { display: none !important; }
           .MuiDrawer-root, .MuiAppBar-root { display: none !important; }
-          body { background: #fff !important; }
+          html, body { width: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+          #root { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          #root > .MuiBox-root { display: block !important; width: 100% !important; margin: 0 !important; }
         }`}
       </style>
 
@@ -113,9 +119,9 @@ export default function ContractPrint() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Typography variant="body1" paragraph>
-              تم بعون الله تعالى في يوم: ({new Date().toLocaleDateString('ar-SA')}) الموافق:
-              ({new Date().toLocaleDateString('ar-SA')})
-            </Typography>
+          تم بعون الله تعالى في يوم: ({formatDateEn(new Date())}) الموافق:
+              ({formatDateEn(new Date())})
+          </Typography>
             <Typography variant="body1" paragraph>
               أولاً: أطراف العقد
             </Typography>
@@ -142,15 +148,15 @@ export default function ContractPrint() {
               ثالثاً: مدة الإيجار
             </Typography>
             <Typography variant="body1" paragraph>
-              تبدأ من {new Date(contract.startDate).toLocaleDateString('ar-SA')} وتنتهي في
-              {new Date(contract.endDate).toLocaleDateString('ar-SA')} قابلة للتجديد بموافقة الطرفين كتابةً.
-            </Typography>
+          تبدأ من {formatDateEn(contract.startDate)} وتنتهي في
+              {formatDateEn(contract.endDate)} قابلة للتجديد بموافقة الطرفين كتابةً.
+          </Typography>
             <Typography variant="body1" paragraph>
               رابعاً: قيمة الإيجار وطريقة السداد
             </Typography>
             <Typography variant="body1" paragraph>
-              قيمة الإيجار المتفق عليها: {formatCurrency(contract.baseRentAmount)} ريال يمني.
-            </Typography>
+          قيمة الإيجار المتفق عليها: {formatCurrencyEn(contract.baseRentAmount)} ريال يمني.
+          </Typography>
             <Typography variant="body1" paragraph>
               خامساً: التزامات الطرف الأول (المؤجر)
             </Typography>
@@ -202,7 +208,7 @@ export default function ContractPrint() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Typography variant="body1" paragraph>
-              This agreement is made on ({new Date().toLocaleDateString('en-US')}).
+              This agreement is made on ({formatDateEn(new Date())}).
             </Typography>
             <Typography variant="body1" paragraph>
               First: Parties
@@ -229,14 +235,13 @@ export default function ContractPrint() {
               Third: Lease Term
             </Typography>
             <Typography variant="body1" paragraph>
-              From {new Date(contract.startDate).toLocaleDateString('en-US')} to{' '}
-              {new Date(contract.endDate).toLocaleDateString('en-US')}, renewable by mutual written consent.
+              From {formatDateEn(contract.startDate)} to {formatDateEn(contract.endDate)}, renewable by mutual written consent.
             </Typography>
             <Typography variant="body1" paragraph>
               Fourth: Rent & Payment
             </Typography>
             <Typography variant="body1" paragraph>
-              Rent amount: {formatCurrency(contract.baseRentAmount)} YER.
+              Rent amount: {formatCurrencyEn(contract.baseRentAmount)} YER.
             </Typography>
             <Typography variant="body1" paragraph>
               Fifth: Landlord Obligations
