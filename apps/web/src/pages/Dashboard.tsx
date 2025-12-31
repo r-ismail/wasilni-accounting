@@ -683,7 +683,8 @@ const Dashboard: React.FC = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {customersQuery.data?.slice(0, 10).map((row) => (
+                        {customersQuery.data?.length ? (
+                          customersQuery.data.slice(0, 10).map((row) => (
                             <TableRow key={row._id}>
                               <TableCell>{row.name}</TableCell>
                               <TableCell>{formatCurrencyEn(row.totalInvoiced)}</TableCell>
@@ -691,7 +692,12 @@ const Dashboard: React.FC = () => {
                                 {formatCurrencyEn(row.balance)}
                               </TableCell>
                             </TableRow>
-                          ))}
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3}>{t('reports.noData')}</TableCell>
+                          </TableRow>
+                        )}
                         </TableBody>
                       </Table>
                     </TableContainer>
@@ -715,7 +721,8 @@ const Dashboard: React.FC = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {unitsQuery.data?.slice(0, 10).map((row) => (
+                        {unitsQuery.data?.length ? (
+                          unitsQuery.data.slice(0, 10).map((row) => (
                             <TableRow key={row._id}>
                               <TableCell>{row.unitNumber}</TableCell>
                               <TableCell>{formatCurrencyEn(row.totalInvoiced)}</TableCell>
@@ -723,7 +730,12 @@ const Dashboard: React.FC = () => {
                                 {formatCurrencyEn(row.balance)}
                               </TableCell>
                             </TableRow>
-                          ))}
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3}>{t('reports.noData')}</TableCell>
+                          </TableRow>
+                        )}
                         </TableBody>
                       </Table>
                     </TableContainer>
