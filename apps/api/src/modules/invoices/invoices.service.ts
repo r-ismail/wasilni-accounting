@@ -97,8 +97,14 @@ export class InvoicesService {
 
     // Create invoice
     const issueDate = new Date();
-    const dueDate = new Date(issueDate);
-    dueDate.setDate(dueDate.getDate() + 30); // Due in 30 days
+    let dueDate: Date;
+    if (contract.rentType === 'monthly') {
+      dueDate = new Date(startDate);
+      dueDate.setDate(25);
+    } else {
+      dueDate = new Date(endDate);
+      dueDate.setDate(dueDate.getDate() + 3);
+    }
 
     const invoice = new this.invoiceModel({
       companyId: new Types.ObjectId(companyId),
