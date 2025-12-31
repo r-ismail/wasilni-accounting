@@ -26,6 +26,9 @@ export class Notification {
   @Prop({ required: true })
   recipient: string; // phone number or email
 
+  @Prop({ type: String })
+  subject?: string;
+
   @Prop({ required: true })
   message: string;
 

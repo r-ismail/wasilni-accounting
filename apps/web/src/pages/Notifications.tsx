@@ -57,17 +57,21 @@ export default function Notifications() {
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, paginateData } = usePagination();
   const [tabValue, setTabValue] = useState(0);
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  const [guideDialogOpen, setGuideDialogOpen] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   
   // Send notification form
   const [notificationType, setNotificationType] = useState('sms');
   const [recipient, setRecipient] = useState('');
+  const [subject, setSubject] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [message, setMessage] = useState('');
   
   // Template form
   const [templateType, setTemplateType] = useState('payment_reminder');
   const [templateName, setTemplateName] = useState('');
+  const [templateSubject, setTemplateSubject] = useState('');
   const [templateBody, setTemplateBody] = useState('');
 
   // Fetch notifications
@@ -150,6 +154,8 @@ export default function Notifications() {
     setSendDialogOpen(false);
     setNotificationType('sms');
     setRecipient('');
+    setSubject('');
+    setSelectedTemplate('');
     setMessage('');
   };
 
@@ -157,6 +163,7 @@ export default function Notifications() {
     setTemplateDialogOpen(false);
     setTemplateType('payment_reminder');
     setTemplateName('');
+    setTemplateSubject('');
     setTemplateBody('');
   };
 
@@ -169,6 +176,7 @@ export default function Notifications() {
     sendNotification.mutate({
       type: notificationType,
       recipient,
+      subject: notificationType === 'email' ? subject : undefined,
       message,
     });
   };
@@ -182,6 +190,7 @@ export default function Notifications() {
     createTemplate.mutate({
       type: templateType,
       name: templateName,
+      subject: templateSubject,
       body: templateBody,
       channels: [notificationType],
     });
@@ -215,13 +224,18 @@ export default function Notifications() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">{t('nav.notifications')}</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Send />}
-          onClick={() => setSendDialogOpen(true)}
-        >
-          {t('notifications.sendNotification')}
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button variant="outlined" onClick={() => setGuideDialogOpen(true)}>
+            {t('notifications.setupGuideButton')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Send />}
+            onClick={() => setSendDialogOpen(true)}
+          >
+            {t('notifications.sendNotification')}
+          </Button>
+        </Box>
       </Box>
 
       {/* Summary Cards */}
@@ -417,7 +431,12 @@ export default function Notifications() {
               <Select
                 value={notificationType}
                 label={t('notifications.type')}
-                onChange={(e) => setNotificationType(e.target.value)}
+                onChange={(e) => {
+                  setNotificationType(e.target.value);
+                  setSelectedTemplate('');
+                  setMessage('');
+                  setSubject('');
+                }}
               >
                 <MenuItem value="sms">📱 SMS</MenuItem>
                 <MenuItem value="whatsapp">💬 WhatsApp</MenuItem>
@@ -425,6 +444,36 @@ export default function Notifications() {
               </Select>
             </FormControl>
 
+            <FormControl fullWidth>
+              <InputLabel>{t('notifications.templates')}</InputLabel>
+              <Select
+                value={selectedTemplate}
+                label={t('notifications.templates')}
+                onChange={(e) => {
+                  const templateId = e.target.value;
+                  setSelectedTemplate(templateId);
+                  const template = templates.find((t: any) => t._id === templateId);
+                  if (template) {
+                    setMessage(template.body);
+                    if (notificationType === 'email' && template.subject) {
+                      setSubject(template.subject);
+                    }
+                  }
+                }}
+              >
+                <MenuItem value="">
+                  <em>{t('common.none')}</em>
+                </MenuItem>
+                {templates
+                  .filter((t: any) => t.channels.includes(notificationType))
+                  .map((template: any) => (
+                    <MenuItem key={template._id} value={template._id}>
+                      {template.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+            
             <TextField
               label={t('notifications.recipient')}
               value={recipient}
@@ -436,6 +485,15 @@ export default function Notifications() {
               }
               fullWidth
             />
+
+            {notificationType === 'email' && (
+              <TextField
+                label={t('notifications.subject')}
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                fullWidth
+              />
+            )}
 
             <TextField
               label={t('notifications.message')}
@@ -452,6 +510,53 @@ export default function Notifications() {
           <Button onClick={handleSendNotification} variant="contained">
             {t('notifications.send')}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Setup Guide Dialog */}
+      <Dialog open={guideDialogOpen} onClose={() => setGuideDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('notifications.setupGuideTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('notifications.setupGuideIntro')}
+          </Typography>
+          <Box component="ul" sx={{ pl: 3, mb: 2 }}>
+            <Typography component="li" variant="body2">
+              {t('notifications.setupGuideSettings')}
+            </Typography>
+            <Typography component="li" variant="body2">
+              {t('notifications.setupGuideSave')}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'grid', gap: 2 }}>
+            <Box>
+              <Typography variant="subtitle1">{t('notifications.smsTitle')}</Typography>
+              <Box component="ul" sx={{ pl: 3 }}>
+                <Typography component="li" variant="body2">{t('notifications.smsStep1')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.smsStep2')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.smsStep3')}</Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="subtitle1">{t('notifications.whatsappTitle')}</Typography>
+              <Box component="ul" sx={{ pl: 3 }}>
+                <Typography component="li" variant="body2">{t('notifications.whatsappStep1')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.whatsappStep2')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.whatsappStep3')}</Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="subtitle1">{t('notifications.emailTitle')}</Typography>
+              <Box component="ul" sx={{ pl: 3 }}>
+                <Typography component="li" variant="body2">{t('notifications.emailStep1')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.emailStep2')}</Typography>
+                <Typography component="li" variant="body2">{t('notifications.emailStep3')}</Typography>
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setGuideDialogOpen(false)}>{t('common.close')}</Button>
         </DialogActions>
       </Dialog>
 
@@ -479,6 +584,13 @@ export default function Notifications() {
               label={t('notifications.templateName')}
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
+              fullWidth
+            />
+
+            <TextField
+              label={t('notifications.subject')}
+              value={templateSubject}
+              onChange={(e) => setTemplateSubject(e.target.value)}
               fullWidth
             />
 

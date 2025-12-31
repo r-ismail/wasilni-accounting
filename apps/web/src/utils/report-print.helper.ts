@@ -1,6 +1,20 @@
 
 export function generateReportHtml(
   data: {
+    stats?: {
+      totalUnits: number;
+      availableUnits: number;
+      occupiedUnits: number;
+      totalCustomers: number;
+      activeContracts: number;
+      totalInvoices: number;
+      paidInvoices: number;
+      unpaidInvoices: number;
+      overdueInvoices: number;
+      totalRevenue: number;
+      totalPaid: number;
+      totalUnpaid: number;
+    };
     revenue: any;
     occupancy: any;
     overdue: any;
@@ -70,10 +84,53 @@ export function generateReportHtml(
       </div>
       <div class="kpi-card">
          <div class="kpi-label">${t('reports.occupancyRate')}</div>
-         <div class="kpi-value">${(data.occupancy?.occupancyRate || 0).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 1 })}</div>
+         <div class="kpi-value">${(data.occupancy?.occupancyRate || 0).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1 })}</div>
       </div>
     </div>
   </div>
+
+  ${data.stats ? `
+  <div class="section">
+    <div class="section-title">${t('dashboard.title')}</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.totalUnits')}</div>
+        <div class="kpi-value">${(data.stats.totalUnits || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.available')}</div>
+        <div class="kpi-value">${(data.stats.availableUnits || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.occupied')}</div>
+        <div class="kpi-value">${(data.stats.occupiedUnits || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.totalCustomers')}</div>
+        <div class="kpi-value">${(data.stats.totalCustomers || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.activeContracts')}</div>
+        <div class="kpi-value">${(data.stats.activeContracts || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.totalInvoices')}</div>
+        <div class="kpi-value">${(data.stats.totalInvoices || 0).toLocaleString('en-US')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.totalRevenue')}</div>
+        <div class="kpi-value">${formatCurrency(data.stats.totalRevenue)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.paid')}</div>
+        <div class="kpi-value">${formatCurrency(data.stats.totalPaid)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">${t('dashboard.unpaidAmount')}</div>
+        <div class="kpi-value">${formatCurrency(data.stats.totalUnpaid)}</div>
+      </div>
+    </div>
+  </div>` : ''}
 
   <div class="section">
     <div class="section-title">${t('reports.customers')}</div>

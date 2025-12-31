@@ -8,6 +8,10 @@ export class SendNotificationDto {
   @IsString()
   recipient: string;
 
+  @IsOptional()
+  @IsString()
+  subject?: string;
+
   @IsString()
   message: string;
 
@@ -78,6 +82,10 @@ export class SendBulkNotificationDto {
 
   @IsString({ each: true })
   recipients: string[];
+
+  @IsOptional()
+  @IsString()
+  subject?: string;
 
   @IsString()
   message: string;

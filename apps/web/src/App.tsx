@@ -16,7 +16,6 @@ import Units from './pages/Units';
 import Contracts from './pages/Contracts';
 import Invoices from './pages/Invoices';
 import Payments from './pages/Payments';
-import Reports from './pages/Reports';
 import Customers from './pages/Customers';
 import CustomerProfile from './pages/CustomerProfile';
 import ContractPrint from './pages/ContractPrint';
@@ -78,7 +77,6 @@ const App: React.FC = () => {
                           <Route path="/contracts/:id/print" element={<ContractPrint />} />
                           <Route path="/invoices" element={<Invoices />} />
                           <Route path="/payments" element={<Payments />} />
-                          <Route path="/reports" element={<Reports />} />
                           <Route path="/customers" element={<Customers />} />
                           <Route path="/customers/:id" element={<CustomerProfile />} />
                           <Route path="/users" element={<Users />} />

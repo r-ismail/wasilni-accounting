@@ -23,7 +23,7 @@ export class MessageTemplate {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   subject?: string; // For emails
 
   @Prop({ required: true })

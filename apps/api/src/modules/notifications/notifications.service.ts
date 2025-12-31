@@ -28,7 +28,7 @@ export class NotificationsService {
     private notificationModel: Model<NotificationDocument>,
     @InjectModel(MessageTemplate.name)
     private templateModel: Model<MessageTemplateDocument>,
-  ) {}
+  ) { }
 
   // ==================== Notifications ====================
 
@@ -41,6 +41,7 @@ export class NotificationsService {
       companyId: new Types.ObjectId(companyId),
       type: dto.type,
       recipient: dto.recipient,
+      subject: dto.subject,
       message: dto.message,
       scheduledAt: dto.scheduledAt || new Date(),
       invoiceId: dto.invoiceId
@@ -75,6 +76,7 @@ export class NotificationsService {
         this.sendNotification(companyId, userId, {
           type: dto.type,
           recipient,
+          subject: dto.subject,
           message: dto.message,
           scheduledAt: dto.scheduledAt,
         }),
@@ -101,7 +103,11 @@ export class NotificationsService {
           await this.sendWhatsApp(notification.recipient, notification.message);
           break;
         case NotificationType.EMAIL:
-          await this.sendEmail(notification.recipient, notification.message);
+          await this.sendEmail(
+            notification.recipient,
+            notification.subject || '',
+            notification.message,
+          );
           break;
       }
 
@@ -137,9 +143,15 @@ export class NotificationsService {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  private async sendEmail(email: string, message: string): Promise<void> {
+  private async sendEmail(
+    email: string,
+    subject: string,
+    message: string,
+  ): Promise<void> {
     // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
-    this.logger.log(`[Email] To: ${email}, Message: ${message}`);
+    this.logger.log(
+      `[Email] To: ${email}, Subject: ${subject}, Message: ${message}`,
+    );
     // Simulate delay
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
