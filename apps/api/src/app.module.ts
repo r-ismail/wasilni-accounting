@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { AuthModule } from './modules/auth/auth.module';
@@ -19,6 +20,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ReportsModule } from './modules/reports/reports.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
+import { BackupsModule } from './modules/backups/backups.module';
 
 @Module({
   imports: [
@@ -27,6 +29,9 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+
+    // Scheduler
+    ScheduleModule.forRoot(),
 
     // Winston Logger
     WinstonModule.forRoot({
@@ -84,6 +89,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
     ReportsModule,
     VendorsModule,
     ExpensesModule,
+    BackupsModule,
   ],
 })
 export class AppModule { }

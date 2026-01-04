@@ -127,6 +127,13 @@ const Settings: React.FC = () => {
       return res.data.data || res.data || [];
     },
   });
+  const backupsQuery = useQuery({
+    queryKey: ['backups'],
+    queryFn: async () => {
+      const res = await api.get('/backups');
+      return res.data.data || res.data || [];
+    },
+  });
   const buildingOptions = React.useMemo(() => {
     const raw = buildings as any;
     if (Array.isArray(raw)) return raw;
@@ -134,6 +141,13 @@ const Settings: React.FC = () => {
     if (Array.isArray(raw?.data?.data)) return raw.data.data;
     return [];
   }, [buildings]);
+  const backupOptions = React.useMemo(() => {
+    const raw = backupsQuery.data as any;
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw?.data?.data)) return raw.data.data;
+    return [];
+  }, [backupsQuery.data]);
 
   // Company form state
   const [companyForm, setCompanyForm] = useState({
@@ -239,6 +253,9 @@ const Settings: React.FC = () => {
   const [editingService, setEditingService] = useState<any>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingServiceId, setDeletingServiceId] = useState<string | null>(null);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [restoreTargetDbName, setRestoreTargetDbName] = useState('');
+  const [restoreFilename, setRestoreFilename] = useState('');
 
   const [advancedForm, setAdvancedForm] = useState({
     // Invoice Customization
@@ -451,6 +468,39 @@ const Settings: React.FC = () => {
     },
   });
 
+  const runBackupMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post('/backups/run');
+      return res.data.data || res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['backups'] });
+      showSnackbar(t('settings.company.backupCreated'), 'success');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
+    },
+  });
+
+  const restoreBackupMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post('/backups/restore', {
+        filename: restoreFilename,
+        targetDbName: restoreTargetDbName,
+      });
+      return res.data.data || res.data;
+    },
+    onSuccess: () => {
+      showSnackbar(t('settings.company.backupRestored'), 'success');
+      setRestoreDialogOpen(false);
+      setRestoreTargetDbName('');
+      setRestoreFilename('');
+    },
+    onError: (error: any) => {
+      showSnackbar(error.response?.data?.message || t('common.error'), 'error');
+    },
+  });
+
   const handleCompanySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateCompanyMutation.mutate(companyForm);
@@ -493,6 +543,33 @@ const Settings: React.FC = () => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleOpenRestoreDialog = (filename: string) => {
+    setRestoreFilename(filename);
+    setRestoreTargetDbName('');
+    setRestoreDialogOpen(true);
+  };
+
+  const handleCloseRestoreDialog = () => {
+    if (restoreBackupMutation.isPending) {
+      return;
+    }
+    setRestoreDialogOpen(false);
+    setRestoreTargetDbName('');
+    setRestoreFilename('');
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (!bytes && bytes !== 0) return '-';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let value = bytes;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex += 1;
+    }
+    return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unitIndex]}`;
   };
 
   if (isLoading) {
@@ -727,6 +804,85 @@ const Settings: React.FC = () => {
                           </Box>
                         }
                       />
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <DescriptionIcon fontSize="small" />
+                            {t('settings.company.backupsTitle')}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('settings.company.backupsDesc')}
+                          </Typography>
+                        </Box>
+
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                          <Button
+                            type="button"
+                            variant="contained"
+                            onClick={() => runBackupMutation.mutate()}
+                            disabled={runBackupMutation.isPending}
+                          >
+                            {runBackupMutation.isPending ? t('settings.company.backupRunning') : t('settings.company.backupNow')}
+                          </Button>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('settings.company.backupSchedule')}
+                          </Typography>
+                        </Stack>
+
+                        <TableContainer component={Paper} variant="outlined">
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>{t('settings.company.backupFilename')}</TableCell>
+                                <TableCell>{t('settings.company.backupSize')}</TableCell>
+                                <TableCell>{t('settings.company.backupCreatedAt')}</TableCell>
+                                <TableCell align="right">{t('common.actions')}</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {backupsQuery.isLoading ? (
+                                <TableRow>
+                                  <TableCell colSpan={4} align="center">
+                                    {t('common.loading')}
+                                  </TableCell>
+                                </TableRow>
+                              ) : backupOptions.length === 0 ? (
+                                <TableRow>
+                                  <TableCell colSpan={4} align="center">
+                                    {t('settings.company.backupEmpty')}
+                                  </TableCell>
+                                </TableRow>
+                              ) : (
+                                backupOptions.map((backup: any) => (
+                                  <TableRow key={backup.filename}>
+                                    <TableCell>{backup.filename}</TableCell>
+                                    <TableCell>{formatBytes(backup.sizeBytes)}</TableCell>
+                                    <TableCell>
+                                      {backup.createdAt ? new Date(backup.createdAt).toLocaleString() : '-'}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      <Button
+                                        type="button"
+                                        size="small"
+                                        onClick={() => handleOpenRestoreDialog(backup.filename)}
+                                      >
+                                        {t('settings.company.backupRestore')}
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                              )}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Stack>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -2374,6 +2530,35 @@ const Settings: React.FC = () => {
           </Grid>
         </Grid>
        </Paper>
+
+      <Dialog open={restoreDialogOpen} onClose={handleCloseRestoreDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('settings.company.backupRestoreTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            {t('settings.company.backupRestoreDesc')}
+          </DialogContentText>
+          <TextField
+            fullWidth
+            label={t('settings.company.backupTargetDbName')}
+            value={restoreTargetDbName}
+            onChange={(e) => setRestoreTargetDbName(e.target.value)}
+            disabled={restoreBackupMutation.isPending}
+            helperText={t('settings.company.backupRestoreWarning')}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRestoreDialog} disabled={restoreBackupMutation.isPending}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => restoreBackupMutation.mutate()}
+            disabled={restoreBackupMutation.isPending || !restoreTargetDbName || !restoreFilename}
+          >
+            {restoreBackupMutation.isPending ? t('common.loading') : t('settings.company.backupRestore')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Service Form Dialog */}
       <ServiceFormDialog
