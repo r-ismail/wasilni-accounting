@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -100,7 +101,7 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       showSnackbar(t('notifications.sent'), 'success');
-      handleCloseSendDialog();
+      handleCloseSendDialog(true);
     },
     onError: (error: any) => {
       showSnackbar(error.response?.data?.message || t('common.error'), 'error');
@@ -115,7 +116,7 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
       showSnackbar(t('notifications.templateCreated'), 'success');
-      handleCloseTemplateDialog();
+      handleCloseTemplateDialog(true);
     },
     onError: (error: any) => {
       showSnackbar(error.response?.data?.message || t('common.error'), 'error');
@@ -150,7 +151,13 @@ export default function Notifications() {
     },
   });
 
-  const handleCloseSendDialog = () => {
+  const isSending = sendNotification.isPending;
+  const isCreatingTemplate = createTemplate.isPending;
+
+  const handleCloseSendDialog = (force?: boolean) => {
+    if (isSending && !force) {
+      return;
+    }
     setSendDialogOpen(false);
     setNotificationType('sms');
     setRecipient('');
@@ -159,7 +166,10 @@ export default function Notifications() {
     setMessage('');
   };
 
-  const handleCloseTemplateDialog = () => {
+  const handleCloseTemplateDialog = (force?: boolean) => {
+    if (isCreatingTemplate && !force) {
+      return;
+    }
     setTemplateDialogOpen(false);
     setTemplateType('payment_reminder');
     setTemplateName('');
@@ -431,6 +441,7 @@ export default function Notifications() {
               <Select
                 value={notificationType}
                 label={t('notifications.type')}
+                disabled={isSending}
                 onChange={(e) => {
                   setNotificationType(e.target.value);
                   setSelectedTemplate('');
@@ -449,6 +460,7 @@ export default function Notifications() {
               <Select
                 value={selectedTemplate}
                 label={t('notifications.templates')}
+                disabled={isSending}
                 onChange={(e) => {
                   const templateId = e.target.value;
                   setSelectedTemplate(templateId);
@@ -477,6 +489,7 @@ export default function Notifications() {
             <TextField
               label={t('notifications.recipient')}
               value={recipient}
+              disabled={isSending}
               onChange={(e) => setRecipient(e.target.value)}
               placeholder={
                 notificationType === 'email'
@@ -490,6 +503,7 @@ export default function Notifications() {
               <TextField
                 label={t('notifications.subject')}
                 value={subject}
+                disabled={isSending}
                 onChange={(e) => setSubject(e.target.value)}
                 fullWidth
               />
@@ -498,6 +512,7 @@ export default function Notifications() {
             <TextField
               label={t('notifications.message')}
               value={message}
+              disabled={isSending}
               onChange={(e) => setMessage(e.target.value)}
               multiline
               rows={4}
@@ -506,9 +521,11 @@ export default function Notifications() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseSendDialog}>{t('common.cancel')}</Button>
-          <Button onClick={handleSendNotification} variant="contained">
-            {t('notifications.send')}
+          <Button onClick={handleCloseSendDialog} disabled={isSending}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleSendNotification} variant="contained" disabled={isSending}>
+            {isSending ? <CircularProgress size={20} color="inherit" /> : t('notifications.send')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -570,6 +587,7 @@ export default function Notifications() {
               <Select
                 value={templateType}
                 label={t('notifications.templateType')}
+                disabled={isCreatingTemplate}
                 onChange={(e) => setTemplateType(e.target.value)}
               >
                 <MenuItem value="payment_reminder">{t('notifications.types.paymentReminder')}</MenuItem>
@@ -583,6 +601,7 @@ export default function Notifications() {
             <TextField
               label={t('notifications.templateName')}
               value={templateName}
+              disabled={isCreatingTemplate}
               onChange={(e) => setTemplateName(e.target.value)}
               fullWidth
             />
@@ -590,6 +609,7 @@ export default function Notifications() {
             <TextField
               label={t('notifications.subject')}
               value={templateSubject}
+              disabled={isCreatingTemplate}
               onChange={(e) => setTemplateSubject(e.target.value)}
               fullWidth
             />
@@ -597,6 +617,7 @@ export default function Notifications() {
             <TextField
               label={t('notifications.body')}
               value={templateBody}
+              disabled={isCreatingTemplate}
               onChange={(e) => setTemplateBody(e.target.value)}
               multiline
               rows={6}
@@ -610,9 +631,11 @@ export default function Notifications() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTemplateDialog}>{t('common.cancel')}</Button>
-          <Button onClick={handleCreateTemplate} variant="contained">
-            {t('common.add')}
+          <Button onClick={handleCloseTemplateDialog} disabled={isCreatingTemplate}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleCreateTemplate} variant="contained" disabled={isCreatingTemplate}>
+            {isCreatingTemplate ? <CircularProgress size={20} color="inherit" /> : t('common.add')}
           </Button>
         </DialogActions>
       </Dialog>

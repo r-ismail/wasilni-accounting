@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress,
   MenuItem,
   FormControl,
   InputLabel,
@@ -94,7 +95,7 @@ export default function Vendors() {
     mutationFn: (data: Partial<Vendor>) => api.post('/vendors', buildVendorPayload(data)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      handleClose();
+      handleClose(true);
       showSnackbar(t('vendors.created'), 'success');
     },
   });
@@ -103,7 +104,7 @@ export default function Vendors() {
     mutationFn: (data: Partial<Vendor>) => api.patch(`/vendors/${editId}`, buildVendorPayload(data)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      handleClose();
+      handleClose(true);
       showSnackbar(t('vendors.updated'), 'success');
     },
   });
@@ -116,6 +117,8 @@ export default function Vendors() {
       showSnackbar(t('vendors.deleted'), 'success');
     },
   });
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   const handleOpen = (vendor?: Vendor) => {
     if (vendor) {
@@ -137,7 +140,10 @@ export default function Vendors() {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (force?: boolean) => {
+    if (isSaving && !force) {
+      return;
+    }
     setOpen(false);
     setEditId(null);
     reset({});
@@ -216,7 +222,7 @@ export default function Vendors() {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={() => handleClose()} maxWidth="sm" fullWidth>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle>{editId ? t('vendors.edit') : t('vendors.add')}</DialogTitle>
           <DialogContent>
@@ -313,15 +319,17 @@ export default function Vendors() {
                 />
               )}
             />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained">
-              {t('common.save')}
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={() => handleClose()} disabled={isSaving}>
+              {t('common.cancel')}
             </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+            <Button type="submit" variant="contained" disabled={isSaving}>
+              {isSaving ? <CircularProgress size={20} color="inherit" /> : t('common.save')}
+            </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
 
       <ConfirmDialog
         open={deleteConfirm.open}
