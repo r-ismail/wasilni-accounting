@@ -1,22 +1,35 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
-import { Contract, ContractDocument } from '../contracts/schemas/contract.schema';
+import { Invoice, InvoiceSchema, InvoiceDocument } from '../invoices/schemas/invoice.schema';
+import { Contract, ContractSchema, ContractDocument } from '../contracts/schemas/contract.schema';
 import { NotificationsService } from './notifications.service';
 import { NotificationType } from './schemas/notification.schema';
 import { TemplateType } from './schemas/message-template.schema';
+import { CompaniesService } from '../companies/companies.service';
+import { TenantConnectionService } from '../../tenant/tenant-connection.service';
 
 @Injectable()
 export class ScheduledNotificationsService {
   private readonly logger = new Logger(ScheduledNotificationsService.name);
 
   constructor(
-    @InjectModel(Invoice.name) private invoiceModel: Model<InvoiceDocument>,
-    @InjectModel(Contract.name) private contractModel: Model<ContractDocument>,
-    private notificationsService: NotificationsService,
-  ) {}
+    private readonly companiesService: CompaniesService,
+    private readonly connectionService: TenantConnectionService,
+    private readonly notificationsService: NotificationsService,
+  ) { }
+
+  private async getModels(companyId: string) {
+    const dbName = await this.companiesService.getCompanyDbName(companyId);
+    const connection = await this.connectionService.getConnection(dbName);
+
+    return {
+      invoiceModel: connection.models[Invoice.name] ||
+        connection.model(Invoice.name, InvoiceSchema),
+      contractModel: connection.models[Contract.name] ||
+        connection.model(Contract.name, ContractSchema),
+    };
+  }
 
   // Run every day at 9 AM
   @Cron(CronExpression.EVERY_DAY_AT_9AM)
@@ -24,48 +37,58 @@ export class ScheduledNotificationsService {
     this.logger.log('Starting payment reminders job');
 
     try {
-      // Find invoices due in 3 days
-      const threeDaysFromNow = new Date();
-      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+      const companies = await this.companiesService.findAll();
+      for (const company of companies) {
+        const companyId = company._id.toString();
+        try {
+          const { invoiceModel } = await this.getModels(companyId);
 
-      const upcomingInvoices = await this.invoiceModel
-        .find({
-          status: { $in: ['draft', 'posted'] },
-          dueDate: {
-            $gte: new Date(),
-            $lte: threeDaysFromNow,
-          },
-        })
-        .populate({
-          path: 'contractId',
-          populate: [{ path: 'customerId' }, { path: 'unitId' }],
-        })
-        .exec();
+          // Find invoices due in 3 days
+          const threeDaysFromNow = new Date();
+          threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
-      this.logger.log(
-        `Found ${upcomingInvoices.length} invoices due in 3 days`,
-      );
+          const upcomingInvoices = await invoiceModel
+            .find({
+              status: { $in: ['draft', 'posted'] },
+              dueDate: {
+                $gte: new Date(),
+                $lte: threeDaysFromNow,
+              },
+            })
+            .populate({
+              path: 'contractId',
+              populate: [{ path: 'customerId' }, { path: 'unitId' }],
+            })
+            .exec();
 
-      for (const invoice of upcomingInvoices) {
-        await this.sendPaymentReminder(invoice);
-      }
+          this.logger.log(
+            `Found ${upcomingInvoices.length} invoices due in 3 days for company ${companyId}`,
+          );
 
-      // Find overdue invoices
-      const overdueInvoices = await this.invoiceModel
-        .find({
-          status: { $in: ['draft', 'posted'] },
-          dueDate: { $lt: new Date() },
-        })
-        .populate({
-          path: 'contractId',
-          populate: [{ path: 'customerId' }, { path: 'unitId' }],
-        })
-        .exec();
+          for (const invoice of upcomingInvoices) {
+            await this.sendPaymentReminder(invoice as InvoiceDocument);
+          }
 
-      this.logger.log(`Found ${overdueInvoices.length} overdue invoices`);
+          // Find overdue invoices
+          const overdueInvoices = await invoiceModel
+            .find({
+              status: { $in: ['draft', 'posted'] },
+              dueDate: { $lt: new Date() },
+            })
+            .populate({
+              path: 'contractId',
+              populate: [{ path: 'customerId' }, { path: 'unitId' }],
+            })
+            .exec();
 
-      for (const invoice of overdueInvoices) {
-        await this.sendOverdueNotice(invoice);
+          this.logger.log(`Found ${overdueInvoices.length} overdue invoices for company ${companyId}`);
+
+          for (const invoice of overdueInvoices) {
+            await this.sendOverdueNotice(invoice as InvoiceDocument);
+          }
+        } catch (error) {
+          this.logger.error(`Error in payment reminders job for company ${companyId}`, error);
+        }
       }
 
       this.logger.log('Payment reminders job completed');
@@ -80,28 +103,38 @@ export class ScheduledNotificationsService {
     this.logger.log('Starting contract expiry reminders job');
 
     try {
-      // Find contracts expiring in 30 days
-      const thirtyDaysFromNow = new Date();
-      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+      const companies = await this.companiesService.findAll();
+      for (const company of companies) {
+        const companyId = company._id.toString();
+        try {
+          const { contractModel } = await this.getModels(companyId);
 
-      const expiringContracts = await this.contractModel
-        .find({
-          isActive: true,
-          endDate: {
-            $gte: new Date(),
-            $lte: thirtyDaysFromNow,
-          },
-        })
-        .populate('customerId')
-        .populate('unitId')
-        .exec();
+          // Find contracts expiring in 30 days
+          const thirtyDaysFromNow = new Date();
+          thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
-      this.logger.log(
-        `Found ${expiringContracts.length} contracts expiring in 30 days`,
-      );
+          const expiringContracts = await contractModel
+            .find({
+              isActive: true,
+              endDate: {
+                $gte: new Date(),
+                $lte: thirtyDaysFromNow,
+              },
+            })
+            .populate('customerId')
+            .populate('unitId')
+            .exec();
 
-      for (const contract of expiringContracts) {
-        await this.sendContractExpiryReminder(contract);
+          this.logger.log(
+            `Found ${expiringContracts.length} contracts expiring in 30 days for company ${companyId}`,
+          );
+
+          for (const contract of expiringContracts) {
+            await this.sendContractExpiryReminder(contract as ContractDocument);
+          }
+        } catch (error) {
+          this.logger.error(`Error in contract expiry reminders job for company ${companyId}`, error);
+        }
       }
 
       this.logger.log('Contract expiry reminders job completed');
@@ -116,7 +149,10 @@ export class ScheduledNotificationsService {
     this.logger.log('Processing pending notifications');
 
     try {
-      await this.notificationsService.processScheduledNotifications();
+      const companies = await this.companiesService.findAll();
+      for (const company of companies) {
+        await this.notificationsService.processScheduledNotifications(company._id.toString());
+      }
     } catch (error) {
       this.logger.error('Error processing pending notifications', error);
     }
@@ -191,7 +227,7 @@ export class ScheduledNotificationsService {
 
       const overdueDays = Math.floor(
         (new Date().getTime() - invoice.dueDate.getTime()) /
-          (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
       );
 
       // Get template
@@ -249,7 +285,7 @@ export class ScheduledNotificationsService {
 
       const daysUntilExpiry = Math.floor(
         (contract.endDate.getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
       );
 
       // Get template

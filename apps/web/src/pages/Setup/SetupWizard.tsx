@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -30,12 +30,16 @@ import type {
 export default function SetupWizard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [prefillLoading, setPrefillLoading] = useState(false);
+  const [prefillError, setPrefillError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [setupData, setSetupData] = useState<{
     company: CompanyInfoFormData;
     buildings: BuildingsUnitsFormData;
     services: ServicesFormData;
     adminUser: AdminUserFormData;
+    companyId?: string;
   }>({
     company: {
       name: '',
@@ -56,7 +60,39 @@ export default function SetupWizard() {
       password: '',
       confirmPassword: '',
     },
+    companyId: undefined,
   });
+
+  useEffect(() => {
+    const companyId = searchParams.get('companyId');
+    if (companyId) {
+      setPrefillLoading(true);
+      setPrefillError(null);
+      api
+        .get(`/companies/${companyId}`)
+        .then((res) => {
+          const c = res.data?.data ?? res.data;
+          if (c) {
+            setSetupData((prev) => ({
+              ...prev,
+              companyId,
+              company: {
+                name: c.name || '',
+                phone: c.phone || '',
+                address: c.address || '',
+                currency: c.currency || 'YER',
+                defaultLanguage: c.defaultLanguage || 'ar',
+                mergeServicesWithRent: c.mergeServicesWithRent ?? true,
+              },
+            }));
+          } else {
+            setPrefillError(t('setup.prefillError'));
+          }
+        })
+        .catch(() => setPrefillError(t('setup.prefillError')))
+        .finally(() => setPrefillLoading(false));
+    }
+  }, [searchParams, t]);
 
   const steps = [
     t('setup.step1'),
@@ -67,6 +103,12 @@ export default function SetupWizard() {
 
   const setupMutation = useMutation({
     mutationFn: async (data: CompleteSetupData) => {
+      // Debug logging to trace where the Finish call is going
+      // (remove or guard with env flag in production)
+      // eslint-disable-next-line no-console
+      console.log('[SetupWizard] POST /setup/run payload:', data);
+      // eslint-disable-next-line no-console
+      console.log('[SetupWizard] API base URL:', (api as any)?.defaults?.baseURL);
       const response = await api.post('/setup/run', data);
       return response.data;
     },
@@ -74,6 +116,10 @@ export default function SetupWizard() {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
+    },
+    onError: (err: any) => {
+      // eslint-disable-next-line no-console
+      console.error('[SetupWizard] setup/run error:', err?.response?.data || err);
     },
   });
 
@@ -112,6 +158,7 @@ export default function SetupWizard() {
         username: data.username,
         password: data.password,
       },
+      companyId: setupData.companyId,
     };
 
     setupMutation.mutate(completeData);
@@ -185,6 +232,19 @@ export default function SetupWizard() {
     );
   }
 
+  if (prefillLoading) {
+    return (
+      <Container maxWidth="md" sx={{ mt: 8 }}>
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <CircularProgress />
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            {t('setup.loadingCompany')}
+          </Typography>
+        </Paper>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 4 }}>
@@ -194,6 +254,12 @@ export default function SetupWizard() {
         <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 4 }}>
           {t('setup.subtitle')}
         </Typography>
+
+        {prefillError && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            {prefillError}
+          </Alert>
+        )}
 
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
           {steps.map((label) => (
@@ -213,7 +279,7 @@ export default function SetupWizard() {
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
           <Button
-            disabled={activeStep === 0 || setupMutation.isPending}
+            disabled={activeStep === 0 || setupMutation.isPending || prefillLoading}
             onClick={handleBack}
           >
             {t('common.back')}
@@ -221,7 +287,7 @@ export default function SetupWizard() {
           <Button
             variant="contained"
             onClick={handleSubmit}
-            disabled={setupMutation.isPending}
+            disabled={setupMutation.isPending || prefillLoading}
           >
             {setupMutation.isPending ? (
               <CircularProgress size={24} />

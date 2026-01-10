@@ -432,7 +432,7 @@ export default function Notifications() {
       </TabPanel>
 
       {/* Send Notification Dialog */}
-      <Dialog open={sendDialogOpen} onClose={handleCloseSendDialog} maxWidth="sm" fullWidth>
+      <Dialog open={sendDialogOpen} onClose={() => handleCloseSendDialog()} maxWidth="sm" fullWidth>
         <DialogTitle>{t('notifications.sendNotification')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -521,10 +521,10 @@ export default function Notifications() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseSendDialog} disabled={isSending}>
+          <Button onClick={() => handleCloseSendDialog()} disabled={isSending}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSendNotification} variant="contained" disabled={isSending}>
+          <Button onClick={() => handleSendNotification()} variant="contained" disabled={isSending}>
             {isSending ? <CircularProgress size={20} color="inherit" /> : t('notifications.send')}
           </Button>
         </DialogActions>
@@ -578,7 +578,7 @@ export default function Notifications() {
       </Dialog>
 
       {/* Create Template Dialog */}
-      <Dialog open={templateDialogOpen} onClose={handleCloseTemplateDialog} maxWidth="md" fullWidth>
+      <Dialog open={templateDialogOpen} onClose={() => handleCloseTemplateDialog()} maxWidth="md" fullWidth>
         <DialogTitle>{t('notifications.addTemplate')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -631,10 +631,10 @@ export default function Notifications() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTemplateDialog} disabled={isCreatingTemplate}>
+          <Button onClick={() => handleCloseTemplateDialog()} disabled={isCreatingTemplate}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCreateTemplate} variant="contained" disabled={isCreatingTemplate}>
+          <Button onClick={() => handleCreateTemplate()} variant="contained" disabled={isCreatingTemplate}>
             {isCreatingTemplate ? <CircularProgress size={20} color="inherit" /> : t('common.add')}
           </Button>
         </DialogActions>

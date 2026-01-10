@@ -24,9 +24,9 @@ interface ServicesStepProps {
 }
 
 const defaultServices = [
-  { name: 'Water', nameAr: 'ماء', type: 'metered' as const, defaultPrice: 0.5 },
+  { name: 'Water', nameAr: 'ماء', type: 'metered' as const, defaultPrice: 250 },
   { name: 'Electricity', nameAr: 'كهرباء', type: 'metered' as const, defaultPrice: 0.3 },
-  { name: 'Internet', nameAr: 'إنترنت', type: 'fixed_fee' as const, defaultPrice: 100 },
+  { name: 'Internet', nameAr: 'إنترنت', type: 'fixed_fee' as const, defaultPrice: 4000 },
 ];
 
 export default function ServicesStep({ data, onNext, onBack: _onBack }: ServicesStepProps) {

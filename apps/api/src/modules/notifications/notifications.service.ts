@@ -1,16 +1,17 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
   Notification,
   NotificationDocument,
   NotificationType,
   NotificationStatus,
+  NotificationSchema,
 } from './schemas/notification.schema';
 import {
   MessageTemplate,
   MessageTemplateDocument,
   TemplateType,
+  MessageTemplateSchema,
 } from './schemas/message-template.schema';
 import {
   SendNotificationDto,
@@ -18,17 +19,30 @@ import {
   UpdateTemplateDto,
   SendBulkNotificationDto,
 } from './dto/notification.dto';
+import { CompaniesService } from '../companies/companies.service';
+import { TenantConnectionService } from '../../tenant/tenant-connection.service';
 
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
 
   constructor(
-    @InjectModel(Notification.name)
-    private notificationModel: Model<NotificationDocument>,
-    @InjectModel(MessageTemplate.name)
-    private templateModel: Model<MessageTemplateDocument>,
+    private readonly companiesService: CompaniesService,
+    private readonly connectionService: TenantConnectionService,
   ) { }
+
+  private async getModels(companyId: string) {
+    const dbName = await this.companiesService.getCompanyDbName(companyId);
+    const connection = await this.connectionService.getConnection(dbName);
+
+    return {
+      notificationModel: connection.models[Notification.name] ||
+        connection.model(Notification.name, NotificationSchema),
+      templateModel: connection.models[MessageTemplate.name] ||
+        connection.model(MessageTemplate.name, MessageTemplateSchema),
+    };
+  }
+
 
   // ==================== Notifications ====================
 
@@ -37,7 +51,8 @@ export class NotificationsService {
     userId: string,
     dto: SendNotificationDto,
   ): Promise<NotificationDocument> {
-    const notification = new this.notificationModel({
+    const { notificationModel } = await this.getModels(companyId);
+    const notification = new notificationModel({
       companyId: new Types.ObjectId(companyId),
       type: dto.type,
       recipient: dto.recipient,
@@ -164,6 +179,7 @@ export class NotificationsService {
       customerId?: string;
     },
   ): Promise<NotificationDocument[]> {
+    const { notificationModel } = await this.getModels(companyId);
     const query: any = { companyId: new Types.ObjectId(companyId) };
 
     if (filters?.status) {
@@ -178,7 +194,7 @@ export class NotificationsService {
       query.customerId = new Types.ObjectId(filters.customerId);
     }
 
-    return this.notificationModel
+    return notificationModel
       .find(query)
       .populate('customerId')
       .populate('invoiceId')
@@ -186,8 +202,9 @@ export class NotificationsService {
       .exec();
   }
 
-  async findPendingNotifications(): Promise<NotificationDocument[]> {
-    return this.notificationModel
+  async findPendingNotifications(companyId: string): Promise<NotificationDocument[]> {
+    const { notificationModel } = await this.getModels(companyId);
+    return notificationModel
       .find({
         status: NotificationStatus.PENDING,
         scheduledAt: { $lte: new Date() },
@@ -195,8 +212,9 @@ export class NotificationsService {
       .exec();
   }
 
-  async retryFailedNotification(id: string): Promise<NotificationDocument> {
-    const notification = await this.notificationModel.findById(id).exec();
+  async retryFailedNotification(companyId: string, id: string): Promise<NotificationDocument> {
+    const { notificationModel } = await this.getModels(companyId);
+    const notification = await notificationModel.findById(id).exec();
 
     if (!notification) {
       throw new NotFoundException('Notification not found');
@@ -221,7 +239,8 @@ export class NotificationsService {
     companyId: string,
     dto: CreateTemplateDto,
   ): Promise<MessageTemplateDocument> {
-    const template = new this.templateModel({
+    const { templateModel } = await this.getModels(companyId);
+    const template = new templateModel({
       companyId: new Types.ObjectId(companyId),
       ...dto,
     });
@@ -232,7 +251,8 @@ export class NotificationsService {
   async findAllTemplates(
     companyId: string,
   ): Promise<MessageTemplateDocument[]> {
-    return this.templateModel
+    const { templateModel } = await this.getModels(companyId);
+    return templateModel
       .find({
         $or: [
           { companyId: new Types.ObjectId(companyId) },
@@ -247,8 +267,9 @@ export class NotificationsService {
     companyId: string,
     type: TemplateType,
   ): Promise<MessageTemplateDocument | null> {
+    const { templateModel } = await this.getModels(companyId);
     // Try to find company-specific template first
-    let template = await this.templateModel
+    let template = await templateModel
       .findOne({
         companyId: new Types.ObjectId(companyId),
         type,
@@ -258,7 +279,7 @@ export class NotificationsService {
 
     // If not found, try default template
     if (!template) {
-      template = await this.templateModel
+      template = await templateModel
         .findOne({
           type,
           isDefault: true,
@@ -271,10 +292,12 @@ export class NotificationsService {
   }
 
   async updateTemplate(
+    companyId: string,
     id: string,
     dto: UpdateTemplateDto,
   ): Promise<MessageTemplateDocument> {
-    const template = await this.templateModel.findById(id).exec();
+    const { templateModel } = await this.getModels(companyId);
+    const template = await templateModel.findById(id).exec();
 
     if (!template) {
       throw new NotFoundException('Template not found');
@@ -288,8 +311,9 @@ export class NotificationsService {
     return template.save();
   }
 
-  async deleteTemplate(id: string): Promise<void> {
-    const template = await this.templateModel.findById(id).exec();
+  async deleteTemplate(companyId: string, id: string): Promise<void> {
+    const { templateModel } = await this.getModels(companyId);
+    const template = await templateModel.findById(id).exec();
 
     if (!template) {
       throw new NotFoundException('Template not found');
@@ -299,7 +323,7 @@ export class NotificationsService {
       throw new Error('Cannot delete default templates');
     }
 
-    await this.templateModel.findByIdAndDelete(id).exec();
+    await templateModel.findByIdAndDelete(id).exec();
   }
 
   // ==================== Template Rendering ====================
@@ -317,11 +341,11 @@ export class NotificationsService {
 
   // ==================== Scheduled Notifications ====================
 
-  async processScheduledNotifications(): Promise<void> {
-    const pending = await this.findPendingNotifications();
+  async processScheduledNotifications(companyId: string): Promise<void> {
+    const pending = await this.findPendingNotifications(companyId);
 
     this.logger.log(
-      `Processing ${pending.length} scheduled notifications`,
+      `Processing ${pending.length} scheduled notifications for company ${companyId}`,
     );
 
     for (const notification of pending) {

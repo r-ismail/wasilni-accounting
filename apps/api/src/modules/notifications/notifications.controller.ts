@@ -26,7 +26,7 @@ import { NotificationType, NotificationStatus } from './schemas/notification.sch
 @UseGuards(JwtAuthGuard)
 @Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(private readonly notificationsService: NotificationsService) { }
 
   // ==================== Notifications ====================
 
@@ -89,9 +89,9 @@ export class NotificationsController {
 
   @Post(':id/retry')
   @ApiOperation({ summary: 'Retry a failed notification' })
-  async retryNotification(@Param('id') id: string) {
+  async retryNotification(@Request() req: any, @Param('id') id: string) {
     const notification =
-      await this.notificationsService.retryFailedNotification(id);
+      await this.notificationsService.retryFailedNotification(req.user.companyId, id);
 
     return {
       success: true,
@@ -150,10 +150,12 @@ export class NotificationsController {
   @Put('templates/:id')
   @ApiOperation({ summary: 'Update a template' })
   async updateTemplate(
+    @Request() req: any,
     @Param('id') id: string,
     @Body() updateTemplateDto: UpdateTemplateDto,
   ) {
     const template = await this.notificationsService.updateTemplate(
+      req.user.companyId,
       id,
       updateTemplateDto,
     );
@@ -167,8 +169,8 @@ export class NotificationsController {
 
   @Delete('templates/:id')
   @ApiOperation({ summary: 'Delete a template' })
-  async deleteTemplate(@Param('id') id: string) {
-    await this.notificationsService.deleteTemplate(id);
+  async deleteTemplate(@Request() req: any, @Param('id') id: string) {
+    await this.notificationsService.deleteTemplate(req.user.companyId, id);
 
     return {
       success: true,

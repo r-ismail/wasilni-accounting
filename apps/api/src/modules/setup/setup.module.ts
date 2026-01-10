@@ -12,14 +12,14 @@ import { UsersModule } from '../users/users.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Company.name, schema: CompanySchema }]),
-    forwardRef(() => CompaniesModule),
+    CompaniesModule,
     BuildingsModule,
     UnitsModule,
     ServicesModule,
-    forwardRef(() => UsersModule),
+    UsersModule,
   ],
   controllers: [SetupController],
   providers: [SetupService],
   exports: [SetupService],
 })
-export class SetupModule {}
+export class SetupModule { }

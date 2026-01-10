@@ -27,6 +27,7 @@ import Settings from './pages/Settings';
 import SetupWizard from './pages/Setup/SetupWizard';
 import Vendors from './pages/Vendors';
 import Expenses from './pages/Expenses';
+import CompaniesAdmin from './pages/admin/CompaniesAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -86,6 +87,7 @@ const App: React.FC = () => {
                           <Route path="/readings" element={<MeterReadings />} />
                           <Route path="/notifications" element={<Notifications />} />
                           <Route path="/settings" element={<Settings />} />
+                          <Route path="/admin/companies" element={<CompaniesAdmin />} />
                           <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                       </Layout>

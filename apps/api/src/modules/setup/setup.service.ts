@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Company } from '../companies/schemas/company.schema';
+import { Company, CompanyDocument } from '../companies/schemas/company.schema';
 import { CompaniesService } from '../companies/companies.service';
 import { BuildingsService } from '../buildings/buildings.service';
 import { UnitsService } from '../units/units.service';
@@ -9,21 +9,24 @@ import { ServicesService } from '../services/services.service';
 import { UsersService } from '../users/users.service';
 import { RunSetupDto } from './dto/run-setup.dto';
 import { FurnishingStatus } from '../units/schemas/unit.schema';
+import { TenantContextService } from '../../tenant/tenant-context.service';
 
 @Injectable()
 export class SetupService {
+  private readonly logger = new Logger(SetupService.name);
+
   constructor(
     @InjectModel(Company.name) private companyModel: Model<Company>,
-    @Inject(forwardRef(() => CompaniesService))
     private companiesService: CompaniesService,
     private buildingsService: BuildingsService,
     private unitsService: UnitsService,
     private servicesService: ServicesService,
-    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    private tenantContextService: TenantContextService,
   ) { }
 
   async getSetupStatus(userId: string): Promise<{ setupCompleted: boolean; companyId?: string }> {
+    this.logger?.debug?.(`getSetupStatus for user ${userId}`);
     // Check if user is super admin (no company)
     const user = await this.usersService.findById(userId);
 
@@ -48,6 +51,7 @@ export class SetupService {
   }
 
   async runSetup(userId: string, setupDto: RunSetupDto): Promise<{ companyId: string }> {
+    this.logger?.log?.(`runSetup invoked by user ${userId} for companyId ${setupDto.companyId || 'new'}`);
     // Verify user is super admin
     const user = await this.usersService.findById(userId);
 
@@ -59,24 +63,48 @@ export class SetupService {
       throw new BadRequestException('Only super admin can run initial setup');
     }
 
-    if (user.companyId) {
-      throw new BadRequestException('Setup already completed for this user');
+    let companyId: string;
+    let companyDoc: CompanyDocument | null = null;
+
+    if (setupDto.companyId) {
+      companyDoc = await this.companyModel.findById(setupDto.companyId).exec();
+      if (!companyDoc) {
+        throw new BadRequestException('Company not found');
+      }
+      await this.companyModel.findByIdAndUpdate(setupDto.companyId, {
+        name: setupDto.company.name,
+        taxNumber: setupDto.company.taxNumber,
+        phone: setupDto.company.phone,
+        address: setupDto.company.address,
+        currency: setupDto.company.currency,
+        defaultLanguage: setupDto.company.defaultLanguage,
+        mergeServicesWithRent: setupDto.company.mergeServicesWithRent,
+        setupCompleted: true,
+        isActive: true,
+      });
+      companyId = setupDto.companyId;
+    } else {
+      const slugBase = this.slugify(setupDto.company.name);
+      const slug = slugBase || `company-${Date.now()}`;
+      companyDoc = new this.companyModel({
+        name: setupDto.company.name,
+        slug,
+        phone: setupDto.company.phone,
+        address: setupDto.company.address,
+        taxNumber: setupDto.company.taxNumber,
+        currency: setupDto.company.currency,
+        defaultLanguage: setupDto.company.defaultLanguage,
+        mergeServicesWithRent: setupDto.company.mergeServicesWithRent,
+        setupCompleted: true,
+        isActive: true,
+      });
+      await companyDoc.save();
+      companyId = companyDoc._id.toString();
     }
 
-    // Create company
-    const company = new this.companyModel({
-      name: setupDto.company.name,
-      phone: setupDto.company.phone,
-      address: setupDto.company.address,
-      currency: setupDto.company.currency,
-      defaultLanguage: setupDto.company.defaultLanguage,
-      mergeServicesWithRent: setupDto.company.mergeServicesWithRent,
-      setupCompleted: true,
-      isActive: true,
-    });
-    await company.save();
-
-    const companyId = company._id.toString();
+    const tenantDbName =
+      companyDoc?.slug || this.slugify(companyDoc?.name || '') || `company-${companyId}`;
+    this.tenantContextService.setOverrideDbName(tenantDbName);
 
     try {
       // Create buildings and units
@@ -134,9 +162,19 @@ export class SetupService {
 
       return { companyId };
     } catch (error) {
+      this.logger?.error?.(`runSetup failed for company ${companyId}: ${error?.message}`, error?.stack);
       // Rollback: delete company if setup fails
-      await this.companyModel.deleteOne({ _id: company._id }).exec();
+      await this.companyModel.deleteOne({ _id: companyDoc?._id }).exec();
       throw error;
     }
+  }
+
+  private slugify(value: string) {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 }

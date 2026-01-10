@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+// Resolve API base URL:
+// - if VITE_API_URL is an absolute URL, use it
+// - if it is relative (e.g., "/api"), prepend window origin
+// - otherwise default to local API port
+const envUrl = (import.meta.env.VITE_API_URL as string | undefined) || '';
+const apiBase = envUrl
+  ? envUrl.startsWith('http')
+    ? envUrl.replace(/\/$/, '')
+    : `${window.location.origin}${envUrl}`.replace(/\/$/, '')
+  : 'http://localhost:3001';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: apiBase,
   headers: {
     'Content-Type': 'application/json',
   },

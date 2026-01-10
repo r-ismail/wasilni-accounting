@@ -9,6 +9,9 @@ export class Company {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true, unique: true })
+  slug: string;
+
   @Prop()
   phone?: string;
 

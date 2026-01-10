@@ -78,6 +78,7 @@ export const completeSetupSchema = z.object({
     username: z.string(),
     password: z.string(),
   }),
+  companyId: z.string().optional(),
 });
 
 export type CompleteSetupData = z.infer<typeof completeSetupSchema>;

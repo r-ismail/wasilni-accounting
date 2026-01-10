@@ -127,6 +127,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
   ];
 
+  if (user?.role === 'super_admin') {
+    menuItems.unshift({
+      text: t('admin.companies.title'),
+      icon: <BusinessIcon />,
+      path: '/admin/companies',
+    });
+  }
+
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#f8f9fa' }}>
       {/* Logo and Company Name */}
@@ -240,40 +248,89 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: i18n.language === 'ar' ? 0 : { sm: `${drawerWidth}px` },
           mr: i18n.language === 'ar' ? { sm: `${drawerWidth}px` } : 0,
-          bgcolor: 'white',
+          bgcolor: 'rgba(255,255,255,0.95)',
           color: 'text.primary',
           borderBottom: '1px solid',
           borderColor: 'divider',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 6px 18px rgba(246, 248, 250, 0.12)',
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ gap: 1 }}>
           <IconButton
             color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
           
-          {/* Page Title */}
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || companyName || t('app.title')}
-          </Typography>
+          {/* Page Title / Context */}
+          {(() => {
+            const currentItem = menuItems.find(item => item.path === location.pathname);
+            return (
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    letterSpacing: 0.4,
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                  }}
+                  noWrap
+                >
+                  {companyName || t('app.title')}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  noWrap
+                  sx={{
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      px: 1.5,
+                      py: 0.5,
+                      bgcolor: 'primary',
+                      color: 'primary.main',
+                      borderRadius: 1.5,
+                      fontSize: '0.95rem',
+                      fontWeight: 800,
+                      boxShadow: 'inset 0 0 0 1px rgba(168, 3, 3, 0.06)',
+                    }}
+                  >
+                    {currentItem?.text || t('app.title')}
+                  </Box>
+                </Typography>
+              </Box>
+            );
+          })()}
 
           {/* Company Logo/Name Badge */}
           {companyLogo ? (
             <Box
               sx={{
-                mr: 2,
+                mr: 1,
                 display: { xs: 'none', md: 'flex' },
                 alignItems: 'center',
-                height: 40,
+                height: 44,
                 px: 1.5,
                 bgcolor: 'white',
                 border: '1px solid',
                 borderColor: 'divider',
-                borderRadius: 1,
+                borderRadius: 999,
+                boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
               }}
             >
               <img
@@ -287,11 +344,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               icon={<BusinessIcon />}
               label={companyName}
               sx={{ 
-                mr: 2,
+                mr: 1,
                 display: { xs: 'none', md: 'flex' },
-                bgcolor: 'primary.light',
+                bgcolor: 'primary',
                 color: 'primary.main',
-                fontWeight: 600,
+                fontWeight: 700,
+                borderRadius: 999,
+                px: 0.5,
               }}
             />
           ) : null}
@@ -301,9 +360,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             color="inherit" 
             onClick={toggleLanguage}
             sx={{ 
-              mr: 1,
               border: '1px solid',
               borderColor: 'divider',
+              bgcolor: 'background.paper',
             }}
           >
             <LanguageIcon />
@@ -311,13 +370,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Logout Button */}
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             startIcon={<LogoutIcon />}
             onClick={handleLogout}
             sx={{ 
               textTransform: 'none',
-              fontWeight: 600,
+              fontWeight: 700,
+              boxShadow: '0 4px 12px rgba(211,47,47,0.2)',
             }}
           >
             {t('auth.logout')}

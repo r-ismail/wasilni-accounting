@@ -249,6 +249,38 @@
       "super_admin": "Super Admin"
     }
   },
+  "admin": {
+    "companies": {
+      "title": "Company Directory",
+      "subtitle": "Manage tenant companies, slugs/DB names, and connection details.",
+      "accessDenied": "Access denied",
+      "superAdminOnly": "Super admin only.",
+      "total": "Total",
+      "searchPlaceholder": "Search by name, slug, phone",
+      "createTitle": "Create Company",
+      "editTitle": "Edit Company",
+      "name": "Name",
+      "phone": "Phone",
+      "address": "Address",
+      "currency": "Currency",
+      "language": "Language",
+      "merge": "Merge services with rent invoices",
+      "defaultLanguage": "Default Language",
+      "slug": "DB Slug",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "new": "New Company",
+      "deleteTitle": "Delete company?",
+      "deleteBody": "This removes the company record from control DB. Tenant databases are not deleted automatically.",
+      "setupTitle": "Run tenant setup",
+      "setupBody": "Open the setup wizard for {{name}} to create its admin user, buildings, units, and services.",
+      "setupAction": "Run setup",
+      "setupLaunch": "Launch Setup",
+      "setupCopy": "Copy setup link",
+      "db": "DB",
+      "connection": "Connection"
+    }
+  },
   "reports": {
     "title": "Reports",
     "subtitle": "Revenue, occupancy, and overdue insights",
@@ -339,6 +371,8 @@
     "setupSuccess": "Setup completed successfully!",
     "redirecting": "Redirecting to dashboard...",
     "setupError": "Error during setup",
+    "prefillError": "Could not load company info. You can continue by filling it manually.",
+    "loadingCompany": "Loading company information...",
     "pleaseFillAllFields": "Please fill all required fields",
     "arabic": "Arabic",
     "english": "English",

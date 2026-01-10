@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TenantMongooseModule } from '../../tenant/tenant-mongoose.module';
 import { ContractsController } from './contracts.controller';
 import { ContractsService } from './contracts.service';
 import { Contract, ContractSchema } from './schemas/contract.schema';
@@ -8,7 +8,7 @@ import { CustomersModule } from '../customers/customers.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
+    TenantMongooseModule.forFeature([
       { name: Contract.name, schema: ContractSchema },
     ]),
     UnitsModule,

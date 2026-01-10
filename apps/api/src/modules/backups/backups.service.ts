@@ -4,6 +4,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CompaniesService } from '../companies/companies.service';
+import { TenantConnectionService } from '../../tenant/tenant-connection.service';
 
 export interface BackupInfo {
   filename: string;
@@ -17,7 +19,11 @@ export interface BackupInfo {
 export class BackupsService {
   private readonly logger = new Logger(BackupsService.name);
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly companiesService: CompaniesService,
+    private readonly tenantConnectionService: TenantConnectionService,
+  ) { }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleDailyBackup() {
@@ -26,14 +32,24 @@ export class BackupsService {
       return;
     }
     try {
-      await this.createBackup('scheduled');
+      const companies = await this.companiesService.findAll();
+      for (const company of companies) {
+        try {
+          await this.createBackup(company._id.toString(), 'scheduled');
+        } catch (error) {
+          this.logger.error(
+            `Scheduled backup failed for ${company._id}: ${this.getErrorMessage(error)}`,
+          );
+        }
+      }
     } catch (error) {
       this.logger.error(`Scheduled backup failed: ${this.getErrorMessage(error)}`);
     }
   }
 
-  async listBackups(): Promise<BackupInfo[]> {
-    const backupDir = this.ensureBackupDir();
+  async listBackups(companyId: string): Promise<BackupInfo[]> {
+    const dbName = await this.companiesService.getCompanyDbName(companyId);
+    const backupDir = this.ensureBackupDir(dbName);
     const entries = await fs.promises.readdir(backupDir);
     const backups = await Promise.all(
       entries
@@ -54,9 +70,10 @@ export class BackupsService {
     return backups.sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt));
   }
 
-  async createBackup(source: 'manual' | 'scheduled'): Promise<BackupInfo> {
-    const backupDir = this.ensureBackupDir();
-    const uri = this.getMongoUri();
+  async createBackup(companyId: string, source: 'manual' | 'scheduled'): Promise<BackupInfo> {
+    const dbName = await this.companiesService.getCompanyDbName(companyId);
+    const backupDir = this.ensureBackupDir(dbName);
+    const uri = this.tenantConnectionService.buildMongoUri(dbName);
     const timestamp = this.formatTimestamp(new Date());
     const filename = `backup-${timestamp}.gz`;
     const filePath = path.join(backupDir, filename);
@@ -70,7 +87,7 @@ export class BackupsService {
       '--gzip',
     ]);
 
-    await this.cleanupOldBackups();
+    await this.cleanupOldBackups(backupDir);
     const stat = await fs.promises.stat(filePath);
 
     return {
@@ -82,15 +99,16 @@ export class BackupsService {
     };
   }
 
-  async restoreBackup(filename: string, targetDbName: string) {
-    const backupDir = this.ensureBackupDir();
+  async restoreBackup(companyId: string, filename: string, targetDbName: string) {
+    const dbName = await this.companiesService.getCompanyDbName(companyId);
+    const backupDir = this.ensureBackupDir(dbName);
     const filePath = path.join(backupDir, filename);
     if (!fs.existsSync(filePath)) {
       throw new Error(`Backup not found: ${filename}`);
     }
 
-    const uri = this.getMongoUri();
-    const sourceDb = this.getSourceDatabaseName(uri);
+    const sourceDb = dbName;
+    const uri = this.tenantConnectionService.buildMongoUri(targetDbName);
 
     this.logger.log(`Restoring backup ${filename} to ${targetDbName}`);
 
@@ -111,32 +129,15 @@ export class BackupsService {
     };
   }
 
-  private getMongoUri() {
-    const uri = this.configService.get<string>('MONGODB_URI');
-    if (!uri) {
-      throw new Error('MONGODB_URI is not configured');
-    }
-    return uri;
-  }
-
-  private getSourceDatabaseName(uri: string) {
-    const match = uri.match(/\/([^/?]+)(\?|$)/);
-    if (match && match[1]) {
-      return match[1];
-    }
-    return 'admin';
-  }
-
-  private ensureBackupDir() {
+  private ensureBackupDir(dbName: string) {
     const configuredDir = this.getEnv('BACKUP_DIR', 'backups');
-    const resolvedDir = path.resolve(process.cwd(), configuredDir);
+    const resolvedDir = path.resolve(process.cwd(), configuredDir, dbName);
     fs.mkdirSync(resolvedDir, { recursive: true });
     return resolvedDir;
   }
 
-  private async cleanupOldBackups() {
+  private async cleanupOldBackups(backupDir: string) {
     const retentionDays = parseInt(this.getEnv('BACKUP_RETENTION_DAYS', '15'), 10);
-    const backupDir = this.ensureBackupDir();
     const entries = await fs.promises.readdir(backupDir);
     const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
 

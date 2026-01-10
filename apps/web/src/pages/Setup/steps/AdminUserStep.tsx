@@ -22,11 +22,18 @@ export default function AdminUserStep({ data, onNext, onBack: _onBack }: AdminUs
   });
 
   const onSubmit = (formData: AdminUserFormData) => {
+    // eslint-disable-next-line no-console
+    console.log('[AdminUserStep] submit data:', formData);
     onNext(formData);
   };
 
+  const onSubmitError = (formErrors: any) => {
+    // eslint-disable-next-line no-console
+    console.warn('[AdminUserStep] validation errors:', formErrors);
+  };
+
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmit, onSubmitError)} sx={{ mt: 3 }}>
       <Typography variant="h6" gutterBottom>
         {t('setup.step4')}
       </Typography>

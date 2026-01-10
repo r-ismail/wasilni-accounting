@@ -24,6 +24,11 @@ export class CompanyInfoDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiPropertyOptional({ description: 'Tax/VAT number', example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  taxNumber?: string;
+
   @ApiPropertyOptional({ description: 'Company phone number', example: '+967777123456' })
   @IsString()
   @IsOptional()
@@ -153,6 +158,11 @@ export class AdminUserDto {
 
 // Main Setup DTO
 export class RunSetupDto {
+  @ApiPropertyOptional({ description: 'Existing company ID to run setup against' })
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
   @ApiProperty({ description: 'Company information' })
   @ValidateNested()
   @Type(() => CompanyInfoDto)

@@ -21,6 +21,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { BackupsModule } from './modules/backups/backups.module';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -32,6 +33,9 @@ import { BackupsModule } from './modules/backups/backups.module';
 
     // Scheduler
     ScheduleModule.forRoot(),
+
+    // Tenant database routing - Moved to end
+
 
     // Winston Logger
     WinstonModule.forRoot({
@@ -67,7 +71,9 @@ import { BackupsModule } from './modules/backups/backups.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
+        uri:
+          configService.get<string>('CONTROL_MONGODB_URI') ||
+          configService.get<string>('MONGODB_URI'),
       }),
       inject: [ConfigService],
     }),
