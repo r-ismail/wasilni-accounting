@@ -8,7 +8,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 import { getTheme } from './theme/theme';
 import ProtectedRoute from './components/ProtectedRoute';
-import SetupCheck from './components/SetupCheck';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -24,10 +23,10 @@ import Meters from './pages/Meters';
 import MeterReadings from './pages/MeterReadings';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
-import SetupWizard from './pages/Setup/SetupWizard';
 import Vendors from './pages/Vendors';
 import Expenses from './pages/Expenses';
 import CompaniesAdmin from './pages/admin/CompaniesAdmin';
+import Onboarding from './pages/admin/Onboarding';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,42 +55,31 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
-                path="/setup"
-                element={
-                  <ProtectedRoute>
-                    <SetupCheck>
-                      <SetupWizard />
-                    </SetupCheck>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/*"
                 element={
                   <ProtectedRoute>
-                    <SetupCheck>
-                      <Layout>
-                        <Routes>
-                          <Route path="/" element={<Dashboard />} />
-                          <Route path="/units" element={<Units />} />
-                          <Route path="/contracts" element={<Contracts />} />
-                          <Route path="/contracts/:id/print" element={<ContractPrint />} />
-                          <Route path="/invoices" element={<Invoices />} />
-                          <Route path="/payments" element={<Payments />} />
-                          <Route path="/customers" element={<Customers />} />
-                          <Route path="/customers/:id" element={<CustomerProfile />} />
-                          <Route path="/users" element={<Users />} />
-                          <Route path="/vendors" element={<Vendors />} />
-                          <Route path="/expenses" element={<Expenses />} />
-                          <Route path="/meters" element={<Meters />} />
-                          <Route path="/readings" element={<MeterReadings />} />
-                          <Route path="/notifications" element={<Notifications />} />
-                          <Route path="/settings" element={<Settings />} />
-                          <Route path="/admin/companies" element={<CompaniesAdmin />} />
-                          <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                      </Layout>
-                    </SetupCheck>
+                    <Layout>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/units" element={<Units />} />
+                        <Route path="/contracts" element={<Contracts />} />
+                        <Route path="/contracts/:id/print" element={<ContractPrint />} />
+                        <Route path="/invoices" element={<Invoices />} />
+                        <Route path="/payments" element={<Payments />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/customers/:id" element={<CustomerProfile />} />
+                        <Route path="/users" element={<Users />} />
+                        <Route path="/vendors" element={<Vendors />} />
+                        <Route path="/expenses" element={<Expenses />} />
+                        <Route path="/meters" element={<Meters />} />
+                        <Route path="/readings" element={<MeterReadings />} />
+                        <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/admin/companies" element={<CompaniesAdmin />} />
+                        <Route path="/admin/onboarding" element={<Onboarding />} />
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                      </Routes>
+                    </Layout>
                   </ProtectedRoute>
                 }
               />

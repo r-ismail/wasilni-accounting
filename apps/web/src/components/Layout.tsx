@@ -36,6 +36,7 @@ import {
   Logout as LogoutIcon,
   Engineering as EngineeringIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
+  RocketLaunch as RocketLaunchIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
@@ -132,6 +133,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       text: t('admin.companies.title'),
       icon: <BusinessIcon />,
       path: '/admin/companies',
+    });
+    menuItems.unshift({
+      text: t('admin.onboarding.title'),
+      icon: <RocketLaunchIcon />,
+      path: '/admin/onboarding',
     });
   }
 

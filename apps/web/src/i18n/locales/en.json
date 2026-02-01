@@ -272,13 +272,26 @@
       "new": "New Company",
       "deleteTitle": "Delete company?",
       "deleteBody": "This removes the company record from control DB. Tenant databases are not deleted automatically.",
-      "setupTitle": "Run tenant setup",
-      "setupBody": "Open the setup wizard for {{name}} to create its admin user, buildings, units, and services.",
-      "setupAction": "Run setup",
-      "setupLaunch": "Launch Setup",
-      "setupCopy": "Copy setup link",
       "db": "DB",
       "connection": "Connection"
+    },
+    "onboarding": {
+      "title": "Onboarding",
+      "subtitle": "Create a company, seed basics, and an admin in one step",
+      "success": "Onboarding completed successfully",
+      "run": "Run onboarding",
+      "companyInfo": "Company Information",
+      "adminUser": "Admin User",
+      "buildings": "Buildings",
+      "services": "Services",
+      "addBuilding": "Add building",
+      "addService": "Add service",
+      "noBuildings": "No buildings added",
+      "noServices": "No services added",
+      "buildingLabel": "Building {{index}}",
+      "serviceLabel": "Service {{index}}",
+      "furnished": "Furnished units",
+      "unfurnished": "Unfurnished units"
     }
   },
   "reports": {

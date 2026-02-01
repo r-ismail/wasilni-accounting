@@ -10,7 +10,6 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { BuildingsModule } from './modules/buildings/buildings.module';
 import { UnitsModule } from './modules/units/units.module';
 import { ServicesModule } from './modules/services/services.module';
-import { SetupModule } from './modules/setup/setup.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { ContractsModule } from './modules/contracts/contracts.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
@@ -21,7 +20,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { BackupsModule } from './modules/backups/backups.module';
-import { TenantModule } from './tenant/tenant.module';
+import { OnboardingModule } from './modules/onboarding/onboarding.module';
 
 @Module({
   imports: [
@@ -33,9 +32,6 @@ import { TenantModule } from './tenant/tenant.module';
 
     // Scheduler
     ScheduleModule.forRoot(),
-
-    // Tenant database routing - Moved to end
-
 
     // Winston Logger
     WinstonModule.forRoot({
@@ -49,21 +45,25 @@ import { TenantModule } from './tenant/tenant.module';
             }),
           ),
         }),
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: 'error',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-          ),
-        }),
-        new winston.transports.File({
-          filename: 'logs/combined.log',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-          ),
-        }),
+        ...(process.env.NODE_ENV !== 'production' && !process.env.VERCEL
+          ? [
+            new winston.transports.File({
+              filename: 'logs/error.log',
+              level: 'error',
+              format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.json(),
+              ),
+            }),
+            new winston.transports.File({
+              filename: 'logs/combined.log',
+              format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.json(),
+              ),
+            }),
+          ]
+          : []),
       ],
     }),
 
@@ -85,7 +85,6 @@ import { TenantModule } from './tenant/tenant.module';
     BuildingsModule,
     UnitsModule,
     ServicesModule,
-    SetupModule,
     CustomersModule,
     ContractsModule,
     InvoicesModule,
@@ -96,6 +95,7 @@ import { TenantModule } from './tenant/tenant.module';
     VendorsModule,
     ExpensesModule,
     BackupsModule,
+    OnboardingModule,
   ],
 })
 export class AppModule { }

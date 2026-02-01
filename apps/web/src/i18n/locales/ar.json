@@ -336,6 +336,24 @@
       "slug": "قاعدة البيانات",
       "actions": "الإجراءات",
       "setupAction": "تشغيل الإعداد"
+    },
+    "onboarding": {
+      "title": "تهيئة سريعة",
+      "subtitle": "إنشاء شركة مع البيانات الأساسية ومستخدم إداري بخطوة واحدة",
+      "success": "تمت التهيئة بنجاح",
+      "run": "تشغيل التهيئة",
+      "companyInfo": "بيانات الشركة",
+      "adminUser": "المستخدم الإداري",
+      "buildings": "المباني",
+      "services": "الخدمات",
+      "addBuilding": "إضافة مبنى",
+      "addService": "إضافة خدمة",
+      "noBuildings": "لا توجد مبانٍ مضافة",
+      "noServices": "لا توجد خدمات مضافة",
+      "buildingLabel": "مبنى {{index}}",
+      "serviceLabel": "خدمة {{index}}",
+      "furnished": "وحدات مفروشة",
+      "unfurnished": "وحدات غير مفروشة"
     }
   },
   "setup": {

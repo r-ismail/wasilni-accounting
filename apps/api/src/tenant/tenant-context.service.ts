@@ -3,7 +3,9 @@ import { REQUEST } from '@nestjs/core';
 import { CompaniesService } from '../modules/companies/companies.service';
 
 interface TenantRequest {
-  user?: { companyId?: string; role?: string };
+  user?: { companyId?: string; role?: string; username?: string };
+  method?: string;
+  url?: string;
 }
 
 @Injectable({ scope: Scope.REQUEST })
@@ -57,6 +59,7 @@ export class TenantContextService {
 
     const role = this.request?.user?.role;
     const companyId = this.request?.user?.companyId;
+    const requestInfo = `${this.request?.method || 'UNKNOWN'} ${this.request?.url || ''}`.trim();
 
     // Super admin should always stay on control DB
     if (role === 'super_admin' || role === 'superadmin') {
@@ -70,7 +73,7 @@ export class TenantContextService {
       // Only warn if not a super admin (already handled above, but just in case of different spelling/format)
       if (role !== 'super_admin' && role !== 'superadmin') {
         this.logger.warn(
-          `Company context is missing (role: ${role || 'none'}); using control/fallback DB "${controlDb}".`,
+          `Company context is missing (role: ${role || 'none'}, req: ${requestInfo}); using control/fallback DB "${controlDb}".`,
         );
       }
       this.resolvedDbName = controlDb;
@@ -92,13 +95,17 @@ export class TenantContextService {
       company = await this.companiesService.findById(companyId);
     } catch (err) {
       // If the provided companyId is not a valid ObjectId, try by slug
-      this.logger.warn(`Invalid companyId format "${companyId}", trying slug lookup.`);
-      company = await this.companiesService.findBySlug(companyId);
+      this.logger.warn(`Invalid companyId format "${companyId}", trying slug lookup. req: ${requestInfo}`);
+      try {
+        company = await this.companiesService.findBySlug(companyId);
+      } catch (innerErr) {
+        this.logger.error(`Slug lookup failed for "${companyId}" (req: ${requestInfo}): ${innerErr?.message}`);
+      }
     }
     if (!company) {
       const controlDb = this.getControlDbName();
       this.logger.warn(
-        `Company "${companyId}" not found; falling back to control DB "${controlDb}".`,
+        `Company "${companyId}" not found (req: ${requestInfo}); falling back to control DB "${controlDb}".`,
       );
       this.resolvedDbName = controlDb;
       return this.resolvedDbName;

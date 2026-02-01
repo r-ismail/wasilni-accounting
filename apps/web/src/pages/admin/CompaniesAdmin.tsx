@@ -22,7 +22,6 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
@@ -71,10 +70,6 @@ const CompaniesAdmin: React.FC = () => {
     mergeServicesWithRent: true,
   });
   const [selected, setSelected] = useState<Company | null>(null);
-  const [setupDialogOpen, setSetupDialogOpen] = useState(false);
-  const [setupCompanyId, setSetupCompanyId] = useState<string | null>(null);
-  const [setupCompanyName, setSetupCompanyName] = useState<string | null>(null);
-  const setupLink = setupCompanyId ? `${window.location.origin}/setup?companyId=${setupCompanyId}` : '';
 
   const companiesQuery = useQuery({
     queryKey: ['admin-companies'],
@@ -89,16 +84,9 @@ const CompaniesAdmin: React.FC = () => {
       const res = await api.post('/companies', payload);
       return res.data;
     },
-    onSuccess: (created) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
       setCreateOpen(false);
-      const companyId = created?.data?._id || created?._id;
-      const companyName = created?.data?.name || created?.name;
-      if (companyId) {
-        setSetupCompanyId(companyId);
-        setSetupCompanyName(companyName || null);
-        setSetupDialogOpen(true);
-      }
     },
   });
 
@@ -173,18 +161,6 @@ const CompaniesAdmin: React.FC = () => {
             }}
           >
             <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="primary"
-            onClick={() => {
-              setSetupCompanyId(params.row._id);
-              setSetupCompanyName(params.row.name);
-              setSetupDialogOpen(true);
-            }}
-            title={t('admin.companies.setupAction')}
-          >
-            <PlayArrowIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
@@ -399,47 +375,6 @@ const CompaniesAdmin: React.FC = () => {
             disabled={deleteMutation.isPending}
           >
             {deleteMutation.isPending ? t('common.deleting') : t('common.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={setupDialogOpen}
-        onClose={() => setSetupDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('admin.companies.setupTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            {t('admin.companies.setupBody', { name: setupCompanyName || '' })}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {setupCompanyId ? `/setup?companyId=${setupCompanyId}` : ''}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSetupDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button
-            onClick={() => {
-              if (setupCompanyId) {
-                window.open(setupLink, '_blank', 'noopener');
-              }
-            }}
-            variant="outlined"
-          >
-            {t('admin.companies.setupLaunch')}
-          </Button>
-          <Button
-            onClick={async () => {
-              if (setupCompanyId && navigator.clipboard) {
-                await navigator.clipboard.writeText(setupLink);
-              }
-              setSetupDialogOpen(false);
-            }}
-            variant="contained"
-          >
-            {t('admin.companies.setupCopy')}
           </Button>
         </DialogActions>
       </Dialog>

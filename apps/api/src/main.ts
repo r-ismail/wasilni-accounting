@@ -1,26 +1,25 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+let cachedApp: any;
 
+async function setupApp(app: INestApplication) {
   // Use Winston logger
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Enable CORS
-  /* 
-   * Fix for CORS: correctly create array of origins. 
-   */
-  
   const defaultOrigins = ['http://localhost:5173', 'https://wasilni-accounting-web.vercel.app'];
   const allowedCorsOrigins = process.env.CORS_ORIGIN
     ? [...defaultOrigins, ...process.env.CORS_ORIGIN.split(',').map(o => o.trim())]
     : defaultOrigins;
+
   app.enableCors({
     origin: (incomingOrigin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl) or allowed origins
       if (!incomingOrigin || allowedCorsOrigins.includes(incomingOrigin)) {
         return callback(null, true);
       }
@@ -45,9 +44,6 @@ async function bootstrap() {
     }),
   );
 
-  // API prefix
-  //app.setGlobalPrefix('api');
-
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Aqarat Accounting API')
@@ -58,10 +54,36 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
+  await app.init();
+  return app;
+}
+
+async function bootstrap() {
+  // For Vercel/Serverless
+  if (process.env.VERCEL) {
+    if (!cachedApp) {
+      const app = await NestFactory.create(AppModule);
+      await setupApp(app);
+      cachedApp = app.getHttpAdapter().getInstance();
+    }
+    return cachedApp;
+  }
+
+  // For Local/Railway
+  const app = await NestFactory.create(AppModule);
+  await setupApp(app);
   const port = process.env.PORT || 3001;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`Swagger docs available at: http://localhost:${port}/api/docs`);
 }
 
-bootstrap();
+// Start local server if not in Vercel environment
+if (!process.env.VERCEL) {
+  bootstrap();
+}
+
+// Export for Vercel
+export default async (req: any, res: any) => {
+  const app = await bootstrap();
+  return app(req, res);
+};
