@@ -19,7 +19,10 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@aqarat/shared": ["../../packages/shared/src"]
+      "@aqarat/shared": ["../../packages/shared/src/index"],
+      "@aqarat/shared/*": ["../../packages/shared/src/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "../../packages/shared/src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
