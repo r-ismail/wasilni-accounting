@@ -205,8 +205,8 @@ export class MetersService {
       // Get all unit meters for this service in the building
       const unitMeters = await this.meterModel
         .find({
-          companyId: new Types.ObjectId(companyId),
-          buildingId: new Types.ObjectId(buildingId),
+          companyId: new (Types.ObjectId as any)(companyId),
+          buildingId: new (Types.ObjectId as any)(buildingId),
           serviceId: meter.serviceId,
           type: 'unit',
         })
@@ -254,10 +254,10 @@ export class MetersService {
     return distributions;
   }
   private async recalculateMeterReadings(companyId: string, meterId: Types.ObjectId | string) {
-    const meterObjectId = typeof meterId === 'string' ? new Types.ObjectId(meterId) : meterId;
+    const meterObjectId = typeof meterId === 'string' ? new (Types.ObjectId as any)(meterId) : meterId;
     const readings = await this.meterReadingModel
       .find({
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
         meterId: meterObjectId,
       })
       .sort({ readingDate: 1 })

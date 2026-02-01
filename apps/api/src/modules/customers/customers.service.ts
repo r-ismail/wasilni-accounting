@@ -179,9 +179,9 @@ export class CustomersService {
     // If phone is being updated, check uniqueness
     if (updateCustomerDto.phone) {
       const existing = await this.customerModel.findOne({
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
         phone: updateCustomerDto.phone,
-        _id: { $ne: new Types.ObjectId(id) },
+        _id: { $ne: new (Types.ObjectId as any)(id) },
       });
 
       if (existing) {
@@ -191,8 +191,8 @@ export class CustomersService {
 
     const customer = await this.customerModel.findOneAndUpdate(
       {
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       },
       { $set: updateCustomerDto },
       { new: true },
@@ -207,8 +207,8 @@ export class CustomersService {
 
   async remove(companyId: string, id: string): Promise<void> {
     const result = await this.customerModel.deleteOne({
-      _id: new Types.ObjectId(id),
-      companyId: new Types.ObjectId(companyId),
+      _id: new (Types.ObjectId as any)(id),
+      companyId: new (Types.ObjectId as any)(companyId),
     }).exec();
 
     if (result.deletedCount === 0) {

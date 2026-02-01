@@ -11,7 +11,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.usersService.findByUsername(loginDto.username);
@@ -38,7 +38,7 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
-    });
+    } as any);
 
     // Store refresh token hash
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);

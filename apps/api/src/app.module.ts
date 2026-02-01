@@ -40,11 +40,12 @@ import { OnboardingModule } from './modules/onboarding/onboarding.module';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.colorize(),
-            winston.format.printf(({ timestamp, level, message, context }) => {
-              return `${timestamp} [${context}] ${level}: ${message}`;
+            winston.format.printf((info: any) => {
+              const { timestamp, level, message, context } = info;
+              return `${timestamp} [${context || 'App'}] ${level}: ${message}`;
             }),
           ),
-        }),
+        } as any),
         ...(process.env.NODE_ENV !== 'production' && !process.env.VERCEL
           ? [
             new winston.transports.File({
@@ -54,14 +55,14 @@ import { OnboardingModule } from './modules/onboarding/onboarding.module';
                 winston.format.timestamp(),
                 winston.format.json(),
               ),
-            }),
+            } as any),
             new winston.transports.File({
               filename: 'logs/combined.log',
               format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.json(),
               ),
-            }),
+            } as any),
           ]
           : []),
       ],

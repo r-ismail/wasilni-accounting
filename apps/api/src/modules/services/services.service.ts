@@ -98,12 +98,12 @@ export class ServicesService {
     buildingIds?: string[],
   ): Promise<void> {
     if (!buildingIds) return;
-    const ids = buildingIds.map((b) => new Types.ObjectId(b));
+    const ids = buildingIds.map((b) => new (Types.ObjectId as any)(b));
 
     const count = await this.buildingModel
       .countDocuments({
         _id: { $in: ids },
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
     if (count !== ids.length) {
@@ -112,14 +112,14 @@ export class ServicesService {
 
     // Remove service from all company buildings
     await this.buildingModel.updateMany(
-      { companyId: new Types.ObjectId(companyId), services: serviceId },
+      { companyId: new (Types.ObjectId as any)(companyId), services: serviceId },
       { $pull: { services: serviceId } },
     );
 
     // Add service to selected buildings
     if (ids.length) {
       await this.buildingModel.updateMany(
-        { companyId: new Types.ObjectId(companyId), _id: { $in: ids } },
+        { companyId: new (Types.ObjectId as any)(companyId), _id: { $in: ids } },
         { $addToSet: { services: serviceId } },
       );
     }

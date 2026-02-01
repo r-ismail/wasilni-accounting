@@ -53,19 +53,19 @@ export class NotificationsService {
   ): Promise<NotificationDocument> {
     const { notificationModel } = await this.getModels(companyId);
     const notification = new notificationModel({
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
       type: dto.type,
       recipient: dto.recipient,
       subject: dto.subject,
       message: dto.message,
       scheduledAt: dto.scheduledAt || new Date(),
       invoiceId: dto.invoiceId
-        ? new Types.ObjectId(dto.invoiceId)
+        ? new (Types.ObjectId as any)(dto.invoiceId)
         : undefined,
       customerId: dto.customerId
-        ? new Types.ObjectId(dto.customerId)
+        ? new (Types.ObjectId as any)(dto.customerId)
         : undefined,
-      createdBy: new Types.ObjectId(userId),
+      createdBy: new (Types.ObjectId as any)(userId),
       status: dto.scheduledAt
         ? NotificationStatus.PENDING
         : NotificationStatus.PENDING,
@@ -180,7 +180,7 @@ export class NotificationsService {
     },
   ): Promise<NotificationDocument[]> {
     const { notificationModel } = await this.getModels(companyId);
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.status) {
       query.status = filters.status;
@@ -191,7 +191,7 @@ export class NotificationsService {
     }
 
     if (filters?.customerId) {
-      query.customerId = new Types.ObjectId(filters.customerId);
+      query.customerId = new (Types.ObjectId as any)(filters.customerId);
     }
 
     return notificationModel
@@ -241,7 +241,7 @@ export class NotificationsService {
   ): Promise<MessageTemplateDocument> {
     const { templateModel } = await this.getModels(companyId);
     const template = new templateModel({
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
       ...dto,
     });
 
@@ -255,7 +255,7 @@ export class NotificationsService {
     return templateModel
       .find({
         $or: [
-          { companyId: new Types.ObjectId(companyId) },
+          { companyId: new (Types.ObjectId as any)(companyId) },
           { isDefault: true },
         ],
       })
@@ -271,7 +271,7 @@ export class NotificationsService {
     // Try to find company-specific template first
     let template = await templateModel
       .findOne({
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
         type,
         isActive: true,
       })
