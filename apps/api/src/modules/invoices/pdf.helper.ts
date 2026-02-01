@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+// Lazy load puppeteer to avoid bootstrap issues on Vercel
 
 export interface InvoicePdfData {
   invoice: {
@@ -228,15 +228,23 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 </html>
   `;
 
-  const browser = await puppeteer.launch({
+  let puppeteer;
+  try {
+    puppeteer = (await import('puppeteer')).default;
+  } catch (err) {
+    console.error('Puppeteer load error:', err);
+    throw new Error('PDF generation (Puppeteer) is not available in this environment. Vercel requires @sparticuz/chromium for this feature.');
+  }
+
+  const browser = await (puppeteer as any).launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   const page = await browser.newPage();
-  await page.setContent(html, { 
+  await page.setContent(html, {
     waitUntil: 'networkidle0',
-    timeout: 30000 
+    timeout: 30000
   });
   // Wait for fonts to load
   await page.evaluateHandle('document.fonts.ready');

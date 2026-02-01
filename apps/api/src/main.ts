@@ -3,13 +3,18 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from 'nest-winston';
 
 let cachedApp: any;
 
 async function setupApp(app: INestApplication) {
   // Use Winston logger
-  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+  try {
+    const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+    app.useLogger(logger);
+  } catch (e) {
+    console.error('Failed to set Winston logger:', e);
+  }
 
   // Enable CORS
   const defaultOrigins = ['http://localhost:5173', 'https://wasilni-accounting-web.vercel.app'];
@@ -19,7 +24,6 @@ async function setupApp(app: INestApplication) {
 
   app.enableCors({
     origin: (incomingOrigin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl) or allowed origins
       if (!incomingOrigin || allowedCorsOrigins.includes(incomingOrigin)) {
         return callback(null, true);
       }
@@ -32,7 +36,6 @@ async function setupApp(app: INestApplication) {
     credentials: true,
   });
 
-  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -44,7 +47,6 @@ async function setupApp(app: INestApplication) {
     }),
   );
 
-  // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Aqarat Accounting API')
     .setDescription('Multi-tenant property management accounting system API')
@@ -59,31 +61,53 @@ async function setupApp(app: INestApplication) {
 }
 
 async function bootstrap() {
-  // For Vercel/Serverless
-  if (process.env.VERCEL) {
-    if (!cachedApp) {
-      const app = await NestFactory.create(AppModule);
+  if (!cachedApp) {
+    console.log('Bootstrapping NestJS application...');
+    try {
+      const app = await NestFactory.create(AppModule, {
+        logger: ['error', 'warn', 'log', 'debug'], // Basic console logger for bootstrap phase
+      });
       await setupApp(app);
       cachedApp = app.getHttpAdapter().getInstance();
+      console.log('NestJS application bootstrapped successfully.');
+    } catch (err) {
+      console.error('NestJS Bootstrap Error:', err);
+      throw err;
     }
-    return cachedApp;
   }
-
-  // For Local/Railway
-  const app = await NestFactory.create(AppModule);
-  await setupApp(app);
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+  return cachedApp;
 }
 
-// Start local server if not in Vercel environment
+// For Local/Railway development
 if (!process.env.VERCEL) {
-  bootstrap();
+  (async () => {
+    try {
+      const app = await NestFactory.create(AppModule);
+      await setupApp(app);
+      const port = process.env.PORT || 3001;
+      await app.listen(port);
+      console.log(`Application is running on: http://localhost:${port}`);
+    } catch (err) {
+      console.error('Local bootstrap failed:', err);
+    }
+  })();
 }
 
 // Export for Vercel
 export default async (req: any, res: any) => {
-  const app = await bootstrap();
-  return app(req, res);
+  if (req.url === '/api/health') {
+    return res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  }
+
+  try {
+    const app = await bootstrap();
+    return app(req, res);
+  } catch (err) {
+    console.error('Vercel Invoke Error:', err);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    });
+  }
 };
