@@ -13,14 +13,14 @@ export class VendorsService {
     async create(companyId: string, dto: CreateVendorDto): Promise<VendorDocument> {
         const vendor = new this.vendorModel({
             ...dto,
-            companyId: new Types.ObjectId(companyId),
+            companyId: new (Types.ObjectId as any)(companyId),
         });
         return vendor.save();
     }
 
     async findAll(companyId: string): Promise<VendorDocument[]> {
         return this.vendorModel
-            .find({ companyId: new Types.ObjectId(companyId) })
+            .find({ companyId: new (Types.ObjectId as any)(companyId) })
             .sort({ name: 1 })
             .exec();
     }

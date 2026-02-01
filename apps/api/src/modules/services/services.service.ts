@@ -11,7 +11,7 @@ export class ServicesService {
   constructor(
     @InjectModel(Service.name) private serviceModel: Model<Service>,
     @InjectModel(Building.name) private buildingModel: Model<Building>,
-  ) {}
+  ) { }
 
   async create(
     companyId: string,
@@ -19,7 +19,7 @@ export class ServicesService {
   ): Promise<Service> {
     const service = new this.serviceModel({
       ...createServiceDto,
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
     });
     const saved = await service.save();
     await this.syncServiceBuildings(companyId, saved._id, createServiceDto.buildingIds);
@@ -27,7 +27,7 @@ export class ServicesService {
   }
 
   async findAll(companyId: string, activeOnly = false): Promise<Service[]> {
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
     if (activeOnly) {
       query.isActive = true;
     }
@@ -37,8 +37,8 @@ export class ServicesService {
   async findOne(companyId: string, id: string): Promise<Service> {
     const service = await this.serviceModel
       .findOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
@@ -57,8 +57,8 @@ export class ServicesService {
     const service = await this.serviceModel
       .findOneAndUpdate(
         {
-          _id: new Types.ObjectId(id),
-          companyId: new Types.ObjectId(companyId),
+          _id: new (Types.ObjectId as any)(id),
+          companyId: new (Types.ObjectId as any)(companyId),
         },
         { ...updateServiceDto, updatedAt: new Date() },
         { new: true },
@@ -76,8 +76,8 @@ export class ServicesService {
   async remove(companyId: string, id: string): Promise<void> {
     const result = await this.serviceModel
       .deleteOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
@@ -87,8 +87,8 @@ export class ServicesService {
 
     // Remove from buildings
     await this.buildingModel.updateMany(
-      { companyId: new Types.ObjectId(companyId), services: new Types.ObjectId(id) },
-      { $pull: { services: new Types.ObjectId(id) } },
+      { companyId: new (Types.ObjectId as any)(companyId), services: new (Types.ObjectId as any)(id) },
+      { $pull: { services: new (Types.ObjectId as any)(id) } },
     );
   }
 

@@ -14,7 +14,7 @@ export class ReportsService {
   ) { }
 
   async getRevenueReport(companyId: string, filters?: { fromDate?: string; toDate?: string }) {
-    const match: any = { companyId: new Types.ObjectId(companyId) };
+    const match: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.fromDate || filters?.toDate) {
       match.issueDate = {};
@@ -70,7 +70,7 @@ export class ReportsService {
   }
 
   async getOccupancyReport(companyId: string) {
-    const companyObjectId = new Types.ObjectId(companyId);
+    const companyObjectId = new (Types.ObjectId as any)(companyId);
 
     const [unitSummary, perBuilding] = await Promise.all([
       this.unitModel.aggregate([
@@ -155,7 +155,7 @@ export class ReportsService {
 
   async getOverdueReport(companyId: string) {
     const now = new Date();
-    const companyObjectId = new Types.ObjectId(companyId);
+    const companyObjectId = new (Types.ObjectId as any)(companyId);
 
     const [summary] = await this.invoiceModel
       .aggregate([
@@ -208,7 +208,7 @@ export class ReportsService {
   }
 
   async getCustomersReport(companyId: string) {
-    const companyObjectId = new Types.ObjectId(companyId);
+    const companyObjectId = new (Types.ObjectId as any)(companyId);
 
     const customers = await this.invoiceModel.aggregate([
       { $match: { companyId: companyObjectId } },
@@ -256,7 +256,7 @@ export class ReportsService {
   }
 
   async getUnitsReport(companyId: string) {
-    const companyObjectId = new Types.ObjectId(companyId);
+    const companyObjectId = new (Types.ObjectId as any)(companyId);
 
     const units = await this.invoiceModel.aggregate([
       { $match: { companyId: companyObjectId } },

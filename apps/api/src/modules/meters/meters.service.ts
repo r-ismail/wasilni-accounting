@@ -12,13 +12,13 @@ export class MetersService {
     @InjectModel(Meter.name) private meterModel: Model<MeterDocument>,
     @InjectModel(MeterReading.name) private meterReadingModel: Model<MeterReadingDocument>,
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
-  ) {}
+  ) { }
 
   async create(companyId: string, createMeterDto: CreateMeterDto) {
     const service = await this.serviceModel
       .findOne({
-        _id: new Types.ObjectId(createMeterDto.serviceId),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(createMeterDto.serviceId),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
@@ -28,18 +28,18 @@ export class MetersService {
 
     const meter = new this.meterModel({
       ...createMeterDto,
-      companyId: new Types.ObjectId(companyId),
-      buildingId: createMeterDto.buildingId ? new Types.ObjectId(createMeterDto.buildingId) : undefined,
-      unitId: createMeterDto.unitId ? new Types.ObjectId(createMeterDto.unitId) : undefined,
-      serviceId: new Types.ObjectId(createMeterDto.serviceId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      buildingId: createMeterDto.buildingId ? new (Types.ObjectId as any)(createMeterDto.buildingId) : undefined,
+      unitId: createMeterDto.unitId ? new (Types.ObjectId as any)(createMeterDto.unitId) : undefined,
+      serviceId: new (Types.ObjectId as any)(createMeterDto.serviceId),
     });
     return meter.save();
   }
 
   async findAll(companyId: string, type?: string) {
-    const filter: any = { companyId: new Types.ObjectId(companyId) };
+    const filter: any = { companyId: new (Types.ObjectId as any)(companyId) };
     if (type) filter.type = type;
-    
+
     return this.meterModel
       .find(filter)
       .populate('serviceId', 'name type')
@@ -50,12 +50,12 @@ export class MetersService {
 
   async findOne(companyId: string, id: string) {
     const meter = await this.meterModel
-      .findOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .findOne({ _id: new (Types.ObjectId as any)(id), companyId: new (Types.ObjectId as any)(companyId) })
       .populate('serviceId')
       .populate('buildingId')
       .populate('unitId')
       .exec();
-    
+
     if (!meter) throw new NotFoundException('Meter not found');
     return meter;
   }
@@ -63,21 +63,21 @@ export class MetersService {
   async update(companyId: string, id: string, updateMeterDto: UpdateMeterDto) {
     const meter = await this.meterModel
       .findOneAndUpdate(
-        { _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) },
+        { _id: new (Types.ObjectId as any)(id), companyId: new (Types.ObjectId as any)(companyId) },
         updateMeterDto,
         { new: true },
       )
       .exec();
-    
+
     if (!meter) throw new NotFoundException('Meter not found');
     return meter;
   }
 
   async remove(companyId: string, id: string) {
     const result = await this.meterModel
-      .deleteOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .deleteOne({ _id: new (Types.ObjectId as any)(id), companyId: new (Types.ObjectId as any)(companyId) })
       .exec();
-    
+
     if (result.deletedCount === 0) throw new NotFoundException('Meter not found');
     return { message: 'Meter deleted successfully' };
   }
@@ -85,7 +85,7 @@ export class MetersService {
   // Meter Readings
   async createReading(companyId: string, createReadingDto: CreateMeterReadingDto) {
     const meter = await this.findOne(companyId, createReadingDto.meterId);
-    
+
     // Get previous reading
     const previousReading = await this.meterReadingModel
       .findOne({ meterId: meter._id })
@@ -97,8 +97,8 @@ export class MetersService {
     const consumption = currentReading - prevValue;
 
     const reading = new this.meterReadingModel({
-      companyId: new Types.ObjectId(companyId),
-      meterId: new Types.ObjectId(createReadingDto.meterId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      meterId: new (Types.ObjectId as any)(createReadingDto.meterId),
       readingDate: new Date(createReadingDto.readingDate),
       currentReading,
       previousReading: prevValue,
@@ -113,8 +113,8 @@ export class MetersService {
   }
 
   async findReadings(companyId: string, meterId?: string) {
-    const filter: any = { companyId: new Types.ObjectId(companyId) };
-    if (meterId) filter.meterId = new Types.ObjectId(meterId);
+    const filter: any = { companyId: new (Types.ObjectId as any)(companyId) };
+    if (meterId) filter.meterId = new (Types.ObjectId as any)(meterId);
 
     return this.meterReadingModel
       .find(filter)
@@ -125,7 +125,7 @@ export class MetersService {
 
   async updateReading(companyId: string, id: string, updateReadingDto: UpdateMeterReadingDto) {
     const reading = await this.meterReadingModel
-      .findOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .findOne({ _id: new (Types.ObjectId as any)(id), companyId: new (Types.ObjectId as any)(companyId) })
       .exec();
 
     if (!reading) throw new NotFoundException('Reading not found');
@@ -137,7 +137,7 @@ export class MetersService {
       }
       const duplicate = await this.meterReadingModel
         .findOne({
-          companyId: new Types.ObjectId(companyId),
+          companyId: new (Types.ObjectId as any)(companyId),
           meterId: reading.meterId,
           readingDate,
           _id: { $ne: reading._id },
@@ -168,7 +168,7 @@ export class MetersService {
 
   async removeReading(companyId: string, id: string) {
     const reading = await this.meterReadingModel
-      .findOne({ _id: new Types.ObjectId(id), companyId: new Types.ObjectId(companyId) })
+      .findOne({ _id: new (Types.ObjectId as any)(id), companyId: new (Types.ObjectId as any)(companyId) })
       .exec();
 
     if (!reading) throw new NotFoundException('Reading not found');
@@ -184,8 +184,8 @@ export class MetersService {
     // Get building meter readings for the date
     const buildingMeters = await this.meterModel
       .find({
-        companyId: new Types.ObjectId(companyId),
-        buildingId: new Types.ObjectId(buildingId),
+        companyId: new (Types.ObjectId as any)(companyId),
+        buildingId: new (Types.ObjectId as any)(buildingId),
         type: 'building',
       })
       .exec();

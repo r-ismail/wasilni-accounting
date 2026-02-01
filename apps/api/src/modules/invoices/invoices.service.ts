@@ -47,8 +47,8 @@ export class InvoicesService {
     // Check for existing invoice for same period
     const existing = await this.invoiceModel
       .findOne({
-        companyId: new Types.ObjectId(companyId),
-        contractId: new Types.ObjectId(contractId),
+        companyId: new (Types.ObjectId as any)(companyId),
+        contractId: new (Types.ObjectId as any)(contractId),
         periodStart: startDate,
       })
       .exec();
@@ -107,8 +107,8 @@ export class InvoicesService {
     }
 
     const invoice = new this.invoiceModel({
-      companyId: new Types.ObjectId(companyId),
-      contractId: new Types.ObjectId(contractId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      contractId: new (Types.ObjectId as any)(contractId),
       invoiceNumber,
       periodStart: startDate,
       periodEnd: endDate,
@@ -172,14 +172,14 @@ export class InvoicesService {
       overdue?: string;
     },
   ): Promise<InvoiceDocument[]> {
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.status) {
       query.status = filters.status;
     }
 
     if (filters?.contractId) {
-      query.contractId = new Types.ObjectId(filters.contractId);
+      query.contractId = new (Types.ObjectId as any)(filters.contractId);
     }
 
     if (filters?.fromDate) {
@@ -233,7 +233,7 @@ export class InvoicesService {
 
   async getInvoiceLines(invoiceId: string): Promise<InvoiceLineDocument[]> {
     return this.invoiceLineModel
-      .find({ invoiceId: new Types.ObjectId(invoiceId) })
+      .find({ invoiceId: new (Types.ObjectId as any)(invoiceId) })
       .populate('serviceId')
       .exec();
   }
@@ -302,7 +302,7 @@ export class InvoicesService {
     buildingId?: string,
   ): Promise<void> {
     const filter: any = {
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
       isActive: true,
       type: { $in: ['fixed_fee', 'variable'] },
     };
@@ -310,8 +310,8 @@ export class InvoicesService {
     if (buildingId) {
       const building = await this.buildingModel
         .findOne({
-          _id: new Types.ObjectId(buildingId),
-          companyId: new Types.ObjectId(companyId),
+          _id: new (Types.ObjectId as any)(buildingId),
+          companyId: new (Types.ObjectId as any)(companyId),
         })
         .select('services')
         .exec();
@@ -330,7 +330,7 @@ export class InvoicesService {
     // Create invoice lines for each service
     for (const service of services) {
       const serviceLine = new this.invoiceLineModel({
-        invoiceId: new Types.ObjectId(invoiceId),
+        invoiceId: new (Types.ObjectId as any)(invoiceId),
         type: 'service',
         description: service.name,
         quantity: 1,
@@ -351,7 +351,7 @@ export class InvoicesService {
     // Find the last invoice for this month
     const lastInvoice = await this.invoiceModel
       .findOne({
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
         invoiceNumber: { $regex: `^${prefix}` },
       })
       .sort({ invoiceNumber: -1 })
@@ -383,8 +383,8 @@ export class InvoicesService {
   ): Promise<void> {
     const meters = await this.meterModel
       .find({
-        companyId: new Types.ObjectId(companyId),
-        unitId: new Types.ObjectId(unitId),
+        companyId: new (Types.ObjectId as any)(companyId),
+        unitId: new (Types.ObjectId as any)(unitId),
         type: 'unit',
         isActive: true,
       })
@@ -417,7 +417,7 @@ export class InvoicesService {
       }
 
       const meterLine = new this.invoiceLineModel({
-        invoiceId: new Types.ObjectId(invoiceId),
+        invoiceId: new (Types.ObjectId as any)(invoiceId),
         type: 'meter',
         description: descriptionParts.join(' '),
         quantity: totalConsumption,

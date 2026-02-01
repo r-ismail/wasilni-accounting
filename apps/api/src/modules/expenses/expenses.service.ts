@@ -13,8 +13,8 @@ export class ExpensesService {
     async create(companyId: string, userId: string, dto: CreateExpenseDto): Promise<ExpenseDocument> {
         const expense = new this.expenseModel({
             ...dto,
-            companyId: new Types.ObjectId(companyId),
-            recordedBy: new Types.ObjectId(userId),
+            companyId: new (Types.ObjectId as any)(companyId),
+            recordedBy: new (Types.ObjectId as any)(userId),
         });
         return expense.save();
     }
@@ -23,7 +23,7 @@ export class ExpensesService {
         companyId: string,
         filters?: { fromDate?: string; toDate?: string; vendorId?: string; buildingId?: string }
     ): Promise<ExpenseDocument[]> {
-        const query: any = { companyId: new Types.ObjectId(companyId) };
+        const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
         if (filters?.fromDate || filters?.toDate) {
             query.date = {};
@@ -32,11 +32,11 @@ export class ExpensesService {
         }
 
         if (filters?.vendorId) {
-            query.vendorId = new Types.ObjectId(filters.vendorId);
+            query.vendorId = new (Types.ObjectId as any)(filters.vendorId);
         }
 
         if (filters?.buildingId) {
-            query.buildingId = new Types.ObjectId(filters.buildingId);
+            query.buildingId = new (Types.ObjectId as any)(filters.buildingId);
         }
 
         return this.expenseModel

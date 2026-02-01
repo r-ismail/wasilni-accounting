@@ -14,12 +14,12 @@ export class CustomersService {
     @InjectModel(Contract.name) private contractModel: Model<ContractDocument>,
     @InjectModel(Invoice.name) private invoiceModel: Model<InvoiceDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
-  ) {}
+  ) { }
 
   async create(companyId: string, createCustomerDto: CreateCustomerDto): Promise<CustomerDocument> {
     // Check if phone already exists for this company
     const existing = await this.customerModel.findOne({
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
       phone: createCustomerDto.phone,
     });
 
@@ -29,7 +29,7 @@ export class CustomersService {
 
     const customer = new this.customerModel({
       ...createCustomerDto,
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
     });
 
     return customer.save();
@@ -39,7 +39,7 @@ export class CustomersService {
     companyId: string,
     filters?: { search?: string; type?: string; activeOnly?: boolean },
   ): Promise<CustomerDocument[]> {
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.type) {
       query.type = filters.type;
@@ -62,8 +62,8 @@ export class CustomersService {
 
   async findOne(companyId: string, id: string): Promise<CustomerDocument> {
     const customer = await this.customerModel.findOne({
-      _id: new Types.ObjectId(id),
-      companyId: new Types.ObjectId(companyId),
+      _id: new (Types.ObjectId as any)(id),
+      companyId: new (Types.ObjectId as any)(companyId),
     }).exec();
 
     if (!customer) {
@@ -75,8 +75,8 @@ export class CustomersService {
 
   async getProfile(companyId: string, id: string): Promise<any> {
     const customer = await this.findOne(companyId, id);
-    const companyObjectId = new Types.ObjectId(companyId);
-    const customerObjectId = new Types.ObjectId(id);
+    const companyObjectId = new (Types.ObjectId as any)(companyId);
+    const customerObjectId = new (Types.ObjectId as any)(id);
 
     const contracts = await this.contractModel
       .find({
@@ -94,21 +94,21 @@ export class CustomersService {
     const contractIds = contracts.map((contract) => contract._id);
     const invoices = contractIds.length
       ? await this.invoiceModel
-          .find({
-            companyId: companyObjectId,
-            contractId: { $in: contractIds },
-          })
-          .populate({
-            path: 'contractId',
-            select: 'unitId startDate endDate',
-            populate: {
-              path: 'unitId',
-              select: 'unitNumber buildingId',
-              populate: { path: 'buildingId', select: 'name' },
-            },
-          })
-          .sort({ issueDate: -1 })
-          .exec()
+        .find({
+          companyId: companyObjectId,
+          contractId: { $in: contractIds },
+        })
+        .populate({
+          path: 'contractId',
+          select: 'unitId startDate endDate',
+          populate: {
+            path: 'unitId',
+            select: 'unitNumber buildingId',
+            populate: { path: 'buildingId', select: 'name' },
+          },
+        })
+        .sort({ issueDate: -1 })
+        .exec()
       : [];
 
     const payments = await this.paymentModel
@@ -146,11 +146,11 @@ export class CustomersService {
     const activeContracts = contracts.filter((contract) => contract.isActive).length;
     const lastPayment = payments.length
       ? {
-          amount: payments[0].amount,
-          paymentDate: payments[0].paymentDate,
-          paymentMethod: payments[0].paymentMethod,
-          invoiceId: payments[0].invoiceId,
-        }
+        amount: payments[0].amount,
+        paymentDate: payments[0].paymentDate,
+        paymentMethod: payments[0].paymentMethod,
+        invoiceId: payments[0].invoiceId,
+      }
       : null;
 
     return {

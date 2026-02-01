@@ -7,13 +7,13 @@ import { BulkCreateUnitsDto } from './dto/bulk-create-units.dto';
 
 @Injectable()
 export class UnitsService {
-  constructor(@InjectModel(Unit.name) private unitModel: Model<Unit>) {}
+  constructor(@InjectModel(Unit.name) private unitModel: Model<Unit>) { }
 
   async create(companyId: string, createUnitDto: CreateUnitDto): Promise<Unit> {
     const unit = new this.unitModel({
       ...createUnitDto,
-      companyId: new Types.ObjectId(companyId),
-      buildingId: new Types.ObjectId(createUnitDto.buildingId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      buildingId: new (Types.ObjectId as any)(createUnitDto.buildingId),
       usageType: createUnitDto.usageType || UsageType.APARTMENT,
     });
     return unit.save();
@@ -28,8 +28,8 @@ export class UnitsService {
     for (let i = 0; i < bulkCreateDto.count; i++) {
       const unitNumber = (bulkCreateDto.startNumber + i).toString();
       units.push({
-        companyId: new Types.ObjectId(companyId),
-        buildingId: new Types.ObjectId(bulkCreateDto.buildingId),
+        companyId: new (Types.ObjectId as any)(companyId),
+        buildingId: new (Types.ObjectId as any)(bulkCreateDto.buildingId),
         unitNumber,
         furnishingStatus: bulkCreateDto.furnishingStatus,
         usageType: bulkCreateDto.usageType || UsageType.APARTMENT,
@@ -49,10 +49,10 @@ export class UnitsService {
       furnishingStatus?: string;
     },
   ): Promise<Unit[]> {
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.buildingId) {
-      query.buildingId = new Types.ObjectId(filters.buildingId);
+      query.buildingId = new (Types.ObjectId as any)(filters.buildingId);
     }
     if (filters?.status) {
       query.status = filters.status;
@@ -67,8 +67,8 @@ export class UnitsService {
   async findOne(companyId: string, id: string): Promise<Unit> {
     const unit = await this.unitModel
       .findOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
@@ -87,8 +87,8 @@ export class UnitsService {
     const unit = await this.unitModel
       .findOneAndUpdate(
         {
-          _id: new Types.ObjectId(id),
-          companyId: new Types.ObjectId(companyId),
+          _id: new (Types.ObjectId as any)(id),
+          companyId: new (Types.ObjectId as any)(companyId),
         },
         { ...updateUnitDto, updatedAt: new Date() },
         { new: true },
@@ -105,8 +105,8 @@ export class UnitsService {
   async remove(companyId: string, id: string): Promise<void> {
     const result = await this.unitModel
       .deleteOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 

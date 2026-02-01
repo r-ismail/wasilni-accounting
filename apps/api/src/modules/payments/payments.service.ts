@@ -10,7 +10,7 @@ export class PaymentsService {
   constructor(
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     @InjectModel(Invoice.name) private invoiceModel: Model<InvoiceDocument>,
-  ) {}
+  ) { }
 
   async create(
     createPaymentDto: CreatePaymentDto,
@@ -19,15 +19,15 @@ export class PaymentsService {
   ): Promise<PaymentDocument> {
     // Get invoice
     // Convert string to ObjectId if needed
-    const invoiceId = typeof createPaymentDto.invoiceId === 'string' 
-      ? new Types.ObjectId(createPaymentDto.invoiceId)
+    const invoiceId = typeof createPaymentDto.invoiceId === 'string'
+      ? new (Types.ObjectId as any)(createPaymentDto.invoiceId)
       : createPaymentDto.invoiceId;
-    
+
     // Convert companyId to ObjectId if needed
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
-    
+
     const invoice = await this.invoiceModel
       .findOne({ _id: invoiceId, companyId: companyObjectId })
       .populate({
@@ -36,7 +36,7 @@ export class PaymentsService {
           path: 'customerId',
         },
       });
-    
+
     if (!invoice) {
       throw new NotFoundException('Invoice not found');
     }
@@ -52,9 +52,9 @@ export class PaymentsService {
     // Create payment
     // Convert userId to ObjectId if needed
     const userObjectId = typeof userId === 'string'
-      ? new Types.ObjectId(userId)
+      ? new (Types.ObjectId as any)(userId)
       : userId;
-    
+
     const payment = new this.paymentModel({
       ...createPaymentDto,
       companyId: companyObjectId,
@@ -68,7 +68,7 @@ export class PaymentsService {
 
     // Update invoice paid amount
     invoice.paidAmount += createPaymentDto.amount;
-    
+
     // Update invoice status
     if (invoice.paidAmount >= invoice.totalAmount) {
       invoice.status = 'paid';
@@ -84,9 +84,9 @@ export class PaymentsService {
   async findAll(companyId: string, filters?: any): Promise<PaymentDocument[]> {
     // Convert companyId to ObjectId if needed
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
-    
+
     const query: any = { companyId: companyObjectId };
 
     if (filters?.invoiceId) {
@@ -114,9 +114,9 @@ export class PaymentsService {
   async findOne(id: string, companyId: string): Promise<PaymentDocument> {
     // Convert companyId to ObjectId if needed
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
-    
+
     const payment = await this.paymentModel
       .findOne({ _id: id, companyId: companyObjectId })
       .populate('invoiceId')
@@ -133,7 +133,7 @@ export class PaymentsService {
 
   async delete(id: string, companyId: string): Promise<void> {
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
     const payment = await this.paymentModel.findOne({ _id: id, companyId: companyObjectId });
 
@@ -169,7 +169,7 @@ export class PaymentsService {
     companyId: string,
   ): Promise<PaymentDocument[]> {
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
     return this.paymentModel
       .find({ invoiceId, companyId: companyObjectId })
@@ -183,7 +183,7 @@ export class PaymentsService {
     companyId: string,
   ): Promise<PaymentDocument[]> {
     const companyObjectId = typeof companyId === 'string'
-      ? new Types.ObjectId(companyId)
+      ? new (Types.ObjectId as any)(companyId)
       : companyId;
     return this.paymentModel
       .find({ contractId, companyId: companyObjectId })

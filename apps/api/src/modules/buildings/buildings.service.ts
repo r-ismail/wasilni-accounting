@@ -10,7 +10,7 @@ export class BuildingsService {
   constructor(
     @InjectModel(Building.name) private buildingModel: Model<Building>,
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
-  ) {}
+  ) { }
 
   async create(
     companyId: string,
@@ -20,7 +20,7 @@ export class BuildingsService {
 
     const building = new this.buildingModel({
       ...createBuildingDto,
-      companyId: new Types.ObjectId(companyId),
+      companyId: new (Types.ObjectId as any)(companyId),
       services,
     });
     return building.save();
@@ -28,7 +28,7 @@ export class BuildingsService {
 
   async findAll(companyId: string): Promise<Building[]> {
     return this.buildingModel
-      .find({ companyId: new Types.ObjectId(companyId) })
+      .find({ companyId: new (Types.ObjectId as any)(companyId) })
       .populate('services', 'name type')
       .sort({ createdAt: -1 })
       .exec();
@@ -37,8 +37,8 @@ export class BuildingsService {
   async findOne(companyId: string, id: string): Promise<Building> {
     const building = await this.buildingModel
       .findOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .populate('services', 'name type')
       .exec();
@@ -63,8 +63,8 @@ export class BuildingsService {
     const building = await this.buildingModel
       .findOneAndUpdate(
         {
-          _id: new Types.ObjectId(id),
-          companyId: new Types.ObjectId(companyId),
+          _id: new (Types.ObjectId as any)(id),
+          companyId: new (Types.ObjectId as any)(companyId),
         },
         { ...updateBuildingDto, ...(services ? { services } : {}), updatedAt: new Date() },
         { new: true },
@@ -82,8 +82,8 @@ export class BuildingsService {
   async remove(companyId: string, id: string): Promise<void> {
     const result = await this.buildingModel
       .deleteOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
@@ -97,11 +97,11 @@ export class BuildingsService {
     serviceIds?: string[] | Types.ObjectId[],
   ): Promise<Types.ObjectId[] | undefined> {
     if (!serviceIds) return undefined;
-    const ids = serviceIds.map((id) => new Types.ObjectId(id));
+    const ids = serviceIds.map((id) => new (Types.ObjectId as any)(id));
     const count = await this.serviceModel
       .countDocuments({
         _id: { $in: ids },
-        companyId: new Types.ObjectId(companyId),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 

@@ -35,8 +35,8 @@ export class ContractsService {
 
     // Check for overlapping active contracts for this unit
     const overlapping = await this.contractModel.findOne({
-      companyId: new Types.ObjectId(companyId),
-      unitId: new Types.ObjectId(createContractDto.unitId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      unitId: new (Types.ObjectId as any)(createContractDto.unitId),
       isActive: true,
       $or: [
         {
@@ -53,9 +53,9 @@ export class ContractsService {
     // Create contract
     const contract = new this.contractModel({
       ...createContractDto,
-      companyId: new Types.ObjectId(companyId),
-      unitId: new Types.ObjectId(createContractDto.unitId),
-      customerId: new Types.ObjectId(createContractDto.customerId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      unitId: new (Types.ObjectId as any)(createContractDto.unitId),
+      customerId: new (Types.ObjectId as any)(createContractDto.customerId),
       startDate,
       endDate,
     });
@@ -74,14 +74,14 @@ export class ContractsService {
     companyId: string,
     filters?: { unitId?: string; customerId?: string; activeOnly?: boolean },
   ): Promise<ContractDocument[]> {
-    const query: any = { companyId: new Types.ObjectId(companyId) };
+    const query: any = { companyId: new (Types.ObjectId as any)(companyId) };
 
     if (filters?.unitId) {
-      query.unitId = new Types.ObjectId(filters.unitId);
+      query.unitId = new (Types.ObjectId as any)(filters.unitId);
     }
 
     if (filters?.customerId) {
-      query.customerId = new Types.ObjectId(filters.customerId);
+      query.customerId = new (Types.ObjectId as any)(filters.customerId);
     }
 
     if (filters?.activeOnly) {
@@ -102,8 +102,8 @@ export class ContractsService {
   async findOne(companyId: string, id: string): Promise<ContractDocument> {
     const contract = await this.contractModel
       .findOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .populate({
         path: 'unitId',
@@ -137,8 +137,8 @@ export class ContractsService {
     const contract = await this.contractModel
       .findOneAndUpdate(
         {
-          _id: new Types.ObjectId(id),
-          companyId: new Types.ObjectId(companyId),
+          _id: new (Types.ObjectId as any)(id),
+          companyId: new (Types.ObjectId as any)(companyId),
         },
         { $set: updateContractDto },
         { new: true },
@@ -193,8 +193,8 @@ export class ContractsService {
     }
 
     const overlapping = await this.contractModel.findOne({
-      companyId: new Types.ObjectId(companyId),
-      unitId: new Types.ObjectId(unitId),
+      companyId: new (Types.ObjectId as any)(companyId),
+      unitId: new (Types.ObjectId as any)(unitId),
       isActive: true,
       _id: { $ne: contract._id },
     });
@@ -226,8 +226,8 @@ export class ContractsService {
 
     const result = await this.contractModel
       .deleteOne({
-        _id: new Types.ObjectId(id),
-        companyId: new Types.ObjectId(companyId),
+        _id: new (Types.ObjectId as any)(id),
+        companyId: new (Types.ObjectId as any)(companyId),
       })
       .exec();
 
