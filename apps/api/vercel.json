@@ -1,16 +1,24 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/main.js",
-      "use": "@vercel/node"
+  "functions": {
+    "src/main.ts": {
+      "memory": 1024,
+      "maxDuration": 10,
+      "includeFiles": "../../packages/shared/src/**"
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "dist/main.js",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+      "src": "/api/health",
+      "dest": "src/main.ts"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "src/main.ts"
+    },
+    {
+      "src": "/health",
+      "dest": "src/main.ts"
     }
   ],
   "env": {
