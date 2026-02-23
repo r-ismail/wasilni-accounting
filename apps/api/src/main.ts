@@ -3,14 +3,16 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 let cachedApp: any;
 
 async function setupApp(app: INestApplication) {
-  // Set global prefix
-  app.setGlobalPrefix('api');
+  // We remove the global 'api' prefix to allow both /api/path and /path 
+  // depending on the Vercel routing, and to match the user's frontend requests.
+  // app.setGlobalPrefix('api'); 
 
-  // Enable CORS with broad support for Vercel preview environments
+  // Enable CORS with broad support for Vercel environments
   const defaultOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
@@ -26,14 +28,12 @@ async function setupApp(app: INestApplication) {
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow if no origin (like mobile apps or curl) or matched
       if (!origin ||
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
         /localhost:\d+$/.test(origin)) {
         callback(null, true);
       } else {
-        console.warn(`CORS blocked for origin: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
     },
@@ -70,12 +70,10 @@ async function setupApp(app: INestApplication) {
 
 async function bootstrap() {
   if (!cachedApp) {
-    console.log('Bootstrapping NestJS application...');
     try {
       const app = await NestFactory.create(AppModule);
       await setupApp(app);
       cachedApp = app.getHttpAdapter().getInstance();
-      console.log('NestJS application bootstrapped successfully.');
     } catch (err) {
       console.error('NestJS Bootstrap Error:', err);
       throw err;
@@ -86,7 +84,7 @@ async function bootstrap() {
 
 // Export for Vercel
 export default async (req: any, res: any) => {
-  // Manual CORS for the health check and initial requests
+  // Standard CORS for health checks
   const origin = req.headers.origin;
   if (origin && (origin.endsWith('.vercel.app') || origin.includes('localhost'))) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -95,22 +93,29 @@ export default async (req: any, res: any) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
 
-  // Handle OPTIONS preflight manually to ensure it always succeeds
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
 
-  if (req.url === '/api/health' || req.url === '/health') {
+  // Support health checks at various common paths
+  const normalizedUrl = req.url.split('?')[0];
+  if (['/api/health', '/health', '/api', '/'].includes(normalizedUrl)) {
     return res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      env: process.env.NODE_ENV,
-      vercel: !!process.env.VERCEL
+      message: 'Wasilni Accounting API is running'
     });
   }
 
   try {
     const app = await bootstrap();
+    // Vercel routes sometimes pass /api/auth/login, NestJS should receive it
+    // If NestJS doesn't have a prefix, it will look for a controller at /api/auth
+    // To fix this, we can strip /api if it exists before passing to NestJS
+    if (req.url.startsWith('/api/')) {
+      req.url = req.url.replace('/api/', '/');
+    }
+
     return app(req, res);
   } catch (err) {
     console.error('Vercel Invoke Error:', err);
@@ -122,7 +127,7 @@ export default async (req: any, res: any) => {
 };
 
 // Local development server
-if (!process.env.VERCEL && require.main === module) {
+if (!process.env.VERCEL) {
   (async () => {
     const app = await NestFactory.create(AppModule);
     await setupApp(app);
